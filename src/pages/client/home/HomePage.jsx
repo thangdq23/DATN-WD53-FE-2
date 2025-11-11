@@ -25,7 +25,7 @@ const { Option } = Select;
 const { TabPane } = Tabs;
 const { Text, Link } = Typography;
 
-const DEFAULT_POSTER = bannerImg;
+const DEFAULT_POSTER = posterTraiTim;
 const DEFAULT_BANNER = bannerImg;
 
 const BANNER_URL = bannerImg;
@@ -119,6 +119,14 @@ const styles = {
     objectFit: "cover",
     display: "block",
   },
+
+  contentWrap: {
+    width: "100%",
+    maxWidth: 1280,
+    margin: "0 auto",
+    padding: "0 24px",
+    boxSizing: "border-box",
+  },
   posterWrap: {
     position: "relative",
     borderRadius: 12,
@@ -188,8 +196,7 @@ const HomePage = () => {
   }, [movies, query, genre, sort]);
 
   return (
-    <div style={{ padding: 24 }}>
-      {/* Banner */}
+    <div>
       <div style={styles.bannerWrap}>
         <img
           src={BANNER_URL}
@@ -202,113 +209,116 @@ const HomePage = () => {
         />
       </div>
 
-      {/* Tabs */}
-      <div
-        style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}
-      >
-        <Tabs activeKey={tabKey} onChange={(k) => setTabKey(k)} centered>
-          <TabPane tab={<b>PHIM SẮP CHIẾU</b>} key="coming" />
-          <TabPane tab={<b>PHIM ĐANG CHIẾU</b>} key="now" />
-          <TabPane tab={<b>SUẤT CHIẾU ĐẶC BIỆT</b>} key="special" />
-        </Tabs>
-      </div>
+      <div style={styles.contentWrap}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: 18,
+          }}
+        >
+          <Tabs activeKey={tabKey} onChange={(k) => setTabKey(k)} centered>
+            <TabPane tab={<b>PHIM SẮP CHIẾU</b>} key="coming" />
+            <TabPane tab={<b>PHIM ĐANG CHIẾU</b>} key="now" />
+            <TabPane tab={<b>SUẤT CHIẾU ĐẶC BIỆT</b>} key="special" />
+          </Tabs>
+        </div>
 
-      {/* Controls */}
-      <Row gutter={[12, 12]} style={{ marginBottom: 12 }}>
-        <Col xs={24} sm={12} md={10} lg={8}>
-          <Search
-            placeholder="Tìm theo tiêu đề..."
-            allowClear
-            enterButton
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </Col>
+        <Row gutter={[12, 12]} style={{ marginBottom: 12 }}>
+          <Col xs={24} sm={12} md={10} lg={8}>
+            <Search
+              placeholder="Tìm theo tiêu đề..."
+              allowClear
+              enterButton
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </Col>
 
-        <Col xs={12} sm={6} md={4} lg={4}>
-          <Select
-            style={{ width: "100%" }}
-            value={genre}
-            onChange={(v) => setGenre(v)}
-          >
-            {genres.map((g) => (
-              <Option key={g} value={g}>
-                {g}
-              </Option>
-            ))}
-          </Select>
-        </Col>
+          <Col xs={12} sm={6} md={4} lg={4}>
+            <Select
+              style={{ width: "100%" }}
+              value={genre}
+              onChange={(v) => setGenre(v)}
+            >
+              {genres.map((g) => (
+                <Option key={g} value={g}>
+                  {g}
+                </Option>
+              ))}
+            </Select>
+          </Col>
 
-        <Col xs={12} sm={6} md={6} lg={6}>
-          <Select
-            style={{ width: "100%" }}
-            value={sort}
-            onChange={(v) => setSort(v)}
-          >
-            <Option value="popular">Mặc định</Option>
-            <Option value="rating">Đánh giá cao</Option>
-            <Option value="year_desc">Năm giảm dần</Option>
-            <Option value="year_asc">Năm tăng dần</Option>
-          </Select>
-        </Col>
+          <Col xs={12} sm={6} md={6} lg={6}>
+            <Select
+              style={{ width: "100%" }}
+              value={sort}
+              onChange={(v) => setSort(v)}
+            >
+              <Option value="popular">Mặc định</Option>
+              <Option value="rating">Đánh giá cao</Option>
+              <Option value="year_desc">Năm giảm dần</Option>
+              <Option value="year_asc">Năm tăng dần</Option>
+            </Select>
+          </Col>
 
-        <Col xs={24} style={{ textAlign: "right" }}>
-          <Button
-            onClick={() => {
-              setQuery("");
-              setGenre("All");
-              setSort("popular");
-            }}
-          >
-            Reset
-          </Button>
-        </Col>
-      </Row>
-
-      {/* Movie grid */}
-      {filtered.length === 0 ? (
-        <Empty description="Không có phim" />
-      ) : (
-        <Row gutter={[24, 28]}>
-          {filtered.map((m) => (
-            <Col key={m.id} xs={12} sm={12} md={8} lg={6}>
-              <Card style={styles.cardNoShadow} bodyStyle={styles.cardBody}>
-                <div style={styles.posterWrap}>
-                  <div style={styles.ageTag}>{m.age}</div>
-                  <img
-                    src={m.poster}
-                    alt={m.title}
-                    style={styles.posterImg}
-                    loading="lazy"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = DEFAULT_POSTER;
-                    }}
-                  />
-                </div>
-
-                <div style={{ paddingTop: 8 }}>
-                  <Link
-                    style={styles.titleLink}
-                    onClick={() => alert(`Mở chi tiết: ${m.title}`)}
-                  >
-                    {m.title}
-                  </Link>
-                  <div style={styles.metaSmall}>
-                    Thể loại: <Text strong>{m.genres.join(", ")}</Text>
-                  </div>
-                  <div style={styles.metaSmall}>
-                    Thời lượng: <Text strong>{m.duration}</Text>
-                  </div>
-                  <div style={styles.metaSmallMuted}>
-                    Ngày khởi chiếu: <Text strong>{m.releaseDate}</Text>
-                  </div>
-                </div>
-              </Card>
-            </Col>
-          ))}
+          <Col xs={24} style={{ textAlign: "right" }}>
+            <Button
+              onClick={() => {
+                setQuery("");
+                setGenre("All");
+                setSort("popular");
+              }}
+            >
+              Reset
+            </Button>
+          </Col>
         </Row>
-      )}
+
+        {filtered.length === 0 ? (
+          <Empty description="Không có phim" />
+        ) : (
+          <Row gutter={[24, 28]}>
+            {filtered.map((m) => (
+              <Col key={m.id} xs={12} sm={12} md={8} lg={6}>
+                <Card style={styles.cardNoShadow} bodyStyle={styles.cardBody}>
+                  <div style={styles.posterWrap}>
+                    <div style={styles.ageTag}>{m.age}</div>
+                    <img
+                      src={m.poster}
+                      alt={m.title}
+                      style={styles.posterImg}
+                      loading="lazy"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = DEFAULT_POSTER;
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ paddingTop: 8 }}>
+                    <Link
+                      style={styles.titleLink}
+                      onClick={() => alert(`Mở chi tiết: ${m.title}`)}
+                    >
+                      {m.title}
+                    </Link>
+                    <div style={styles.metaSmall}>
+                      Thể loại: <Text strong>{m.genres.join(", ")}</Text>
+                    </div>
+                    <div style={styles.metaSmall}>
+                      Thời lượng: <Text strong>{m.duration}</Text>
+                    </div>
+                    <div style={styles.metaSmallMuted}>
+                      Ngày khởi chiếu: <Text strong>{m.releaseDate}</Text>
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        )}
+      </div>
     </div>
   );
 };
