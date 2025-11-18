@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Table,
-  Button,
-  Space,
-  Modal,
-  message,
-  Input,
-  Typography,
-  Select,
-} from "antd";
+import { Table, Button, Space, Modal, Input, Typography, Select } from "antd";
 import {
   PlusOutlined,
   EditOutlined,
@@ -18,17 +9,20 @@ import {
 } from "@ant-design/icons";
 import axios from "axios";
 import GenreForm from "./GenreForm";
+import { useMessage } from "../../../common/hooks/useMessage";
 
 const { Title } = Typography;
 
 const GenrePage = () => {
+  const { antdMessage, HandleError } = useMessage();
+
   const [genres, setGenres] = useState([]);
   const [filteredGenres, setFilteredGenres] = useState([]);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [editingGenre, setEditingGenre] = useState(null);
   const [searchText, setSearchText] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all"); // ✅ thêm lọc trạng thái
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const fetchGenres = async () => {
     try {
@@ -38,8 +32,7 @@ const GenrePage = () => {
       setGenres(data);
       setFilteredGenres(data);
     } catch (error) {
-      console.error(error);
-      message.error("Lỗi khi tải danh sách thể loại!");
+      HandleError(error, { fallback: "Lỗi khi tải danh sách thể loại!" });
     } finally {
       setLoading(false);
     }
@@ -53,16 +46,14 @@ const GenrePage = () => {
     setSearchText(value);
     setStatusFilter(status);
 
-    let filtered = genres;
+    let filtered = [...genres];
 
-    // Lọc theo tên
     if (value) {
       filtered = filtered.filter((item) =>
         item.name.toLowerCase().includes(value.toLowerCase()),
       );
     }
 
-    // Lọc theo trạng thái
     if (status !== "all") {
       const isActive = status === "active";
       filtered = filtered.filter((item) => item.status === isActive);
@@ -76,11 +67,10 @@ const GenrePage = () => {
       await axios.patch(`http://localhost:8000/api/genre/status/${genre._id}`, {
         status: !genre.status,
       });
-      message.success(`Cập nhật trạng thái thành công!`);
+      antdMessage.success("Cập nhật trạng thái thành công!");
       fetchGenres();
     } catch (error) {
-      console.error(error);
-      message.error("Cập nhật trạng thái thất bại!");
+      HandleError(error, { fallback: "Cập nhật trạng thái thất bại!" });
     }
   };
 
@@ -94,13 +84,14 @@ const GenrePage = () => {
       title: "Mô tả",
       dataIndex: "description",
       key: "description",
+      ellipsis: true,
     },
     {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
       render: (status) => (
-        <span style={{ color: status ? "green" : "red" }}>
+        <span style={{ color: status ? "green" : "red", fontWeight: 500 }}>
           {status ? "Hoạt động" : "Đang khóa"}
         </span>
       ),
@@ -108,9 +99,12 @@ const GenrePage = () => {
     {
       title: "Hành động",
       key: "actions",
+      width: 120,
+      align: "center",
       render: (_, record) => (
-        <Space>
+        <Space size="middle">
           <Button
+            size="small"
             icon={<EditOutlined />}
             onClick={() => {
               setEditingGenre(record);
@@ -118,6 +112,8 @@ const GenrePage = () => {
             }}
           />
           <Button
+            size="small"
+            danger={record.status}
             icon={record.status ? <LockOutlined /> : <UnlockOutlined />}
             onClick={() => toggleStatus(record)}
           />
@@ -127,20 +123,17 @@ const GenrePage = () => {
   ];
 
   return (
-    <div>
-      <Title level={2} style={{ marginBottom: 30 }}>
-        Quản lý thể loại phim
-      </Title>
+    <div style={{ padding: "20px" }}>
+      <Title level={2}>Quản lý thể loại phim</Title>
 
-      {/*Bộ lọc: tìm kiếm + lọc trạng thái */}
-      <Space style={{ marginBottom: 16 }}>
+      <Space style={{ marginBottom: 16 }} wrap>
         <Input
           placeholder="Tìm kiếm theo tên thể loại..."
           prefix={<SearchOutlined />}
           value={searchText}
           onChange={(e) => handleSearch(e.target.value, statusFilter)}
           allowClear
-          style={{ width: 250 }}
+          style={{ width: 300 }}
         />
 
         <Select
@@ -162,7 +155,7 @@ const GenrePage = () => {
             setOpenModal(true);
           }}
         >
-          Thêm thể loại
+          Thêm thể loại mới
         </Button>
       </Space>
 
@@ -171,19 +164,23 @@ const GenrePage = () => {
         dataSource={filteredGenres}
         rowKey="_id"
         loading={loading}
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 8 }}
+        bordered
       />
 
       <Modal
         open={openModal}
         footer={null}
         onCancel={() => setOpenModal(false)}
-        title={editingGenre ? "Sửa thể loại" : "Thêm thể loại"}
+        title={editingGenre ? "Chỉnh sửa thể loại" : "Thêm thể loại mới"}
+        destroyOnClose
       >
         <GenreForm
           genre={editingGenre}
           onClose={() => setOpenModal(false)}
           refresh={fetchGenres}
+          antdMessage={antdMessage}
+          HandleError={HandleError}
         />
       </Modal>
     </div>
