@@ -4,6 +4,8 @@ import CreateMovie from "../pages/admin/movie/create/CreateMovie";
 import ListMovie from "../pages/admin/movie/ListMovie";
 import GenrePage from "../pages/admin/genre/GenrePage";
 import UpdateMovie from "../pages/admin/movie/update/UpdateMovie";
+import ListRoomPage from "../pages/admin/room/ListRoomPage";
+import CreateRoom from "../pages/admin/room/create/CreateRoom";
 
 export const AdminRoutes = [
   {
@@ -31,8 +33,17 @@ export const AdminRoutes = [
           },
           {
             path: "update/:id",
-            element:<UpdateMovie />
-          }
+            element: <UpdateMovie />,
+          },
+        ],
+      },
+      {
+        path: "rooms",
+        children: [
+          {
+            index: true,
+            element: <ListRoomPage />,
+          },
         ],
       },
     ],
