@@ -44,6 +44,10 @@ export const AdminRoutes = [
             index: true,
             element: <ListRoomPage />,
           },
+          {
+            path: "create",
+            element: <CreateRoom />,
+         }
         ],
       },
     ],
