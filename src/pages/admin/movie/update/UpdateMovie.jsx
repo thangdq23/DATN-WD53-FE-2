@@ -13,7 +13,7 @@ import dayjs from "dayjs";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getDetailMovie, updateMovieAPI } from "../../../../common/services/movie.service";
-// import { uploadImage } from "../../../../common/utils/uploadImage";
+import { upLoadImage } from "../../../../common/utils/upLoadImage";
 import UploadImage from "../../../../components/UploadImage";
 import { QUERY } from "../../../../common/constants/queryKey";
 import { useMessage } from "../../../../common/hooks/useMessage";
@@ -32,7 +32,7 @@ const UpdateMovie = ()=>{
    const{data:genre} = useQuery({
     queryKey: [QUERY.GENRE],
     queryFn: ()=>getAllGenre(),
-   })
+   });
    const{data} = useQuery({
     queryKey: [QUERY.MOVIE, id],
     queryFn: async ()=>{
@@ -155,8 +155,9 @@ const UpdateMovie = ()=>{
                 >
                   <Select
                     mode="multiple"
-                    placeholder="Thể loại"
+                    placeholder="Chọn thể loại phim"
                     style={{ width: "100%", height: 35 }}
+                    tokenSeparators={[","]}
                     options={genre?.data?.map((item) => ({
                       label: item.name,
                       value: item._id,
@@ -183,60 +184,57 @@ const UpdateMovie = ()=>{
                 </Form.Item>
               </div>
             </section>
-            <section className="flex flex-col items-center gap-2">
-              <div className="w-full flex gap-6">
+            <section className="flex flex-center justìy-between gap-6">
                 <Form.Item
                   label="Quốc gia"
-                  style={{
-                    flex: 1,
-                  }}
                   name={"country"}
                   required
-                  rules={[formRules.required("Quốc gia", true)]}
+                  rules={[
+                    {required: true, message: "Vui lòng chọn quốc gia của phim"},
+                  ]}
+                  className="flex-1"
                 >
                   <Select
+                    placeholder="Chọn quốc gia"
+                    style={{height:35}}
                     showSearch
-                    placeholder="Chọn ngôn ngữ của phim"
                     options={COUNTRY_OPTIONS}
                   />
                 </Form.Item>
                 <Form.Item
                   label="Ngôn ngữ"
-                  style={{
-                    flex: 1,
-                  }}
                   name={"language"}
                   required
-                  rules={[formRules.required("Ngôn ngữ", true)]}
+                  rules={[
+                    {required : true, message:"Vui lòng chọn ngôn ngữ của phim"},
+                  ]}
+                  className="flex-1"
                 >
                   <Select
+                    placeholder="Chọn ngôn ngữ"
+                    style={{height : 35}}
                     showSearch
-                    placeholder="Chọn ngôn ngữ của phim"
                     options={LANGUAGE_OPTIONS}
                   />
                 </Form.Item>
                 <Form.Item
-                  label="Phụ đề (Không bắt buộc)"
-                  style={{
-                    flex: 1,
-                  }}
+                  label="Phụ đề"
+                  className="flex-1"
                   name={"subTitleLanguage"}
                 >
                   <Select
+                    placeholder="Chọn phụ đề"
+                    style={{height: 35}}
                     showSearch
-                    allowClear
-                    placeholder="Phụ đề của phim"
                     options={LANGUAGE_OPTIONS}
                   />
                 </Form.Item>
-              </div>
-              <div className="w-full flex gap-6">
+              </section>
+              <section className= "flex items-center gap-6">
+              <div className="flex-1">
                 <Form.Item
                   label="Đạo diễn"
                   name={"director"}
-                  style={{
-                    flex: 1,
-                  }}
                   tooltip="Nhập tên một diễn viên bất kỳ và enter bạn có thể nhập được tên diễn viên tiếp theo"
                   required
                   rules={[
@@ -245,69 +243,90 @@ const UpdateMovie = ()=>{
                 >
                   <Input placeholder="Nhập tên đạo diễn" style={{ height: 35 }} />
                 </Form.Item>
+                </div>
                 <Form.Item
+                label="Trailer youtube"
+                name={"trailer"}
+                style={{flex:1}}
+                >
+                  <Input placeholder="Nhập link youtube" style={{height:35}} />
+                </Form.Item>
+               </section>
+                  <Form.Item
                   label="Diễn viên"
                   name={"actor"}
                   tooltip="Nhập tên một diễn viên bất kỳ và enter bạn có thể nhập được tên diễn viên tiếp theo"
                   required
-                  style={{
-                    flex: 1,
-                  }}
                   rules={[
                     {
-                      required: true,
+                      required:true,
                       message: "Vui lòng nhập danh sách diễn viên",
-                    },
-                  ]}
-                >
-                  <Select
-                    mode="tags"
-                    suffixIcon={null}
-                    placeholder="Nhập tên diễn viên và nhấn Enter"
-                    style={{ width: "100%", height: 35 }}
-                    tokenSeparators={[","]}
-                    open={false}
-                  />
-                </Form.Item>
-              </div>
-              <div className="w-full flex gap-6">
-                <Form.Item
-                  style={{
-                    flex: 1,
-                  }}
-                  label="Trailer youtube"
-                  name={"trailer"}
-                >
-                  <Input placeholder="Nhập link youtube" style={{ height: 35 }} />
-                </Form.Item>
-                <Form.Item
-                  label="Ngày công chiếu"
-                  name={"releaseDate"}
-                  required
-                  rules={[
-                    {
-                      required: true,
-                      message: "Vui lòng chọn ngày công chiếu",
-                    },
-                  ]}
-                  style={{
-                    flex: 1,
-                  }}
-                >
-                  <DatePicker
-                    placeholder="Chọn ngày công chiếu"
-                    style={{ height: 35, width: "100%" }}
-                    disabledDate={(current) =>
-                      current && current < dayjs().startOf("day")
                     }
-                  />
-                </Form.Item>
-              </div>
-            </section>
-            <Form.Item label="Mô tả phim" name={"description"}>
-              <TextArea rows={5} placeholder="Nhập mô tả phim" />
-            </Form.Item>
-  
+                  ]}
+                  >
+                    <Select 
+                    mode="tags"
+                    className="one-line-select"
+                    suffixIcon={null}
+                    placeholder="Nhập tên diễn viên và ấn Enter"
+                    style={{width:"100%",height:35}}
+                    tokenSeparators ={[","]}
+                    open={false}
+                    />
+                  </Form.Item>
+
+
+                  <Form.Item label="Mô tả phim" name={"description"}>
+                    <TextArea rows={5} placeholder="Nhập mô tả phim" />
+                  </Form.Item>
+                  <div className="flex items-center gap-6">
+                    <Form.Item
+                    label="Ngày công chiếu"
+                    name="releaseDate"
+                    style={{flex:1}}
+                    rules={[
+                      {required: true, message:"Vui lòng nhập ngày công chiếu"}
+                    ]}
+                    >
+                      <DatePicker 
+                      palceholder="Chọn ngày công chiếu"
+                      style={{height: 35, width:"100%"}}
+                      disabledDate={(current)=>current && current <dayjs().startOf("day").add(1)}
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                    label="Ngày kết thúc"
+                    name="enđate"
+                    style={{flex:1}}
+                    dependencies={["releaseDate"]}
+                    rules={[
+                      {required: true, message:"Vui lòng nhập ngày kết thúc chiếu"},
+                      ({getFieldValue})=>({
+                        validator(_, value){
+                          const releaseDate = getFieldValue("releaseDate");
+                          if(!value|| !releaseDate) return Promise.resolve();
+                          const diff = dayjs(value).diff(dayjs(releaseDate),"day");
+                          if(diff<7){
+                            return Promise.reject(
+                              new Error(
+                                "Ngày ngừng chiếu phải cách ngày công chiếu ít nhất 1 tuần!",
+                              ),
+                            );
+                          }
+                          return Promise.resolve();
+                        }
+                      })
+                    ]}
+                    >
+                       <DatePicker 
+                      palceholder="Chọn ngày kết thúc"
+                      style={{height: 35, width:"100%"}}
+                      disabledDate={(current)=>current && current <dayjs().startOf("day").add(1)}
+                      />
+                    </Form.Item>
+                  </div>
+
             <div className="flex justify-end gap-6 mt-6">
               <Button
                 disabled={isLoading}
