@@ -5,8 +5,13 @@ export const getAllRoom = async (params) => {
     return data;
 
 };
+
+export const updateStatusRoom = async (id) => {
+    const { data } = await api.patch(`/room/status/${id}`);
+    return data;
+};
 export const createRoom = async (payload)=>{
     const {data}= await api.post("/room", payload);
     return data;
-}
+};
 
