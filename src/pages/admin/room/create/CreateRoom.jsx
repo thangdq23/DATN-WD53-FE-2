@@ -14,15 +14,14 @@ import { useMessage } from "../../../../common/hooks/useMessage";
 import { createRoom } from "../../../../common/services/room.service";
 import { QUERY } from "../../../../common/constants/queryKey";
 
-
 const CreateRoom = () => {
- const [form] = Form.useForm();
+  const [form] = Form.useForm();
   const queryClient = useQueryClient();
-  const nav=  useNavigate();
-  const { handleError,antdMessage } = useMessage();
-  const {seats,cols,rows,totalSeats} = generatePreviewSeats();
-  const [seatsState,setSeatsState]= useState(seats);
-   const handleUpdateStatusSeat = (seat) => {
+  const nav = useNavigate();
+  const { HandleError, antdMessage } = useMessage();
+  const { seats, cols, rows, totalSeats } = generatePreviewSeats();
+  const [seatsState, setSeatState] = useState(seats);
+  const handleUpdateStatusSeat = (seat) => {
     setSeatState((prevSeats) =>
       prevSeats.map((item) =>
         item.label === seat.label ? { ...item, status: !item.status } : item,
@@ -138,8 +137,7 @@ const CreateRoom = () => {
         </Form>
       </div>
     </div>
-  )
-  
+  );
 };
 
 export default CreateRoom;
