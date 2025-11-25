@@ -47,7 +47,7 @@ export const AdminRoutes = [
           {
             path: "create",
             element: <CreateRoom />,
-         }
+          },
         ],
       },
     ],

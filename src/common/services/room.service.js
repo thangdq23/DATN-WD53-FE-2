@@ -1,17 +1,16 @@
 import api from "../utils/api";
 
 export const getAllRoom = async (params) => {
-    const { data } = await api.get(`/room`, { params });
-    return data;
+  const { data } = await api.get(`/room`, { params });
+  return data;
+};
 
+export const createRoom = async (payload) => {
+  const { data } = await api.post("/room", payload);
+  return data;
 };
 
 export const updateStatusRoom = async (id) => {
-    const { data } = await api.patch(`/room/status/${id}`);
-    return data;
+  const { data } = await api.patch(`/room/status/${id}`);
+  return data;
 };
-export const createRoom = async (payload)=>{
-    const {data}= await api.post("/room", payload);
-    return data;
-};
-
