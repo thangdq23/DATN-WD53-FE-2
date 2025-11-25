@@ -4,6 +4,7 @@ import LoginPage from "../pages/client/auth/LoginPage";
 import RegisterPage from "../pages/client/auth/RegisterPage";
 import HomePage from "../pages/client/home/HomePage";
 import ShowtimePage from "../pages/client/ShowTimePage";
+import AboutPage from "../pages/client/home/components/AboutPage";
 
 export const MainRoutes = [
   {
@@ -17,6 +18,10 @@ export const MainRoutes = [
       {
         path: "showtime/:id",
         element: <ShowtimePage />,
+      },
+      {
+        path: "about",       // thêm route cho AboutPage
+        element: <AboutPage />,
       },
     ],
   },
