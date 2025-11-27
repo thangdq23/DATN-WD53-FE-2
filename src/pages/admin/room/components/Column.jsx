@@ -1,9 +1,25 @@
-import { Button, Popconfirm, Space, Tag, Tooltip } from "antd";
-import TextWrap from "../../../../components/WrapText";
-import { Link } from "react-router";
 import { EditOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button, Popconfirm, Space, Tag, Tooltip } from "antd";
+import { Link } from "react-router";
+import { updateStatusRoom } from "../../../../common/services/room.service";
+import TextWrap from "../../../../components/WrapText";
+import { useMessage } from "../../../../common/hooks/useMessage";
+import { QUERY } from "../../../../common/constants/queryKey";
 
 export const columnRoom = (getSorterProps) => {
+  const { antdMessage, HandleError } = useMessage();
+  const queryClient = useQueryClient();
+  const { mutate, isPending } = useMutation({
+    mutationFn: (id) => updateStatusRoom(id),
+    onSuccess: ({ message }) => {
+      antdMessage.success(message);
+      queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey.includes(QUERY.ROOM),
+      });
+    },
+    onError: (err) => HandleError(err),
+  });
   return [
     {
       title: <p style={{ whiteSpace: "nowrap", margin: 0 }}>Mã phòng</p>,
@@ -65,7 +81,7 @@ export const columnRoom = (getSorterProps) => {
         <Space style={{ display: "flex", gap: 12 }}>
           <Space>
             <Tooltip title="Cập nhật">
-              <Link className="mx-1" to={`/admin/room/update/${record._id}`}>
+              <Link className="mx-1" to={`/admin/rooms/update/${record._id}`}>
                 <EditOutlined style={{ color: "blue" }} />
               </Link>
             </Tooltip>
@@ -74,8 +90,11 @@ export const columnRoom = (getSorterProps) => {
               <Popconfirm
                 placement="bottomLeft"
                 title="Bạn chắc chắn muốn khóa?"
+                onConfirm={() => mutate(record._id)}
               >
                 <Button
+                  loading={isPending}
+                  disabled={isPending}
                   type="text"
                   danger
                   icon={<LockOutlined />}
@@ -83,7 +102,12 @@ export const columnRoom = (getSorterProps) => {
                 />
               </Popconfirm>
             ) : (
-              <Button type="text" icon={<UnlockOutlined />} size="small" />
+              <Button
+                onClick={() => mutate(record._id)}
+                type="text"
+                icon={<UnlockOutlined />}
+                size="small"
+              />
             )}
           </Space>
         </Space>
