@@ -6,6 +6,7 @@ import GenrePage from "../pages/admin/genre/GenrePage";
 import UpdateMovie from "../pages/admin/movie/update/UpdateMovie";
 import ListRoomPage from "../pages/admin/room/ListRoomPage";
 import CreateRoom from "../pages/admin/room/create/CreateRoom";
+import UpdateRoom from "../pages/admin/room/update/UpdateRoom";
 
 export const AdminRoutes = [
   {
@@ -47,6 +48,10 @@ export const AdminRoutes = [
           {
             path: "create",
             element: <CreateRoom />,
+          },
+          {
+            path: "update/:id",
+            element: <UpdateRoom />,
           },
         ],
       },

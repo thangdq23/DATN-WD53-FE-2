@@ -1,7 +1,6 @@
 import { EditOutlined, LockOutlined, UnlockOutlined } from "@ant-design/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Popconfirm, Space, Tag, Tooltip } from "antd";
-
 import { Link } from "react-router";
 import { updateStatusRoom } from "../../../../common/services/room.service";
 import TextWrap from "../../../../components/WrapText";
@@ -82,7 +81,7 @@ export const columnRoom = (getSorterProps) => {
         <Space style={{ display: "flex", gap: 12 }}>
           <Space>
             <Tooltip title="Cập nhật">
-              <Link className="mx-1" to={`/admin/room/update/${record._id}`}>
+              <Link className="mx-1" to={`/admin/rooms/update/${record._id}`}>
                 <EditOutlined style={{ color: "blue" }} />
               </Link>
             </Tooltip>
