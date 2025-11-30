@@ -19,8 +19,11 @@ const MovieFilterBar = ({status}) =>{
         <Search 
           value={searchValue}
           placeholder="Tìm theo tiêu đề ..."
-          onSearch={(e) =>{
-            if (!e.target.value) onFilter({search: null});
+          onSearch={(e)=> {
+            onFilter({search : [e]});
+          }}
+          onChange ={(e) =>{
+            if(!e.target.value) onFilter({search : null});
             setSearchValue(e.target.value);
           }}
           allowClear
