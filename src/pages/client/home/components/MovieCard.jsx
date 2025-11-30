@@ -2,7 +2,7 @@ import React from "react";
 import { Card, Button, Typography } from "antd";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-
+import dayjs from "dayjs";
 const { Text, Link } = Typography;
 
 const MovieCard = ({ movie, onBuy, fallback }) => {
@@ -40,42 +40,47 @@ const MovieCard = ({ movie, onBuy, fallback }) => {
 
   return (
     <Card bordered={false} bodyStyle={{ paddingTop: 12 }}>
-      <div style={styles.posterWrap}>
-        <div style={styles.ageTag}>{movie.age}</div>
-        <img
-          src={movie.poster}
-          alt={movie.title}
-          style={styles.posterImg}
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = fallback;
-          }}
-        />
-      </div>
-      <div style={{ paddingTop: 8 }}>
-        <Link onClick={() => navigate(`/showtime/${movie.id}`)} strong>
-          {movie.title}
-        </Link>
-        <div>
-          Thể loại: <Text strong>{movie.genres.join(", ")}</Text>
+        <Link onClick={()=>navigate(`/showtime/${movie.id}`)}>
+            <div style ={style.posterWrap}>
+              <div style={styles.ageTag}>{movie.age}</div>
+              <img 
+              src={movie.poster}
+              alt={movie.title}
+              style ={styles.posterImg}
+              onError={(e)=>{
+                e.target.onerror=null;
+                e.target.src = fallback;
+              }}
+              />
+            </div>
+            <div style={{ paddingTop: 8 }}>
+          <p className="text-base font-semibold text-primary line-clamp-1 mb-2!">
+            {movie.name}
+          </p>
+          <div>
+            Thể loại:{" "}
+            <Text strong>
+              {movie?.genreIds?.map((item) => item.name)?.join(", ")}
+            </Text>
+          </div>
+          <div>
+            Thời lượng: <Text strong>{movie.duration} phút</Text>
+          </div>
+          <div style={{ color: "#888" }}>
+            Ngày khởi chiếu:{" "}
+            <Text strong>{dayjs(movie.releaseDate).format("DD-MM-YYYY")}</Text>
+          </div>
+          {movie.statusRelease === "nowShowing" && (
+            <Button
+              icon={<ShoppingCartOutlined />}
+              style={styles.buyBtn}
+              onClick={() => onBuy(movie)}
+            >
+              MUA VÉ
+            </Button>
+          )}
         </div>
-        <div>
-          Thời lượng: <Text strong>{movie.duration}</Text>
-        </div>
-        <div style={{ color: "#888" }}>
-          Ngày khởi chiếu: <Text strong>{movie.releaseDate}</Text>
-        </div>
-
-        {movie.status === "now" && (
-          <Button
-            icon={<ShoppingCartOutlined />}
-            style={styles.buyBtn}
-            onClick={() => onBuy(movie)}
-          >
-            MUA VÉ
-          </Button>
-        )}
-      </div>
+      </Link>
     </Card>
   );
 };
