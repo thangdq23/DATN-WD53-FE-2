@@ -9,7 +9,7 @@ const { Text } = Typography;
 
 const AdminLayout = () => {
   return (
-    <Layout style={{ minHeight: "100vh", background: "#0f172a" }}>
+    <Layout style={{ minHeight: "100vh", background: "#f0f2f5" }}>
       {/* Sidebar */}
       <Sider
         width={260}
@@ -20,24 +20,27 @@ const AdminLayout = () => {
           left: 0,
           top: 0,
           bottom: 0,
-          background: "#1e293b",
-          boxShadow: "2px 0 8px rgba(0,0,0,0.1)",
+          background: "#001529", // màu sidebar tối chuyên nghiệp
         }}
       >
+        {/* Logo / Brand */}
         <div
           style={{
             height: 64,
-            padding: "16px 24px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 24,
-            fontWeight: "bold",
-            color: "#00ffff",
+            padding: "0 24px",
+            background: "#002140",
+            marginBottom: 24,
           }}
         >
-          MPV Admin
+          <Text style={{ color: "#fff", fontSize: 22, fontWeight: "bold" }}>
+            MPV Admin
+          </Text>
         </div>
+
+        {/* Menu */}
         <SideBar />
       </Sider>
 
@@ -47,43 +50,27 @@ const AdminLayout = () => {
         <Header
           style={{
             padding: "0 24px",
-            background: "rgba(255,255,255,0.05)",
-            backdropFilter: "blur(8px)",
+            background: "#fff",
             display: "flex",
             alignItems: "center",
-            justifyContent: "flex-end",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+            justifyContent: "space-between",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
           }}
         >
+          <Text strong style={{ fontSize: 18 }}>
+            Dashboard
+          </Text>
           <Space size="middle">
-            <Avatar
-              size="large"
-              icon={<UserOutlined />}
-              style={{
-                border: "2px solid #00ffff",
-                transition: "all 0.3s",
-                cursor: "pointer",
-              }}
-            />
+            <Button type="default" icon={<UserOutlined />} style={{ borderRadius: 6 }}>
+              Admin
+            </Button>
             <Button
               type="primary"
               icon={<LogoutOutlined />}
-              style={{
-                background: "#00ffff",
-                color: "#0f172a",
-                border: "none",
-                fontWeight: "bold",
-                borderRadius: 8,
-                transition: "all 0.3s",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "#00e5e5")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "#00ffff")
-              }
+              danger
+              style={{ borderRadius: 6 }}
               onClick={() => {
-                /* Đăng xuất */
+                // Xử lý logout
               }}
             >
               Đăng xuất
@@ -97,11 +84,9 @@ const AdminLayout = () => {
             margin: "24px 16px",
             padding: 24,
             minHeight: 280,
-            background: "rgba(255,255,255,0.05)",
-            backdropFilter: "blur(8px)",
-            borderRadius: 12,
-            boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
-            transition: "all 0.3s",
+            background: "#fff",
+            borderRadius: 8,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
           }}
         >
           <Outlet />
