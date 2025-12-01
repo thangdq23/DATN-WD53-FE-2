@@ -10,13 +10,13 @@ const MovieTabs = ({ tabKey, onChange }) => (
         tab={
           <span style={{ fontSize: 20, fontWeight: 700 }}>PHIM SẮP CHIẾU</span>
         }
-        key="coming"
+        key="upcoming"
       />
       <TabPane
         tab={
           <span style={{ fontSize: 20, fontWeight: 700 }}>PHIM ĐANG CHIẾU</span>
         }
-        key="now"
+        key="nowShowing"
       />
     </Tabs>
   </div>

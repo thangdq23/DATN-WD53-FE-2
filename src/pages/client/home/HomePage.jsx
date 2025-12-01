@@ -1,40 +1,40 @@
-import React, { useMemo, useState } from "react";
-import { Row, Col, Empty } from "antd";
-import BannerSection from "./components/BannerSection";
-import MovieTabs from "./components/MovieTabs";
-import MovieFilterBar from "./components/MovieFilterBar";
-import MovieCard from "./components/MovieCard";
+import { useQuery } from "@tanstack/react-query";
+import { Col, Empty, Row, Spin } from "antd";
+import { useState } from "react";
 import bannerImg from "../../../assets/images/banner/banner.png";
 import posterTraiTim from "../../../assets/images/poster/trai-tim-que-quat.jpg";
-import sampleMovies from "./data/sampleMovies";
+import { QUERY } from "../../../common/constants/queryKey";
+import { useTable } from "../../../common/hooks/useTable";
+import { getAllMovie } from "../../../common/services/movie.service";
+import BannerSection from "./components/BannerSection";
+import MovieCard from "./components/MovieCard";
+import MovieTabs from "./components/MovieTabs";
+import MovieFilterBar from "./components/MovieFilterBar";
+
 
 const DEFAULT_BANNER = bannerImg;
 const DEFAULT_POSTER = posterTraiTim;
 
 const HomePage = () => {
-  const [tabKey, setTabKey] = useState("coming");
-  const [movies] = useState(sampleMovies);
-  const [query, setQuery] = useState("");
-  const [genre, setGenre] = useState("All");
-  const [sort, setSort] = useState("popular");
-
-  const genres = useMemo(() => {
-    const setG = new Set();
-    movies.forEach((m) => m.genres.forEach((g) => setG.add(g)));
-    return ["All", ...Array.from(setG)];
-  }, [movies]);
-
-  const filtered = useMemo(() => {
-    let list = movies.filter((m) =>
-      m.title.toLowerCase().includes(query.toLowerCase()),
-    );
-    list = list.filter((m) => m.status === tabKey);
-    if (genre !== "All") list = list.filter((m) => m.genres.includes(genre));
-    return list;
-  }, [movies, query, genre, tabKey]);
-
-  const handleBuy = (movie) => {
-    alert(`Mua vé: ${movie.title}`);
+  const{query, onFilter} = useTable();
+  const{data, isLoading} = useQuery({
+    queryKey:[
+      QUERY.MOVIE,
+      "CLIENT",
+      ...Object.values(query),
+      ...Object.keys(query),
+    ],
+    queryFn:()=>
+    getAllMovie({
+      status:true,
+      searchFields: ["name"],
+      ...query,
+    }),
+  });
+  const [tabKey, setTabKey]= useState("nowShowing");
+  const handleChangeTab = (e) =>{
+    onFilter({statusRelease:[e]});
+    setTabKey(e);
   };
 
   return (
@@ -48,36 +48,26 @@ const HomePage = () => {
           padding: "0 24px",
         }}
       >
-        <MovieTabs tabKey={tabKey} onChange={setTabKey} />
-        <MovieFilterBar
-          query={query}
-          onQueryChange={setQuery}
-          genre={genre}
-          onGenreChange={setGenre}
-          genres={genres}
-          sort={sort}
-          onSortChange={setSort}
-          onReset={() => {
-            setQuery("");
-            setGenre("All");
-            setSort("popular");
-          }}
-        />
-
-        {filtered.length === 0 ? (
-          <Empty description="Không có phim" />
+        <MovieTabs tabKey={tabKey} onChange={handleChangeTab} />
+        <MovieFilterBar status={tabKey}/>
+        {isLoading ? (
+          <div className="flex items-center justify-center min-h-[30vh]">
+            <Spin />
+          </div>
         ) : (
-          <Row gutter={[24, 28]}>
-            {filtered.map((m) => (
-              <Col key={m.id} xs={12} sm={12} md={8} lg={6}>
-                <MovieCard
-                  movie={m}
-                  onBuy={handleBuy}
-                  fallback={DEFAULT_POSTER}
-                />
-              </Col>
+         <>
+         {data?.data?.length === 0 ? (
+          <Empty description="Không có phim"/>
+         ):(
+          <Row gutter = {[24,28]}>
+            {data?.data?.map((m)=>(
+              <col key={m.id} xs={12} sm={12} md={18} lg={6}>
+                <MovieCard movie={m} fallback={DEFAULT_POSTER} />
+              </col>
             ))}
           </Row>
+         )}
+         </>
         )}
       </div>
     </div>
