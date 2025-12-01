@@ -7,6 +7,7 @@ import UpdateMovie from "../pages/admin/movie/update/UpdateMovie";
 import ListRoomPage from "../pages/admin/room/ListRoomPage";
 import CreateRoom from "../pages/admin/room/create/CreateRoom";
 import UpdateRoom from "../pages/admin/room/update/UpdateRoom";
+import ListShowtime from "../pages/admin/showtime/ListShowTime";
 
 export const AdminRoutes = [
   {
@@ -54,6 +55,10 @@ export const AdminRoutes = [
             element: <UpdateRoom />,
           },
         ],
+      },
+      {
+        path: "showtimes",
+        element: <ListShowtime />,
       },
     ],
   },
