@@ -21,8 +21,8 @@ const Header = () => {
       label: "Phim",
     },
     {
-      path: "/news",
-      label: "Tin tức",
+      path: "/contact",
+      label: "Liên hệ",
     },
     {
       path: "/discount",

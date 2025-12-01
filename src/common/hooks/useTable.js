@@ -15,7 +15,7 @@ export const convertObject = (inputObj) => {
   }, {});
 };
 
-export const useTable = () => {
+export const useTable = (prefix = "") => {
   const {
     query,
     resetFilter: reset,
