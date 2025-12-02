@@ -11,29 +11,28 @@ import MovieCard from "./components/MovieCard";
 import MovieTabs from "./components/MovieTabs";
 import MovieFilterBar from "./components/MovieFilterBar";
 
-
 const DEFAULT_BANNER = bannerImg;
 const DEFAULT_POSTER = posterTraiTim;
 
 const HomePage = () => {
-  const{query, onFilter} = useTable();
-  const{data, isLoading} = useQuery({
-    queryKey:[
+  const { query, onFilter } = useTable();
+  const { data, isLoading } = useQuery({
+    queryKey: [
       QUERY.MOVIE,
       "CLIENT",
       ...Object.values(query),
       ...Object.keys(query),
     ],
-    queryFn:()=>
-    getAllMovie({
-      status:true,
-      searchFields: ["name"],
-      ...query,
-    }),
+    queryFn: () =>
+      getAllMovie({
+        status: true,
+        searchFields: ["name"],
+        ...query,
+      }),
   });
-  const [tabKey, setTabKey]= useState("nowShowing");
-  const handleChangeTab = (e) =>{
-    onFilter({statusRelease:[e]});
+  const [tabKey, setTabKey] = useState("nowShowing");
+  const handleChangeTab = (e) => {
+    onFilter({ statusRelease: [e] });
     setTabKey(e);
   };
 
@@ -49,25 +48,25 @@ const HomePage = () => {
         }}
       >
         <MovieTabs tabKey={tabKey} onChange={handleChangeTab} />
-        <MovieFilterBar status={tabKey}/>
+        <MovieFilterBar status={tabKey} />
         {isLoading ? (
           <div className="flex items-center justify-center min-h-[30vh]">
             <Spin />
           </div>
         ) : (
-         <>
-         {data?.data?.length === 0 ? (
-          <Empty description="Không có phim"/>
-         ):(
-          <Row gutter = {[24,28]}>
-            {data?.data?.map((m)=>(
-              <col key={m.id} xs={12} sm={12} md={18} lg={6}>
-                <MovieCard movie={m} fallback={DEFAULT_POSTER} />
-              </col>
-            ))}
-          </Row>
-         )}
-         </>
+          <>
+            {data?.data?.length === 0 ? (
+              <Empty description="Không có phim" />
+            ) : (
+              <Row gutter={[24, 28]}>
+                {data?.data?.map((m) => (
+                  <Col key={m.id} xs={12} sm={12} md={18} lg={6}>
+                    <MovieCard movie={m} fallback={DEFAULT_POSTER} />
+                  </Col>
+                ))}
+              </Row>
+            )}
+          </>
         )}
       </div>
     </div>
