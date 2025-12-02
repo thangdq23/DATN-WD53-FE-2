@@ -2,6 +2,7 @@ import { debounce } from "lodash";
 import { create } from "zustand";
 
 export const useFilterStore = create((set, get) => ({
+  query: {},
   getQuery: (prefix = "") => {
     const { query } = get();
     if (!prefix) return query;
@@ -13,9 +14,7 @@ export const useFilterStore = create((set, get) => ({
     });
     return result;
   },
-
   setQuery: (query) => set({ query }),
-
   resetFilter: (prefix = "") => {
     const { query } = get();
     if (!prefix) {
@@ -44,7 +43,6 @@ export const useFilterStore = create((set, get) => ({
     });
     set({ query: newQuery });
   },
-
   updateQueryParams: (params, prefix = "") => {
     const { query } = get();
     const newQuery = { ...query };
@@ -58,7 +56,6 @@ export const useFilterStore = create((set, get) => ({
     });
     set({ query: newQuery });
   },
-
   onChangeSearchInput: debounce((text, options) => {
     const { updateQueryParams } = get();
     if (options.enableOnChangeSearch) {

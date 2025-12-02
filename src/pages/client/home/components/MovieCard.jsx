@@ -3,6 +3,7 @@ import { Card, Button, Typography } from "antd";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
+
 const { Text, Link } = Typography;
 
 const MovieCard = ({ movie, onBuy, fallback }) => {
@@ -40,20 +41,20 @@ const MovieCard = ({ movie, onBuy, fallback }) => {
 
   return (
     <Card bordered={false} bodyStyle={{ paddingTop: 12 }}>
-        <Link onClick={()=>navigate(`/showtime/${movie.id}`)}>
-            <div style ={style.posterWrap}>
-              <div style={styles.ageTag}>{movie.age}</div>
-              <img 
-              src={movie.poster}
-              alt={movie.title}
-              style ={styles.posterImg}
-              onError={(e)=>{
-                e.target.onerror=null;
-                e.target.src = fallback;
-              }}
-              />
-            </div>
-            <div style={{ paddingTop: 8 }}>
+      <Link onClick={() => navigate(`/showtime/${movie._id}`)}>
+        <div style={styles.posterWrap}>
+          <div style={styles.ageTag}>{movie.age}</div>
+          <img
+            src={movie.poster}
+            alt={movie.title}
+            style={styles.posterImg}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = fallback;
+            }}
+          />
+        </div>
+        <div style={{ paddingTop: 8 }}>
           <p className="text-base font-semibold text-primary line-clamp-1 mb-2!">
             {movie.name}
           </p>
@@ -70,6 +71,7 @@ const MovieCard = ({ movie, onBuy, fallback }) => {
             Ngày khởi chiếu:{" "}
             <Text strong>{dayjs(movie.releaseDate).format("DD-MM-YYYY")}</Text>
           </div>
+
           {movie.statusRelease === "nowShowing" && (
             <Button
               icon={<ShoppingCartOutlined />}
