@@ -68,7 +68,7 @@ const ListShowtime = () => {
                   );
                   return (
                     <Link
-                      to={`/admin/showtime/movie/${
+                      to={`/admin/showtimes/movie/${
                         item._id
                       }?showtime_startTimeFrom=${dayjs()
                         .startOf("day")
@@ -138,7 +138,7 @@ const ListShowtime = () => {
             </div>
           )}
         </div>
-        <div className="shadow-lg rounded-md">
+        <div className="shadow-lg rounded-md overflow-hidden">
           {movieId || equalDynamicRoute.includes(pathname) ? (
             <Outlet />
           ) : (
