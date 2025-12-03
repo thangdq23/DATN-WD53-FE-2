@@ -1,9 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { Col, Empty, Row, Spin } from "antd";
 import { useState, useMemo } from "react";
-import bannerImg from "../../../assets/images/banner/banner.png";
+
+import bannerImg1 from "../../../assets/images/banner/banner.png";
+import bannerImg2 from "../../../assets/images/banner/banner3.png";
+import bannerImg3 from "../../../assets/images/banner/banner4.png";
+
 import posterTraiTim from "../../../assets/images/poster/trai-tim-que-quat.jpg";
 import { getAllMovie } from "../../../common/services/movie.service";
+
 import BannerSection from "./components/BannerSection";
 import MovieCard from "./components/MovieCard";
 import MovieTabs from "./components/MovieTabs";
@@ -12,11 +17,13 @@ import MovieFilterBar from "./components/MovieFilterBar";
 const HomePage = () => {
   const [tabKey, setTabKey] = useState("nowShowing");
 
+  // --- Gọi API phim ---
   const { data, isLoading } = useQuery({
     queryKey: ["movies-homepage"],
     queryFn: () => getAllMovie({ status: true }),
   });
 
+  // --- Tách phim theo ngày ---
   const { nowShowingMovies, upcomingMovies } = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -61,9 +68,13 @@ const HomePage = () => {
     setTabKey(key);
   };
 
+  // --- Danh sách banner chạy slideshow ---
+  const bannerList = [bannerImg1, bannerImg2, bannerImg3];
+
   return (
     <div>
-      <BannerSection src={bannerImg} />
+      <BannerSection images={bannerList} interval={3000} />
+
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px" }}>
         <MovieTabs tabKey={tabKey} onChange={handleChangeTab} />
         <MovieFilterBar status={tabKey} />
