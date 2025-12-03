@@ -8,6 +8,7 @@ import ListRoomPage from "../pages/admin/room/ListRoomPage";
 import CreateRoom from "../pages/admin/room/create/CreateRoom";
 import UpdateRoom from "../pages/admin/room/update/UpdateRoom";
 import ListShowtime from "../pages/admin/showtime/ListShowTime";
+import ListShowtimeInMovie from "../pages/admin/showtime/showtimeMovie/ListShowtimeInMovie";
 
 export const AdminRoutes = [
   {
@@ -59,6 +60,7 @@ export const AdminRoutes = [
       {
         path: "showtimes",
         element: <ListShowtime />,
+        children: [{ path: "movie/:id", element: <ListShowtimeInMovie /> }],
       },
     ],
   },
