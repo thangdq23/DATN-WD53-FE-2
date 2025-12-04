@@ -56,6 +56,7 @@ export const useFilterStore = create((set, get) => ({
     });
     set({ query: newQuery });
   },
+
   onChangeSearchInput: debounce((text, options) => {
     const { updateQueryParams } = get();
     if (options.enableOnChangeSearch) {

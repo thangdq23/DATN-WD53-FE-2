@@ -21,8 +21,8 @@ export const useTable = (prefix = "") => {
     resetFilter: reset,
     resetFilterExceptPageAndLimit,
     updateQueryParams,
-  } = useQueryFilter();
-  // ACTION FILTER
+  } = useQueryFilter(prefix);
+
   const getFilteredValue = (key) => {
     return query[key] ? query[key].split(",") : undefined;
   };
@@ -35,7 +35,6 @@ export const useTable = (prefix = "") => {
     }
   };
 
-  // HANDLE ONCHANGE
   const onChangeSearchInput = useMemo(() => {
     return debounce((text, options) => {
       if (options.enableOnChangeSearch) {
@@ -91,6 +90,7 @@ export const useTable = (prefix = "") => {
           : undefined
         : undefined,
   });
+
   return {
     query,
     onFilter,
