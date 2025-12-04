@@ -12,7 +12,6 @@ import ListShowtime from "../pages/admin/showtime/ListShowTime";
 import ListShowtimeInMovie from "../pages/admin/showtime/showtimeMovie/ListShowtimeInMovie";
 import CreateMovieShowtime from "../pages/admin/showtime/create/CreateMovieShowtime";
 
-
 export const AdminRoutes = [
   {
     path: "admin",
@@ -26,27 +25,26 @@ export const AdminRoutes = [
         path: "genres",
         element: <GenrePage />,
       },
+
+      // ==== MOVIES (đổi thành path đầy đủ) ====
       {
         path: "movies",
-        children: [
-          {
-            index: true,
-            element: <ListMovie />,
-          },
-          {
-            path: "create",
-            element: <CreateMovie />,
-          },
-          {
-            path: "update/:id",
-            element: <UpdateMovie />,
-          },
-          {
-      path: ":id",
-      element: <MovieDetail />,   // import component này
-    },
-        ],
+        element: <ListMovie />,
       },
+      {
+        path: "movies/create",
+        element: <CreateMovie />,
+      },
+      {
+        path: "movies/update/:id",
+        element: <UpdateMovie />,
+      },
+      {
+        path: "movies/:id",
+        element: <MovieDetail />,
+      },
+
+      // ==== ROOMS ====
       {
         path: "rooms",
         children: [
@@ -64,6 +62,8 @@ export const AdminRoutes = [
           },
         ],
       },
+
+      // ==== SHOWTIMES (giữ nguyên nếu đang chạy ổn) ====
       {
         path: "showtimes",
         element: <ListShowtime />,

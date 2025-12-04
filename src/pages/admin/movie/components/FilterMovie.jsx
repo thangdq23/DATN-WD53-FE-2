@@ -36,7 +36,7 @@ const FilterMovie = () => {
     if (query.search) {
       setSearch(query.search);
     }
-  }, [query.search]);
+  }, []);
   useEffect(() => {
     if (query.releaseDateFrom) {
       setStatus("upcoming");
