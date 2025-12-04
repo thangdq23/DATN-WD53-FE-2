@@ -25,27 +25,26 @@ export const AdminRoutes = [
         path: "genres",
         element: <GenrePage />,
       },
+
+      // ==== MOVIES ====
       {
         path: "movies",
-        children: [
-          {
-            index: true,
-            element: <ListMovie />,
-          },
-          {
-            path: "create",
-            element: <CreateMovie />,
-          },
-          {
-            path: "update/:id",
-            element: <UpdateMovie />,
-          },
-          {
-            path: ":id",
-            element: <MovieDetail />,
-          },
-        ],
+        element: <ListMovie />,
       },
+      {
+        path: "movies/create",
+        element: <CreateMovie />,
+      },
+      {
+        path: "movies/update/:id",
+        element: <UpdateMovie />,
+      },
+      {
+        path: "movies/:id",
+        element: <MovieDetail />,
+      },
+
+      // ==== ROOMS ====
       {
         path: "rooms",
         children: [
@@ -63,6 +62,8 @@ export const AdminRoutes = [
           },
         ],
       },
+
+      // ==== SHOWTIMES ====
       {
         path: "showtimes",
         element: <ListShowtime />,
