@@ -6,7 +6,7 @@ import {
 } from "@ant-design/icons";
 import { Button, Image, Popconfirm, Space, Tag, Tooltip } from "antd";
 import dayjs from "dayjs";
-import { Link } from "react-router";
+import { Link } from "react-router-dom"; // ✔ Sửa đúng import
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMessage } from "../../../../common/hooks/useMessage";
 import { updateStatusMovie } from "../../../../common/services/movie.service";
@@ -17,6 +17,7 @@ import { statusRelease } from "../../../../common/constants";
 export const columnMovie = (getSorterProps) => {
   const queryClient = useQueryClient();
   const { antdMessage, HandleError } = useMessage();
+
   const { mutate } = useMutation({
     mutationFn: (id) => updateStatusMovie(id),
     onSuccess: ({ message }) => {
@@ -29,6 +30,7 @@ export const columnMovie = (getSorterProps) => {
       HandleError(err);
     },
   });
+
   return [
     {
       title: <p style={{ whiteSpace: "nowrap", margin: 0 }}>Mã phim</p>,
@@ -43,6 +45,7 @@ export const columnMovie = (getSorterProps) => {
         </>
       ),
     },
+
     {
       title: <p style={{ whiteSpace: "nowrap", margin: 0 }}>Poster</p>,
       dataIndex: "poster",
@@ -54,6 +57,7 @@ export const columnMovie = (getSorterProps) => {
         </div>
       ),
     },
+
     {
       title: <p style={{ whiteSpace: "nowrap", margin: 0 }}>Tên phim</p>,
       dataIndex: "name",
@@ -70,6 +74,7 @@ export const columnMovie = (getSorterProps) => {
         </div>
       ),
     },
+
     {
       title: <p style={{ whiteSpace: "nowrap", margin: 0 }}>Thể loại</p>,
       dataIndex: "genreIds",
@@ -83,6 +88,7 @@ export const columnMovie = (getSorterProps) => {
         />
       ),
     },
+
     {
       title: <p style={{ whiteSpace: "nowrap", margin: 0 }}>Ngôn ngữ</p>,
       dataIndex: "language",
@@ -91,14 +97,17 @@ export const columnMovie = (getSorterProps) => {
       render: (language, record) => {
         return (
           <>
-            <p className="mb-0!">{language} </p>
+            <p className="mb-0!">{language}</p>
             {record.subTitleLanguage && (
-              <TextWrap text={`Phụ đề ${record.subTitleLanguage}}`}></TextWrap>
+              <TextWrap
+                text={`Phụ đề ${record.subTitleLanguage}`}
+              ></TextWrap>
             )}
           </>
         );
       },
     },
+
     {
       title: <p style={{ whiteSpace: "nowrap", margin: 0 }}>Độ tuổi</p>,
       dataIndex: "ageRestriction",
@@ -107,13 +116,14 @@ export const columnMovie = (getSorterProps) => {
       render: (age) => {
         return (
           <div className="flex justify-center">
-            <Tooltip className="cursor-pointer">
+            <Tooltip title="Giới hạn độ tuổi">
               <Tag>{age}</Tag>
             </Tooltip>
           </div>
         );
       },
     },
+
     {
       title: (
         <p style={{ whiteSpace: "nowrap", margin: 0 }}>
@@ -127,8 +137,9 @@ export const columnMovie = (getSorterProps) => {
       render: (releaseDate, record) => {
         return (
           <div>
-                    <div className="flex items-center gap-2">
-              <TextWrap text={dayjs(releaseDate).format("YYYY-MM-DD")} />-
+            <div className="flex items-center gap-2">
+              <TextWrap text={dayjs(releaseDate).format("YYYY-MM-DD")} />
+              -
               <TextWrap text={dayjs(record.endDate).format("YYYY-MM-DD")} />
             </div>
             <Tag
@@ -141,6 +152,7 @@ export const columnMovie = (getSorterProps) => {
         );
       },
     },
+
     {
       title: <p style={{ whiteSpace: "nowrap", margin: 0 }}>Trạng thái</p>,
       dataIndex: "status",
@@ -152,24 +164,33 @@ export const columnMovie = (getSorterProps) => {
         </Tag>
       ),
     },
+
+    // ⭐ THAO TÁC
     {
       title: <p style={{ whiteSpace: "nowrap" }}>Thao tác</p>,
       key: "action",
       width: 80,
       render: (_, record) => (
         <Space style={{ display: "flex", gap: 12 }}>
+          {/* ------------------ Xem chi tiết ------------------ */}
           <Tooltip title="Xem chi tiết">
-            <Link to={`/admin/movie/${record._id}`}>
+            <Link to={`/admin/movies/${record._id}`}>
               <EyeOutlined style={{ cursor: "pointer", fontSize: 18 }} />
             </Link>
           </Tooltip>
+
           <Space>
+            {/* ------------------ Cập nhật ------------------ */}
             <Tooltip title="Cập nhật">
-              <Link className="mx-1" to={`/admin/movies/update/${record._id}`}>
+              <Link
+                className="mx-1"
+                to={`/admin/movies/update/${record._id}`}
+              >
                 <EditOutlined style={{ color: "blue" }} />
               </Link>
             </Tooltip>
 
+            {/* ------------------ Khoá / mở khoá ------------------ */}
             {record.status ? (
               <Popconfirm
                 placement="bottomLeft"

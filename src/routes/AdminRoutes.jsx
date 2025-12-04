@@ -8,6 +8,8 @@ import ListRoomPage from "../pages/admin/room/ListRoomPage";
 import CreateRoom from "../pages/admin/room/create/CreateRoom";
 import UpdateRoom from "../pages/admin/room/update/UpdateRoom";
 import ListShowtime from "../pages/admin/showtime/ListShowTime";
+import MovieDetail from "../pages/admin/movie/MovieDetail";
+
 
 export const AdminRoutes = [
   {
@@ -37,6 +39,10 @@ export const AdminRoutes = [
             path: "update/:id",
             element: <UpdateMovie />,
           },
+          {
+      path: ":id",
+      element: <MovieDetail />,   // import component này
+    },
         ],
       },
       {
