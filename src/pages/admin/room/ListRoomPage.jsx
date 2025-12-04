@@ -12,7 +12,7 @@ const ListRoomPage = () => {
   const { query, getSorterProps, onSelectPaginateChange } = useTable();
   const { data, isLoading } = useQuery({
     queryKey: [QUERY.ROOM, ...Object.values(query)],
-    queryFn: () => getAllRoom({ pagination: true, ...query }),
+    queryFn: () => getAllRoom({ searchFields: ['name'] ,pagination: true, ...query }),
   });
   return (
     <div>
