@@ -15,7 +15,7 @@ const AdminLayout = () => {
     { key: "/admin/genres", label: "Quản lý thể loại" },
     { key: "/admin/movies", label: "Quản lý phim" },
     { key: "/admin/rooms", label: "Quản lý phòng chiếu" },
-    { key: "/admin/showtimes", label: "Quản lý suất chiếu" },
+    { key: "/admin/showtimes", label: "Quản lý lịch chiếu" },
   ];
 
   return (

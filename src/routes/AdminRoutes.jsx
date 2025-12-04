@@ -12,7 +12,6 @@ import ListShowtime from "../pages/admin/showtime/ListShowTime";
 import ListShowtimeInMovie from "../pages/admin/showtime/showtimeMovie/ListShowtimeInMovie";
 import CreateMovieShowtime from "../pages/admin/showtime/create/CreateMovieShowtime";
 
-
 export const AdminRoutes = [
   {
     path: "admin",
@@ -42,9 +41,9 @@ export const AdminRoutes = [
             element: <UpdateMovie />,
           },
           {
-      path: ":id",
-      element: <MovieDetail />,   // import component này
-    },
+            path: ":id",
+            element: <MovieDetail />,
+          },
         ],
       },
       {
@@ -67,13 +66,14 @@ export const AdminRoutes = [
       {
         path: "showtimes",
         element: <ListShowtime />,
-        children: [
-          { path: "movie/:id", element: <ListShowtimeInMovie /> },
-          {
-            path: "create",
-            element: <CreateMovieShowtime />,
-          },
-        ],
+      },
+      {
+        path: "showtimes/create",
+        element: <CreateMovieShowtime />,
+      },
+      {
+        path: "showtimes/movie/:id",
+        element: <ListShowtimeInMovie />,
       },
     ],
   },

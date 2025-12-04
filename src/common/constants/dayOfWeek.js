@@ -1,9 +1,9 @@
 export const DAYOFWEEK_LABEL = {
-    0: "Chủ Nhật",
-    1: "Thứ Hai",
-    2: "Thứ Ba",
-    3: "Thứ Tư",
-    4: "Thứ Năm",
-    5: "Thứ Sáu",
-    6: "Thứ Bảy",
-}
+  0: "Chủ nhật",
+  1: "Thứ hai",
+  2: "Thứ ba",
+  3: "Thứ tư",
+  4: "Thứ năm",
+  5: "Thứ sáu",
+  6: "Thứ bảy",
+};

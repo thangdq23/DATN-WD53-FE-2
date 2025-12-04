@@ -66,21 +66,20 @@ const CreateMovieShowtime = () => {
     if (nav) navigate("/admin/showtime");
   };
   return (
-    <div className="p-4">
-      <div className="flex items-start justify-between">
+    <div className="p-6 max-w-6xl mx-auto">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h3>Tạo mới suất chiếu</h3>
-          <p className="text-black whitespace-nowrap">
-            Thêm mới suất chiếu cho phim
-          </p>
+          <h3 className="text-xl font-semibold">Tạo mới suất chiếu</h3>
+          <p className="text-gray-500">Thêm mới suất chiếu cho phim</p>
         </div>
         <p
-          className="text-primary hover:underline duration-300 cursor-pointer"
+          className="text-primary hover:underline cursor-pointer"
           onClick={() => navigate(-1)}
         >
           Quay trở về
         </p>
       </div>
+
       <Form
         form={form}
         initialValues={{
@@ -91,197 +90,178 @@ const CreateMovieShowtime = () => {
           ],
         }}
         layout="vertical"
-        className="mt-4!"
       >
-        <div className="flex items-center gap-6">
-          <Form.Item
-            className="flex-1"
-            label="Phim"
-            name={"movieId"}
-            required
-            rules={[formRules.required("Phim", "choose")]}
-          >
-            <Select
-              options={movieResponse.data?.data.map((item) => ({
-                value: JSON.stringify(item),
-                label: item.name,
-                image: item.poster,
-              }))}
-              showSearch
-              labelInValue
-              placeholder="Chọn phim"
-              optionFilterProp="label"
-              onChange={() => form.setFieldsValue({ dateRange: null })}
-              optionRender={(otps) => {
-                const { data: movie } = otps;
-                return (
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={movie.image}
-                      className="w-8 h-12 rounded-md"
-                      alt=""
-                    />
-                    <p>{movie.label}</p>
-                  </div>
-                );
-              }}
-            />
-          </Form.Item>
-          <Form.Item
-            className="flex-1"
-            label="Phòng chiếu"
-            name={"roomId"}
-            required
-            rules={[formRules.required("Phòng chiếu", "choose")]}
-          >
-            <Select
-              placeholder="Chọn phòng chiếu"
-              options={roomResponse.data?.data.map((item) => ({
-                value: item._id,
-                label: item.name,
-              }))}
-            />
-          </Form.Item>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* CARD 1: PHIM & PHÒNG */}
+          <div className="border rounded-xl p-5 bg-white shadow-sm">
+            <h4 className="font-medium mb-4">Thông tin suất chiếu</h4>
 
-        <div className="flex items-center gap-6">
-          <Form.Item
-            className="flex-1"
-            label="Ghế thường"
-            name={["price", 0, "value"]}
-            rules={[{ required: true, message: "Nhập giá ghế thường" }]}
-          >
-            <InputNumber
-              addonAfter="VND"
-              placeholder="Nhập giá tiền"
-              className="w-full!"
-              {...antdInputNumberPropsCurrency()}
-            />
-          </Form.Item>
-
-          <Form.Item
-            className="flex-1"
-            label="Ghế VIP"
-            name={["price", 1, "value"]}
-            rules={[{ required: true, message: "Nhập giá ghế VIP" }]}
-          >
-            <InputNumber
-              addonAfter="VND"
-              placeholder="Nhập giá tiền"
-              className="w-full!"
-              {...antdInputNumberPropsCurrency(20000)}
-            />
-          </Form.Item>
-
-          <Form.Item
-            className="flex-1"
-            label="Ghế đôi"
-            name={["price", 2, "value"]}
-            rules={[{ required: true, message: "Nhập giá ghế đôi" }]}
-          >
-            <InputNumber
-              addonAfter="VND"
-              placeholder="Nhập giá tiền"
-              className="w-full!"
-              {...antdInputNumberPropsCurrency(30000)}
-            />
-          </Form.Item>
-        </div>
-
-        <Form.Item
-          required
-          label="Ngày chiếu trong tuần"
-          name="dayOfWeeks"
-          rules={[formRules.required("Ngày chiếu trong tuần", "choose")]}
-        >
-          <Select
-            mode="multiple"
-            placeholder="Chọn ngày chiếu trong tuần"
-            options={[
-              { value: "all", label: "Chọn tất cả" },
-              ...Object.entries(DAYOFWEEK_LABEL).map(([value, label]) => ({
-                value: Number(value),
-                label,
-              })),
-            ]}
-            onChange={(values) => {
-              if (values.includes("all")) {
-                form.setFieldsValue({
-                  dayOfWeeks: Object.keys(DAYOFWEEK_LABEL).map((v) =>
-                    Number(v),
-                  ),
-                });
-              }
-            }}
-          />
-        </Form.Item>
-
-        <div className="flex items-center gap-6">
-          <Form.Item
-            className="flex-1"
-            label="Chọn khoảng ngày chiếu"
-            name="dateRange"
-            rules={[formRules.required("Khoảng ngày chiếu", "choose")]}
-          >
-            <RangePicker
-              className="w-full"
-              disabled={!movieSelectForm}
-              placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
-              disabledDate={(current) => {
-                if (!current) return false;
-                const tomorrow = dayjs().add(1, "day").startOf("day");
-                const releaseDate = dayjs(movieSelected.releaseDate).startOf(
-                  "day",
-                );
-                const minDate = releaseDate.isAfter(tomorrow)
-                  ? releaseDate
-                  : tomorrow;
-                const currentDay = current.startOf("day");
-                return currentDay.isBefore(minDate);
-              }}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Khung giờ chiếu"
-            className="flex-1"
-            required
-            name={"fixedHour"}
-            rules={[formRules.required("Khung giờ", "choose")]}
-          >
-            <DurationRangePicker
-              disabled={!movieSelected}
-              durationMinutes={movieSelected.duration}
-            />
-          </Form.Item>
-        </div>
-        <Form.Item>
-          <div className="flex items-center gap-4 justify-end">
-            <Button disabled={isPending}>Đặt lại</Button>
-            <Button
-              onClick={() => {
-                handleFinish();
-              }}
-              loading={isPending}
-              disabled={isPending}
-              type="primary"
-              htmlType="submit"
+            <Form.Item
+              label="Phim"
+              name="movieId"
+              required
+              rules={[formRules.required("Phim", "choose")]}
             >
-              Tạo mới và ở lại
-            </Button>
-            <Button
-              onClick={() => {
-                handleFinish(true);
-              }}
-              loading={isPending}
-              disabled={isPending}
-              type="primary"
-              htmlType="submit"
+              <Select
+                showSearch
+                labelInValue
+                placeholder="Chọn phim"
+                optionFilterProp="label"
+                options={movieResponse.data?.data.map((item) => ({
+                  value: JSON.stringify(item),
+                  label: item.name,
+                  image: item.poster,
+                }))}
+                optionRender={(otps) => {
+                  const { data: movie } = otps;
+                  return (
+                    <div className="flex items-center gap-3">
+                      <img src={movie.image} className="w-8 h-12 rounded-md" />
+                      <p>{movie.label}</p>
+                    </div>
+                  );
+                }}
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Phòng chiếu"
+              name="roomId"
+              required
+              rules={[formRules.required("Phòng chiếu", "choose")]}
             >
-              Tạo mới và trở về
-            </Button>
+              <Select
+                placeholder="Chọn phòng chiếu"
+                options={roomResponse.data?.data.map((item) => ({
+                  value: item._id,
+                  label: item.name,
+                }))}
+              />
+            </Form.Item>
           </div>
-        </Form.Item>
+
+          {/* CARD 2: GIÁ VÉ */}
+          <div className="border rounded-xl p-5 bg-white shadow-sm">
+            <h4 className="font-medium mb-4">Giá vé theo loại ghế</h4>
+
+            <div className="grid grid-cols-1 gap-4">
+              <Form.Item
+                label="Ghế thường"
+                name={["price", 0, "value"]}
+                rules={[{ required: true, message: "Nhập giá ghế thường" }]}
+              >
+                <InputNumber
+                  addonAfter="VND"
+                  className="w-full"
+                  placeholder="Nhập giá"
+                  {...antdInputNumberPropsCurrency()}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Ghế VIP"
+                name={["price", 1, "value"]}
+                rules={[{ required: true, message: "Nhập giá ghế VIP" }]}
+              >
+                <InputNumber
+                  addonAfter="VND"
+                  className="w-full"
+                  placeholder="Nhập giá"
+                  {...antdInputNumberPropsCurrency(20000)}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Ghế đôi"
+                name={["price", 2, "value"]}
+                rules={[{ required: true, message: "Nhập giá ghế đôi" }]}
+              >
+                <InputNumber
+                  addonAfter="VND"
+                  className="w-full"
+                  placeholder="Nhập giá"
+                  {...antdInputNumberPropsCurrency(30000)}
+                />
+              </Form.Item>
+            </div>
+          </div>
+
+          {/* CARD 3: NGÀY & GIỜ */}
+          <div className="border rounded-xl p-5 bg-white shadow-sm lg:col-span-2">
+            <h4 className="font-medium mb-4">Lịch chiếu</h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Form.Item
+                label="Ngày chiếu trong tuần"
+                name="dayOfWeeks"
+                rules={[formRules.required("Ngày chiếu trong tuần", "choose")]}
+              >
+                <Select
+                  mode="multiple"
+                  placeholder="Chọn ngày"
+                  options={[
+                    { value: "all", label: "Chọn tất cả" },
+                    ...Object.entries(DAYOFWEEK_LABEL).map(([v, label]) => ({
+                      value: Number(v),
+                      label,
+                    })),
+                  ]}
+                  onChange={(values) => {
+                    if (values.includes("all")) {
+                      form.setFieldsValue({
+                        dayOfWeeks: Object.keys(DAYOFWEEK_LABEL).map((v) =>
+                          Number(v),
+                        ),
+                      });
+                    }
+                  }}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Khoảng ngày chiếu"
+                name="dateRange"
+                rules={[formRules.required("Khoảng ngày chiếu", "choose")]}
+              >
+                <RangePicker className="w-full" />
+              </Form.Item>
+
+              <Form.Item
+                label="Khung giờ chiếu"
+                name="fixedHour"
+                rules={[formRules.required("Khung giờ", "choose")]}
+              >
+                <DurationRangePicker
+                  disabled={!movieSelected}
+                  durationMinutes={movieSelected.duration}
+                />
+              </Form.Item>
+            </div>
+          </div>
+        </div>
+
+        {/* BUTTONS */}
+        <div className="flex justify-end gap-4 mt-6">
+          <Button disabled={isPending}>Đặt lại</Button>
+
+          <Button
+            type="primary"
+            loading={isPending}
+            disabled={isPending}
+            onClick={() => handleFinish()}
+          >
+            Tạo mới và ở lại
+          </Button>
+
+          <Button
+            type="primary"
+            loading={isPending}
+            disabled={isPending}
+            onClick={() => handleFinish(true)}
+          >
+            Tạo mới và trở về
+          </Button>
+        </div>
       </Form>
     </div>
   );

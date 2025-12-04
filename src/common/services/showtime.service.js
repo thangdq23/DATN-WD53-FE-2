@@ -13,9 +13,7 @@ export const getAllShowtime = async (params) => {
 };
 
 export const getShowtimeWeekday = async (params) => {
-  const { data } = await api.get(`${prefix}/weekday`, {
-    params,
-  });
+  const { data } = await api.get(`${prefix}/weekday`, { params });
   return data;
 };
 
