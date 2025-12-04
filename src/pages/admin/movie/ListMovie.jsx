@@ -1,9 +1,9 @@
-// src/pages/admin/movie/ListMovie.jsx
 import {
   FileAddOutlined,
   EditOutlined,
   LockOutlined,
   UnlockOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -66,7 +66,9 @@ const ListMovie = () => {
   return (
     <div className="w-full min-h-[85dvh] rounded-md shadow-md px-6 py-4 bg-[#f5f7fb]">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold mb-0">Danh sách phim</h3>
+        <div>
+          <h3 className="text-xl font-semibold mb-0">Danh sách phim</h3>
+        </div>
 
         <Link to="/admin/movies/create">
           <Button
@@ -104,17 +106,22 @@ const ListMovie = () => {
             >
               <Row gutter={16} align="middle">
                 <Col xs={24} sm={6} md={4}>
-                  <Image
-                    src={movie.poster}
-                    alt={movie.name}
-                    width="100%"
-                    style={{
-                      borderRadius: 12,
-                      objectFit: "cover",
-                      maxHeight: 220,
-                    }}
-                    preview={false}
-                  />
+                  <div
+                    onClick={() => navigate(`/admin/movies/${movie._id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <Image
+                      src={movie.poster}
+                      alt={movie.name}
+                      width="100%"
+                      style={{
+                        borderRadius: 12,
+                        objectFit: "cover",
+                        maxHeight: 220,
+                      }}
+                      preview={false}
+                    />
+                  </div>
                 </Col>
 
                 <Col xs={24} sm={14} md={16}>
@@ -133,7 +140,11 @@ const ListMovie = () => {
                     )}
                   </Space>
 
-                  <Title level={5} style={{ margin: 0 }}>
+                  <Title
+                    level={5}
+                    style={{ margin: 0, cursor: "pointer" }}
+                    onClick={() => navigate(`/admin/movies/${movie._id}`)}
+                  >
                     {movie.name}
                   </Title>
 
@@ -168,6 +179,10 @@ const ListMovie = () => {
 
                 <Col xs={24} sm={4} md={4} style={{ textAlign: "right" }}>
                   <Space direction="vertical">
+                    <Button
+                      icon={<EyeOutlined />}
+                      onClick={() => navigate(`/admin/movies/${movie._id}`)}
+                    />
                     <Button
                       icon={<EditOutlined />}
                       onClick={() =>

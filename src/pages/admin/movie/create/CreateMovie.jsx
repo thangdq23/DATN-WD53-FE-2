@@ -82,7 +82,7 @@ const CreateMovie = () => {
         onFinish={handleSubmit}
         className="mt-4 bg-white rounded-xl px-6 py-5"
       >
-        {/* HEADER */}
+        
         <div className="flex items-center justify-between mb-4 border-b pb-3">
           <div>
             <h3 className="text-xl font-semibold m-0">Thêm phim mới</h3>
@@ -104,9 +104,9 @@ const CreateMovie = () => {
           </div>
         </div>
 
-        {/* GRID 2 CỘT: TRÁI = POSTER + THÔNG TIN NHANH, PHẢI = CHI TIẾT */}
+        
         <div className="grid grid-cols-12 gap-8">
-          {/* CỘT TRÁI */}
+          
           <div className="col-span-12 md:col-span-4 space-y-5">
             <div className="border rounded-lg px-4 py-4">
               <h4 className="font-semibold text-base mb-3">Poster phim</h4>
@@ -117,7 +117,7 @@ const CreateMovie = () => {
                 rules={[{ required: true, message: "Vui lòng tải ảnh lên!" }]}
                 className="mb-0"
               >
-                {/* vẫn dùng component cũ, chỉ bao trong card khác */}
+                
                 <UploadImage width={240} height={360} />
               </Form.Item>
             </div>
@@ -166,9 +166,9 @@ const CreateMovie = () => {
             </div>
           </div>
 
-          {/* CỘT PHẢI */}
+         
           <div className="col-span-12 md:col-span-8 space-y-6">
-            {/* BLOCK 1: THÔNG TIN CƠ BẢN */}
+            
             <section className="border rounded-lg px-4 py-4 space-y-3">
               <h4 className="font-semibold text-base mb-1">
                 1. Thông tin cơ bản
@@ -205,7 +205,7 @@ const CreateMovie = () => {
               </Form.Item>
             </section>
 
-            {/* BLOCK 2: CHI TIẾT PHIM / NGÔN NGỮ / ĐẠO DIỄN */}
+            
             <section className="border rounded-lg px-4 py-4 space-y-3">
               <h4 className="font-semibold text-base mb-1">2. Chi tiết phim</h4>
 
@@ -324,7 +324,7 @@ const CreateMovie = () => {
               </Form.Item>
             </section>
 
-            {/* BLOCK 3: THỜI GIAN CHIẾU */}
+           
             <section className="border rounded-lg px-4 py-4 space-y-3">
               <h4 className="font-semibold text-base mb-1">
                 3. Thời gian chiếu
@@ -394,7 +394,7 @@ const CreateMovie = () => {
           </div>
         </div>
 
-        {/* BUTTONS */}
+        
         <div className="flex justify-end gap-6 mt-6">
           <Button
             disabled={isLoading}

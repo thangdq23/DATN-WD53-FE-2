@@ -78,7 +78,6 @@ const UpdateMovie = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
 
-    // xử lý poster
     let posterUrl = values.poster;
 
     if (Array.isArray(values.poster)) {
@@ -91,7 +90,7 @@ const UpdateMovie = () => {
           return;
         }
       } else {
-        // trường hợp UploadImage trả về object có url
+        
         posterUrl = values.poster[0]?.url || values.poster[0];
       }
     }
@@ -123,7 +122,6 @@ const UpdateMovie = () => {
         onFinish={handleSubmit}
         className="mt-4 bg-white rounded-xl px-6 py-5"
       >
-        {/* HEADER */}
         <div className="flex items-center justify-between mb-4 border-b pb-3">
           <div>
             <h3 className="text-xl font-semibold m-0">Cập nhật phim</h3>
@@ -142,11 +140,11 @@ const UpdateMovie = () => {
           </div>
         </div>
 
-        {/* GRID 2 CỘT */}
+       
         <div className="grid grid-cols-12 gap-8">
-          {/* LEFT COLUMN */}
+          
           <div className="col-span-12 md:col-span-4 space-y-5">
-            {/* Poster */}
+            
             <div className="border rounded-lg px-4 py-4">
               <h4 className="font-semibold text-base mb-3">Poster phim</h4>
               <Form.Item
@@ -160,7 +158,6 @@ const UpdateMovie = () => {
               </Form.Item>
             </div>
 
-            {/* Thời lượng & tuổi */}
             <div className="border rounded-lg px-4 py-4 space-y-3">
               <h4 className="font-semibold text-base mb-1">
                 Thông tin chiếu nhanh
@@ -200,9 +197,8 @@ const UpdateMovie = () => {
             </div>
           </div>
 
-          {/* RIGHT COLUMN */}
+ 
           <div className="col-span-12 md:col-span-8 space-y-6">
-            {/* BLOCK 1: THÔNG TIN CƠ BẢN */}
             <section className="border rounded-lg px-4 py-4 space-y-3">
               <h4 className="font-semibold text-base">1. Thông tin cơ bản</h4>
 
@@ -233,7 +229,7 @@ const UpdateMovie = () => {
               </Form.Item>
             </section>
 
-            {/* BLOCK 2: CHI TIẾT PHIM */}
+           
             <section className="border rounded-lg px-4 py-4 space-y-3">
               <h4 className="font-semibold text-base">2. Chi tiết phim</h4>
 
@@ -290,7 +286,6 @@ const UpdateMovie = () => {
               </Form.Item>
             </section>
 
-            {/* BLOCK 3: THỜI GIAN CHIẾU */}
             <section className="border rounded-lg px-4 py-4 space-y-3">
               <h4 className="font-semibold text-base">3. Thời gian chiếu</h4>
 
@@ -334,7 +329,6 @@ const UpdateMovie = () => {
           </div>
         </div>
 
-        {/* BUTTON */}
         <div className="flex justify-end gap-6 mt-6">
           <Button
             style={{ width: 150, height: 35 }}
