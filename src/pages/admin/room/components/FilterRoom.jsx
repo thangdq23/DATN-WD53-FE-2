@@ -1,27 +1,48 @@
 import { Input, Select } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTable } from "../../../../common/hooks/useTable";
+import { debounce } from 'lodash';
 
 const FilterRoom = () => {
   const { query, onFilter, onChangeSearchInput } = useTable();
   const [search, setSearch] = useState("");
+  
   useEffect(() => {
-    if (query.search) {
-      setSearch(query.search);
-    }
+    setSearch(query.search || "");
   }, [query.search]);
+
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      onChangeSearchInput(value, { 
+        enableOnChangeSearch: true,
+        prefix: ''
+      });
+    }, 500),
+    [onChangeSearchInput]
+  );
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearch(value);
+    if (value.trim() === '' || value.length > 2) {
+      debouncedSearch(value);
+    }
+  };
 
   return (
     <div className="mt-4 flex items-center gap-3">
-      <Input
+      <Input.Search
         value={search}
-        onChange={(e) => {
-          const value = e.target.value;
-          setSearch(value);
-          onChangeSearchInput(value, { enableOnChangeSearch: true });
-        }}
-        placeholder="Tìm kiếm phòng chiếu"
+        onChange={handleSearchChange}
+        onSearch={(e)=> onFilter({search: [e]})}
+        placeholder="Tìm kiếm phòng chiếu..."
         style={{ height: 35, width: 300 }}
+        allowClear
       />
       <Select
         style={{ height: 35, minWidth: 150 }}
