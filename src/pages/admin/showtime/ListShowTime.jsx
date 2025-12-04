@@ -22,7 +22,7 @@ const ListShowtime = () => {
         ...query,
       }),
   });
-  const equalDynamicRoute = ["/admin/showtime/create"];
+  const equalDynamicRoute = ["/admin/showtimes/create"];
   return (
     <div className=" w-full min-h-[87vh] rounded-md shadow-md px-6 py-4">
       <h3 className="text-base">Quản Lý Lịch Chiếu</h3>
@@ -32,7 +32,7 @@ const ListShowtime = () => {
             <div>
               <h3>Danh Sách Phim</h3>
             </div>
-            <Link to={"/admin/showtime/create"}>
+            <Link to={"/admin/showtimes/create"}>
               <Button className="text-xs!">Thêm suất chiếu</Button>
             </Link>
           </div>
@@ -68,7 +68,7 @@ const ListShowtime = () => {
                   );
                   return (
                     <Link
-                      to={`/admin/showtime/movie/${
+                      to={`/admin/showtimes/movie/${
                         item._id
                       }?showtime_startTimeFrom=${dayjs()
                         .startOf("day")
@@ -138,7 +138,7 @@ const ListShowtime = () => {
             </div>
           )}
         </div>
-        <div className="shadow-lg rounded-md">
+        <div className="shadow-lg rounded-md overflow-hidden">
           {movieId || equalDynamicRoute.includes(pathname) ? (
             <Outlet />
           ) : (

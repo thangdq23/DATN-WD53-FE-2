@@ -1,6 +1,16 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-const BannerSection = ({ src, fallback }) => {
+const BannerSection = ({ images = [], interval = 3000 }) => {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % images.length);
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [images.length, interval]);
+
   const styles = {
     bannerWrap: {
       width: "100%",
@@ -8,25 +18,26 @@ const BannerSection = ({ src, fallback }) => {
       borderRadius: 8,
       marginBottom: 20,
       overflow: "hidden",
+      position: "relative",
     },
     bannerImg: {
       width: "100%",
       height: "100%",
       objectFit: "cover",
       display: "block",
+      transition: "opacity 0.6s ease",
     },
   };
+
+  if (images.length === 0) return null;
 
   return (
     <div style={styles.bannerWrap}>
       <img
-        src={src}
+        key={images[index]}
+        src={images[index]}
         alt="Banner"
         style={styles.bannerImg}
-        onError={(e) => {
-          e.target.onerror = null;
-          e.target.src = fallback;
-        }}
       />
     </div>
   );

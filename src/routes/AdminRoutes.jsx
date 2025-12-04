@@ -2,13 +2,15 @@ import AdminLayout from "../common/layouts/AdminLayout";
 import DashboardPage from "../pages/admin/DashboardPage";
 import CreateMovie from "../pages/admin/movie/create/CreateMovie";
 import ListMovie from "../pages/admin/movie/ListMovie";
-import GenrePage from "../pages/admin/genre/GenrePage";
 import UpdateMovie from "../pages/admin/movie/update/UpdateMovie";
+import MovieDetail from "../pages/admin/movie/MovieDetail";
+import GenrePage from "../pages/admin/genre/GenrePage";
 import ListRoomPage from "../pages/admin/room/ListRoomPage";
 import CreateRoom from "../pages/admin/room/create/CreateRoom";
 import UpdateRoom from "../pages/admin/room/update/UpdateRoom";
 import ListShowtime from "../pages/admin/showtime/ListShowTime";
-import MovieDetail from "../pages/admin/movie/MovieDetail";
+import ListShowtimeInMovie from "../pages/admin/showtime/showtimeMovie/ListShowtimeInMovie";
+import CreateMovieShowtime from "../pages/admin/showtime/create/CreateMovieShowtime";
 
 
 export const AdminRoutes = [
@@ -65,6 +67,13 @@ export const AdminRoutes = [
       {
         path: "showtimes",
         element: <ListShowtime />,
+        children: [
+          { path: "movie/:id", element: <ListShowtimeInMovie /> },
+          {
+            path: "create",
+            element: <CreateMovieShowtime />,
+          },
+        ],
       },
     ],
   },
