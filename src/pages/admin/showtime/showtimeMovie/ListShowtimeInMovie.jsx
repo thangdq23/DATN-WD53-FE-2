@@ -16,7 +16,7 @@ const ListShowtimeInMovie = () => {
   const { id: movieId } = useParams();
   const { query, onSelectPaginateChange } = useTable();
 
-  // Lấy chi tiết phim
+ 
   const { data: movieData, isLoading: isLoadingMovie } = useQuery({
     queryKey: [QUERYKEY.MOVIE, movieId],
     queryFn: () => getDetailMovie(movieId),
@@ -25,7 +25,7 @@ const ListShowtimeInMovie = () => {
 
   const movie = movieData?.data || {};
 
-  // Lấy lịch chiếu theo ngày
+  
   const { data, isLoading } = useQuery({
     queryKey: [
       QUERYKEY.SHOWTIME,
@@ -53,7 +53,7 @@ const ListShowtimeInMovie = () => {
         </div>
       ) : (
         <>
-          {/* HEADER: Thông tin phim + filter */}
+          
           <div className="bg-primary/5 gap-6 py-6 px-8 border-b-gray-700/80 border-b">
             <div
               className="grid gap-4"
@@ -96,7 +96,7 @@ const ListShowtimeInMovie = () => {
             <FilterShowtimeInMovie />
           </div>
 
-          {/* BODY: Lịch chiếu */}
+          
           {isLoading ? (
             <div className="flex min-h-[20vh] items-center justify-center">
               <Spin size="default" />
@@ -117,7 +117,7 @@ const ListShowtimeInMovie = () => {
                 </div>
               </div>
 
-              {/* Không có lịch chiếu */}
+              
               {data?.data && Object.entries(data.data).length === 0 && (
                 <div className="min-h-[35vh] flex items-center justify-center">
                   <p className="text-red-500">Không có lịch chiếu nào</p>
@@ -148,7 +148,7 @@ const ListShowtimeInMovie = () => {
                   </div>
                 ))}
 
-              {/* Phân trang */}
+              
               <div>
                 <Pagination
                   onChange={onSelectPaginateChange}
