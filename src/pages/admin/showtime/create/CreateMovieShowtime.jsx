@@ -63,7 +63,7 @@ const CreateMovieShowtime = () => {
       })),
     };
     await mutateAsync(payload);
-    if (nav) navigate("/admin/showtime");
+    if (nav) navigate("/admin/showtimes");
   };
   return (
     <div className="p-6 max-w-6xl mx-auto">
