@@ -21,3 +21,13 @@ export const createManyShowtime = async (payload) => {
   const { data } = await api.post(`${prefix}/many`, payload);
   return data;
 };
+
+export const createShowtime = async (payload) => {
+  const { data } = await api.post(`${prefix}`, payload);
+  return data;
+};
+
+export const updateShowtime = async (payload, id) => {
+  const { data } = await api.patch(`${prefix}/update/${id}`, payload);
+  return data;
+};

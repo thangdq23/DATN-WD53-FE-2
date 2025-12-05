@@ -1,6 +1,8 @@
-export const QUERY = {
-  GENRE: Object.assign("GENRE", {}),
-  MOVIE: Object.assign("MOVIE", {}),
-  ROOM: Object.assign("ROOM", {}),
-  SHOWTIME: Object.assign("SHOWTIME", {}),
+export const QUERYKEY = {
+  GENRE: "GENRE",
+  MOVIE: "MOVIE",
+  ROOM: "ROOM",
+  SHOWTIME: "SHOWTIME",
 };
+
+export const QUERY = QUERYKEY;
