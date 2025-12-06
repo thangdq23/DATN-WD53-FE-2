@@ -131,11 +131,11 @@ const ShowtimePage = () => {
                 <div className="flex items-center gap-2 text-gray-300"><Spin size="small" /> Đang tải suất chiếu...</div>
               ) : todaysShowtimes && todaysShowtimes.length > 0 ? (
                 <div className="flex flex-wrap gap-3">
-                  {todaysShowtimes.map((s) => (
-                    <button key={s._id} className="px-4 py-2 bg-red-600/80 hover:bg-red-700 rounded-lg shadow-md font-medium transition">
-                      {dayjs(s.startTime).format("HH:mm")}
-                    </button>
-                  ))}
+              {todaysShowtimes.map((s) => (
+               <button key={s._id} className="px-4 py-2 bg-red-600/80 hover:bg-red-700 rounded-lg shadow-md font-medium transition">
+                  {dayjs(s.startTime).format("HH:mm")}
+                </button>
+              ))}
                 </div>
               ) : (
                 <div className="text-gray-300">Không có suất chiếu hôm nay</div>
@@ -178,15 +178,15 @@ const ShowtimePage = () => {
                 </Link>
               ))
             )}
-          </div>
-        </div>
-        <Modal
-          open={trailerModal.open}
-          onCancel={() => setTrailerModal({ open: false, url: null, title: "" })}
-          footer={null}
-          title={trailerModal.title}
-          centered
-        >
+      </div>
+    </div>
+    <Modal
+      open={trailerModal.open}
+      onCancel={() => setTrailerModal({ open: false, url: null, title: "" })}
+      footer={null}
+      title={trailerModal.title}
+      centered
+    >
           <div className="relative w-full aspect-video">
             {trailerModal.url && (
               <iframe

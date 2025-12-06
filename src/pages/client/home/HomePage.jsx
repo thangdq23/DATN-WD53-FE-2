@@ -72,7 +72,7 @@ const HomePage = () => {
   const bannerList = [bannerImg1, bannerImg2, bannerImg3];
 
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-b from-[#0b1220] via-[#121826] to-[#0b1220] text-white pb-24">
       <BannerSection images={bannerList} interval={3000} />
 
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px" }}>
