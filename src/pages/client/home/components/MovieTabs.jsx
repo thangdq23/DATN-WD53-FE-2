@@ -8,13 +8,17 @@ const MovieTabs = ({ tabKey, onChange }) => (
     <Tabs activeKey={tabKey} onChange={onChange} centered>
       <TabPane
         tab={
-          <span style={{ fontSize: 20, fontWeight: 700 }}>PHIM SẮP CHIẾU</span>
+          <span style={{ fontSize: 20, fontWeight: 700 }}>
+            PHIM SẮP CHIẾU
+          </span>
         }
         key="upcoming"
       />
       <TabPane
         tab={
-          <span style={{ fontSize: 20, fontWeight: 700 }}>PHIM ĐANG CHIẾU</span>
+          <span style={{ fontSize: 20, fontWeight: 700 }}>
+            PHIM ĐANG CHIẾU
+          </span>
         }
         key="nowShowing"
       />
