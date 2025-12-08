@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
-import { useAuthSelector } from "../common/stores/useAuthStore";
+import { useAuthSelector } from "../store/useAuthStore";
 
 let socket = null;
 
@@ -13,11 +13,11 @@ export const initSocket = (token) => {
     socket.on("connect", () => console.log("Socket connected", socket?.id));
 
     socket.on("disconnect", (reason) =>
-      console.log("Socket disconnected", reason)
+      console.log("Socket disconnected", reason),
     );
 
     socket.on("connect_error", (err) =>
-      console.error("Socket connect error:", err.message)
+      console.error("Socket connect error:", err.message),
     );
   }
 
