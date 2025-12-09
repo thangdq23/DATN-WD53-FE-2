@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { Outlet } from "react-router";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
@@ -132,9 +133,14 @@ const ShowtimePage = () => {
               ) : todaysShowtimes && todaysShowtimes.length > 0 ? (
                 <div className="flex flex-wrap gap-3">
               {todaysShowtimes.map((s) => (
-               <button key={s._id} className="px-4 py-2 bg-red-600/80 hover:bg-red-700 rounded-lg shadow-md font-medium transition">
-                  {dayjs(s.startTime).format("HH:mm")}
-                </button>
+                <Link
+                  key={s._id}
+                  to={`/showtime/${id}/${s._id}/${s.roomId?._id}?hour=${dayjs(s.startTime).format("HH:mm")}`}
+                >
+                  <button className="px-4 py-2 bg-red-600/80 hover:bg-red-700 rounded-lg shadow-md font-medium transition">
+                    {dayjs(s.startTime).format("HH:mm")}
+                  </button>
+                </Link>
               ))}
                 </div>
               ) : (
@@ -179,6 +185,7 @@ const ShowtimePage = () => {
               ))
             )}
       </div>
+      <Outlet />
     </div>
     <Modal
       open={trailerModal.open}

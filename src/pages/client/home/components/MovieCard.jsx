@@ -4,11 +4,11 @@ import { ShoppingCartOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { useQuery } from "@tanstack/react-query";
-
+import { getShowtimeWeekday } from "../../../../common/services/showtime.service";
 
 const { Text, Link } = Typography;
 
-const MovieCard = ({ movie, onBuy, fallback }) => {
+const MovieCard = ({ movie, onBuy = () => {}, fallback }) => {
   const navigate = useNavigate();
 
   const styles = {
@@ -42,10 +42,14 @@ const MovieCard = ({ movie, onBuy, fallback }) => {
   };
 
   return (
-    <Card bordered={false} bodyStyle={{ paddingTop: 12 }}>
+    <Card
+      variant="borderless"
+      styles={{ body: { paddingTop: 12 } }}
+    >
       <Link onClick={() => navigate(`/showtime/${movie._id}`)}>
         <div style={styles.posterWrap}>
           <div style={styles.ageTag}>{movie.age}</div>
+
           <img
             src={movie.poster}
             alt={movie.title}
@@ -56,21 +60,25 @@ const MovieCard = ({ movie, onBuy, fallback }) => {
             }}
           />
         </div>
+
         <div style={{ paddingTop: 8 }}>
           <p className="text-base md:text-lg font-semibold text-white line-clamp-1 mb-2!">
             {movie.name}
           </p>
+
           <div className="text-xs text-gray-300">
-            Thể loại: {" "}
+            Thể loại:{" "}
             <Text strong className="text-gray-200">
-              {movie?.genreIds?.map((item) => item.name)?.join(", ")}
+              {movie?.genreIds?.map((item) => item.name).join(", ")}
             </Text>
           </div>
+
           <div className="text-xs text-gray-300 mt-1">
-            Thời lượng: <Text strong className="text-gray-200">{movie.duration} phút</Text>
+            Thời lượng:{" "}
+            <Text strong className="text-gray-200">{movie.duration} phút</Text>
           </div>
 
-          {/* Suất chiếu hôm nay (tối đa 3) */}
+          {/* Suất chiếu hôm nay */}
           <ShowtimeToday movieId={movie._id} />
 
           {movie.statusRelease === "nowShowing" && (
@@ -102,7 +110,9 @@ const ShowtimeToday = ({ movieId }) => {
   });
 
   const payload = data?.data || {};
-  const todayKey = Object.keys(payload).find((d) => dayjs(d).isSame(dayjs(), "day"));
+  const todayKey = Object.keys(payload).find((d) =>
+    dayjs(d).isSame(dayjs(), "day")
+  );
   const times = todayKey ? payload[todayKey] : [];
   const firstThree = Array.isArray(times) ? times.slice(0, 3) : [];
 

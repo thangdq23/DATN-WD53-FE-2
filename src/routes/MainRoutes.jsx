@@ -7,6 +7,7 @@ import ShowtimePage from "../pages/client/ShowTimePage";
 import AboutPage from "../pages/client/home/components/AboutPage";
 import ContactPage from "../pages/client/home/components/ContactPage";
 import RulePage from "../pages/client/home/components/RulePage";
+import ShowtimePicker from "../pages/client/movie/detail/components/ShowtimePicker";
 
 export const MainRoutes = [
   {
@@ -20,6 +21,10 @@ export const MainRoutes = [
       {
         path: "showtime/:id",
         element: <ShowtimePage />,
+        children: [
+          { index: true, element: <ShowtimePicker /> },
+          { path: ":showtimeId/:roomId", element: <ShowtimePicker /> },
+        ],
       },
       {
         path: "about",       // thêm route cho AboutPage
