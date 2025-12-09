@@ -3,9 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Button, Image, Pagination, Spin, Tag } from "antd";
 import dayjs from "dayjs";
 import { useParams } from "react-router";
+import { useState } from "react";
 import { DAYOFWEEK_LABEL } from "../../../../common/constants/dayOfWeek";
 import { QUERYKEY } from "../../../../common/constants/queryKey";
-import { useTable } from "../../../../common/hooks/useTable";
 import { getDetailMovie } from "../../../../common/services/movie.service";
 import { getShowtimeWeekday } from "../../../../common/services/showtime.service";
 import FilterShowtimeInMovie from "./components/FilterShowtimeInMovie";
@@ -14,9 +14,28 @@ import CreateShowtimeModal from "./create/CreateShowtimeModal";
 
 const ListShowtimeInMovie = () => {
   const { id: movieId } = useParams();
-  const { query, onSelectPaginateChange } = useTable();
 
- 
+  const [query, setQuery] = useState({
+    page: 1,
+    limit: 10,
+  });
+
+  const updateFilter = (payload) => {
+    setQuery((prev) => ({
+      ...prev,
+      ...payload,
+      page: 1,
+    }));
+  };
+
+  const onSelectPaginateChange = (page) => {
+    setQuery((prev) => ({ ...prev, page }));
+  };
+
+  const cleanedQuery = Object.fromEntries(
+    Object.entries(query).filter(([_, v]) => v !== undefined && v !== null && v !== "")
+  );
+
   const { data: movieData, isLoading: isLoadingMovie } = useQuery({
     queryKey: [QUERYKEY.MOVIE, movieId],
     queryFn: () => getDetailMovie(movieId),
@@ -25,139 +44,112 @@ const ListShowtimeInMovie = () => {
 
   const movie = movieData?.data || {};
 
-  
   const { data, isLoading } = useQuery({
-    queryKey: [
-      QUERYKEY.SHOWTIME,
-      movieId,
-      ...Object.values(query),
-      ...Object.keys(query),
-    ],
+    queryKey: [QUERYKEY.SHOWTIME, movieId, ...Object.values(cleanedQuery)],
     queryFn: () =>
       getShowtimeWeekday({
         movieId,
         sort: "startTime",
         order: "asc",
-        limit: 2,
-        startTimeFrom: dayjs().startOf("day").toISOString(),
-        ...query,
+        ...cleanedQuery,
       }),
     enabled: !!movieId,
   });
 
   return (
-    <div>
-      {isLoadingMovie && movie ? (
+    <div className="bg-[#f5f7fb] min-h-screen p-8">
+      {isLoadingMovie ? (
         <div className="flex justify-center items-center h-[80vh]">
-          <Spin />
+          <Spin size="large" />
         </div>
       ) : (
         <>
-          
-          <div className="bg-primary/5 gap-6 py-6 px-8 border-b-gray-700/80 border-b">
-            <div
-              className="grid gap-4"
-              style={{ gridTemplateColumns: "1fr 4fr" }}
-            >
-              <div className="rounded-md h-58 w-full overflow-hidden">
-                <Image src={movie.poster} className="object-cover" />
+          <div className="bg-white rounded-2xl shadow p-8 mb-10 flex justify-between gap-10">
+            <div className="flex gap-10">
+              <div className="w-[260px] h-[360px] rounded-xl overflow-hidden shadow-md border">
+                <Image src={movie.poster} className="w-full h-full object-cover" />
               </div>
 
-              <div>
-                <h3 className="line-clamp-1 text-xl font-semibold">
-                  {movie.name}
-                </h3>
+              <div className="flex flex-col gap-3 pt-3">
+                <h2 className="text-3xl font-semibold">{movie.name}</h2>
 
-                <p className="line-clamp-3 mt-2 text-gray-300/70">
-                  {movie.description}
+                <p className="px-3 py-1 rounded-md bg-blue-50 text-blue-600 w-fit">
+                  Phim rất hay
                 </p>
 
-                <p className="mt-2 text-gray-300/70 line-clamp-1">
-                  <span className="text-white">Thời lượng:</span>{" "}
-                  {movie.duration} phút
+                <p className="px-3 py-1 rounded-md bg-green-50 text-green-600 w-fit">
+                  Thời lượng: {movie.duration} phút
                 </p>
 
-                <p className="mt-2 text-gray-300/70 line-clamp-1">
-                  <span className="text-white">Thể loại:</span>{" "}
+                <p className="px-3 py-1 rounded-md bg-purple-50 text-purple-600 w-fit">
+                  Thể loại:{" "}
                   {(movie?.category || [])
-                    .filter((c) => c.status)
                     .map((c) => c.name)
                     .join(", ") || "Chưa cập nhật"}
                 </p>
 
                 {movie.ageRestriction && (
-                  <Tag color="blue" className="mt-2 inline-block">
+                  <p className="px-3 py-1 rounded-md bg-orange-50 text-orange-600 w-fit">
                     {movie.ageRestriction}
-                  </Tag>
+                  </p>
                 )}
               </div>
             </div>
 
-            <FilterShowtimeInMovie />
+            <div className="flex items-start">
+              <CreateShowtimeModal movie={movie}>
+                <Button type="primary" size="large" className="px-6 rounded-xl">
+                  Thêm lịch chiếu
+                </Button>
+              </CreateShowtimeModal>
+            </div>
           </div>
 
-          
+          <div className="bg-white shadow-sm rounded-xl p-6 mb-8 border">
+            <FilterShowtimeInMovie updateFilter={updateFilter} />
+          </div>
+
           {isLoading ? (
-            <div className="flex min-h-[20vh] items-center justify-center">
-              <Spin size="default" />
+            <div className="flex justify-center items-center h-[40vh]">
+              <Spin size="large" />
             </div>
           ) : (
-            <div className="px-8 py-4">
-              <div className="mb-4 flex items-start justify-between">
-                <div>
-                  <p className="text-lg font-medium">Lịch chiếu</p>
-                  <p className="text-xs text-gray-300/50 mt-2">
-                    {data?.meta?.total} Ngày chiếu
-                  </p>
-                </div>
-                <div>
-                  <CreateShowtimeModal movie={movie}>
-                    <Button>Thêm lịch chiếu</Button>
-                  </CreateShowtimeModal>
-                </div>
-              </div>
-
-              
-              {data?.data && Object.entries(data.data).length === 0 && (
-                <div className="min-h-[35vh] flex items-center justify-center">
-                  <p className="text-red-500">Không có lịch chiếu nào</p>
-                </div>
-              )}
-
-              {/* Có lịch chiếu theo từng ngày */}
+            <div className="space-y-10">
               {data?.data &&
-                Object.entries(data.data).length !== 0 &&
                 Object.entries(data.data).map(([date, showtimes]) => (
-                  <div key={date} className="mb-6">
-                    <div className="text-base flex items-center gap-2">
-                      <CalendarOutlined className="text-primary!" />
-                      <p className="font-medium">
-                        {DAYOFWEEK_LABEL[dayjs(date).day()]},{" "}
-                        {dayjs(date).format("DD/MM")}
-                      </p>
+                  <div
+                    key={date}
+                    className="bg-white p-6 rounded-2xl border shadow-sm"
+                  >
+                    <div className="flex items-center gap-3 text-xl font-semibold text-gray-900 mb-6">
+                      <CalendarOutlined className="text-blue-500 text-2xl" />
+                      {DAYOFWEEK_LABEL[dayjs(date).day()]},{" "}
+                      {dayjs(date).format("DD/MM")}
                     </div>
 
                     <div
-                      className="grid gap-4 mt-4"
+                      className="grid gap-6"
                       style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
                     >
                       {showtimes.map((item) => (
-                        <ShowtimeCard key={item._id} item={item} />
+                        <div
+                          key={item._id}
+                          className="transition transform hover:-translate-y-1 hover:shadow-xl rounded-xl"
+                        >
+                          <ShowtimeCard item={item} />
+                        </div>
                       ))}
                     </div>
                   </div>
                 ))}
 
-              
-              <div>
-                <Pagination
-                  onChange={onSelectPaginateChange}
-                  current={data?.meta?.page}
-                  align="end"
-                  total={data?.meta?.total}
-                  pageSize={data?.meta?.limit}
-                />
-              </div>
+              <Pagination
+                onChange={onSelectPaginateChange}
+                current={data?.meta?.page}
+                total={data?.meta?.total}
+                pageSize={data?.meta?.limit}
+                className="pt-6 flex justify-end"
+              />
             </div>
           )}
         </>
