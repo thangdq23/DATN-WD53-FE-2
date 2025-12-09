@@ -1,5 +1,19 @@
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
-import { Button, DatePicker, Form, InputNumber, Select } from "antd";
+import {
+  Button,
+  DatePicker,
+  Form,
+  InputNumber,
+  Select,
+} from "antd";
+import {
+  VideoCameraOutlined,
+  DollarCircleOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+  UndoOutlined,
+  PlusCircleOutlined,
+} from "@ant-design/icons";
 import dayjs from "dayjs";
 import { QUERYKEY } from "../../../../../../common/constants/queryKey";
 import { useMessage } from "../../../../../../common/hooks/useMessage";
@@ -56,8 +70,12 @@ const CreateOneComponent = ({ movie, setOpen }) => {
     await mutateAsync(payload);
   };
 
+  const handleReset = () => {
+    form.resetFields();
+  };
+
   return (
-    <div className="p-4">
+    <div className="mt-4 rounded-3xl bg-gradient-to-b from-orange-50 via-rose-50 to-white px-5 py-6 shadow-lg">
       <Form
         form={form}
         initialValues={{
@@ -68,18 +86,28 @@ const CreateOneComponent = ({ movie, setOpen }) => {
           ],
         }}
         layout="vertical"
-        className="mt-4!"
+        className="space-y-6 [&_.ant-form-item-label>label]:text-slate-800"
       >
-        <div className="flex items-center gap-6">
+        {/* PHÒNG CHIẾU */}
+        <div className="rounded-2xl border border-orange-100 bg-white/90 px-4 py-4 shadow-sm md:px-5 md:py-5">
+          <div className="mb-3 flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-rose-500">
+              <VideoCameraOutlined />
+            </div>
+            <p className="text-sm font-semibold text-slate-800">
+              Phòng chiếu <span className="text-red-500">*</span>
+            </p>
+          </div>
+
           <Form.Item
-            className="flex-1"
-            label="Phòng chiếu"
+            className="mb-0"
+            label={null}
             name="roomId"
-            required
             rules={[formRules.required("Phòng chiếu", "choose")]}
           >
             <Select
               placeholder="Chọn phòng chiếu"
+              className="w-full"
               options={roomResponse.data?.data?.map((item) => ({
                 value: item._id,
                 label: item.name,
@@ -88,60 +116,83 @@ const CreateOneComponent = ({ movie, setOpen }) => {
           </Form.Item>
         </div>
 
-        <div className="flex items-center gap-6">
-          <Form.Item
-            className="flex-1"
-            label="Ghế thường"
-            name={["price", 0, "value"]}
-            rules={[{ required: true, message: "Nhập giá ghế thường" }]}
-          >
-            <InputNumber
-              addonAfter="VND"
-              placeholder="Nhập giá tiền"
-              className="w-full!"
-              {...antdInputNumberPropsCurrency()}
-            />
-          </Form.Item>
+        {/* BẢNG GIÁ VÉ */}
+        <div className="rounded-2xl border border-amber-100 bg-white/90 px-4 py-4 shadow-sm md:px-5 md:py-5">
+          <div className="mb-3 flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-500">
+              <DollarCircleOutlined />
+            </div>
+            <p className="text-sm font-semibold text-slate-800">
+              Bảng giá vé <span className="text-red-500">*</span>
+            </p>
+          </div>
 
-          <Form.Item
-            className="flex-1"
-            label="Ghế VIP"
-            name={["price", 1, "value"]}
-            rules={[{ required: true, message: "Nhập giá ghế VIP" }]}
-          >
-            <InputNumber
-              addonAfter="VND"
-              placeholder="Nhập giá tiền"
-              className="w-full!"
-              {...antdInputNumberPropsCurrency(20000)}
-            />
-          </Form.Item>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <Form.Item
+              className="flex-1"
+              label="Ghế thường"
+              name={["price", 0, "value"]}
+              rules={[{ required: true, message: "Nhập giá ghế thường" }]}
+            >
+              <InputNumber
+                addonAfter="VND"
+                placeholder="Nhập giá tiền"
+                className="w-full"
+                {...antdInputNumberPropsCurrency()}
+              />
+            </Form.Item>
 
-          <Form.Item
-            className="flex-1"
-            label="Ghế đôi"
-            name={["price", 2, "value"]}
-            rules={[{ required: true, message: "Nhập giá ghế đôi" }]}
-          >
-            <InputNumber
-              addonAfter="VND"
-              placeholder="Nhập giá tiền"
-              className="w-full!"
-              {...antdInputNumberPropsCurrency(30000)}
-            />
-          </Form.Item>
+            <Form.Item
+              className="flex-1"
+              label="Ghế VIP"
+              name={["price", 1, "value"]}
+              rules={[{ required: true, message: "Nhập giá ghế VIP" }]}
+            >
+              <InputNumber
+                addonAfter="VND"
+                placeholder="Nhập giá tiền"
+                className="w-full"
+                {...antdInputNumberPropsCurrency(20000)}
+              />
+            </Form.Item>
+
+            <Form.Item
+              className="flex-1"
+              label="Ghế đôi"
+              name={["price", 2, "value"]}
+              rules={[{ required: true, message: "Nhập giá ghế đôi" }]}
+            >
+              <InputNumber
+                addonAfter="VND"
+                placeholder="Nhập giá tiền"
+                className="w-full"
+                {...antdInputNumberPropsCurrency(30000)}
+              />
+            </Form.Item>
+          </div>
         </div>
 
-        <div className="flex items-center gap-6">
+        {/* NGÀY CHIẾU */}
+        <div className="rounded-2xl border border-violet-100 bg-white/90 px-4 py-4 shadow-sm md:px-5 md:py-5">
+          <div className="mb-3 flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-violet-100 text-violet-500">
+              <CalendarOutlined />
+            </div>
+            <p className="text-sm font-semibold text-slate-800">
+              Ngày chiếu <span className="text-red-500">*</span>
+            </p>
+          </div>
+
           <Form.Item
-            className="flex-1"
-            label="Chọn ngày chiếu"
+            className="mb-0"
+            label={null}
             name="dateTime"
-            rules={[formRules.required("Khoảng ngày chiếu", "choose")]}
+            rules={[formRules.required("Ngày chiếu", "choose")]}
           >
             <DatePicker
               className="w-full"
-              placeholder="Ngày chiếu"
+              placeholder="dd/mm/yyyy"
+              format="DD/MM/YYYY"
               disabledDate={(current) => {
                 if (!current) return false;
                 const tomorrow = dayjs().add(1, "day").startOf("day");
@@ -154,12 +205,24 @@ const CreateOneComponent = ({ movie, setOpen }) => {
               }}
             />
           </Form.Item>
+        </div>
+
+        {/* KHUNG GIỜ CHIẾU */}
+        <div className="rounded-2xl border border-emerald-100 bg-white/90 px-4 py-4 shadow-sm md:px-5 md:py-5">
+          <div className="mb-3 flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-500">
+              <ClockCircleOutlined />
+            </div>
+            <p className="text-sm font-semibold text-slate-800">
+              Khung giờ chiếu <span className="text-red-500">*</span>
+            </p>
+          </div>
 
           <Form.Item
-            label="Khung giờ chiếu"
-            className="flex-1"
-            required
+            className="mb-0"
+            label={null}
             name="fixedHour"
+            required
             rules={[formRules.required("Khung giờ", "choose")]}
           >
             <DurationRangePicker
@@ -169,17 +232,27 @@ const CreateOneComponent = ({ movie, setOpen }) => {
           </Form.Item>
         </div>
 
-        <Form.Item>
-          <div className="flex items-center mt-6 gap-4 justify-end">
-            <Button disabled={isPending}>Đặt lại</Button>
+        {/* BUTTONS */}
+        <Form.Item className="mb-0">
+          <div className="mt-2 flex items-center justify-end gap-4">
+            <Button
+              onClick={handleReset}
+              disabled={isPending}
+              className="flex items-center gap-2 border-slate-300 px-6 py-2 text-slate-700"
+            >
+              <UndoOutlined />
+              Đặt lại
+            </Button>
             <Button
               onClick={handleFinish}
               loading={isPending}
               disabled={isPending}
               type="primary"
               htmlType="submit"
+              className="flex items-center gap-2 border-none bg-gradient-to-r from-orange-500 to-red-500 px-6 py-2 font-semibold shadow-md hover:from-orange-600 hover:to-red-600"
             >
-              Tạo mới
+              <PlusCircleOutlined />
+              Tạo suất chiếu
             </Button>
           </div>
         </Form.Item>
