@@ -15,7 +15,6 @@ import CreateShowtimeModal from "./create/CreateShowtimeModal";
 const getCategoryTextFromMovie = (movie) => {
   if (!movie) return "";
 
-  // 1. Ưu tiên các field quen thuộc
   let categoriesRaw =
     movie?.category ||
     movie?.categories ||
@@ -49,7 +48,7 @@ const getCategoryTextFromMovie = (movie) => {
 
   if (text) return text;
 
-  // 2. Không có → thử dò TẤT CẢ các mảng trong movie
+  // fallback: quét thêm các mảng/object có chứa category/genre
   for (const [key, value] of Object.entries(movie)) {
     if (Array.isArray(value) && value.length) {
       const first = value[0];
@@ -63,7 +62,6 @@ const getCategoryTextFromMovie = (movie) => {
     }
   }
 
-  // 3. Thử dò object có key chứa "category" hoặc "genre"
   for (const [key, value] of Object.entries(movie)) {
     if (
       value &&
@@ -127,10 +125,8 @@ const ListShowtimeInMovie = () => {
     enabled: !!movieId,
   });
 
-  // Thể loại lấy bằng hàm heuristic
   const categoryText = getCategoryTextFromMovie(movie);
 
-  // Mô tả chi tiết phim
   const movieDescription =
     movie?.description ||
     movie?.shortDescription ||
@@ -139,79 +135,80 @@ const ListShowtimeInMovie = () => {
     "";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-8 py-6">
+    <div className="min-h-screen bg-[#f5f7fb] px-8 py-6">
       {isLoadingMovie ? (
         <div className="flex h-[80vh] items-center justify-center">
           <Spin size="large" />
         </div>
       ) : (
         <>
-          {/* Header phim */}
-          <div className="mb-10 flex justify-between gap-10 rounded-2xl border border-slate-800 bg-slate-900/95 p-8 shadow-2xl shadow-black/40">
-            <div className="flex gap-10">
-              <div className="h-[360px] w-[260px] overflow-hidden rounded-xl border border-slate-700 shadow-lg shadow-black/50">
-                <Image
-                  src={movie.poster}
-                  alt={movie.name}
-                  className="h-full w-full object-cover"
-                />
+          {/* Thông tin phim */}
+          <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+            <div className="flex justify-between gap-10">
+              <div className="flex gap-10">
+                <div className="h-[360px] w-[260px] overflow-hidden rounded-xl border border-slate-200 shadow">
+                  <Image
+                    src={movie.poster}
+                    alt={movie.name}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-3 pt-2 text-slate-900">
+                  <h2 className="text-3xl font-semibold">{movie.name}</h2>
+
+                  <p className="w-fit rounded-md bg-green-50 px-3 py-1 text-sm text-green-600">
+                    Thời lượng: {movie.duration} phút
+                  </p>
+
+                  <p className="w-fit rounded-md bg-purple-50 px-3 py-1 text-sm text-purple-600">
+                    Thể loại: {categoryText || "Chưa cập nhật"}
+                  </p>
+
+                  {movie.ageRestriction && (
+                    <p className="w-fit rounded-md bg-orange-50 px-3 py-1 text-sm text-orange-600">
+                      {movie.ageRestriction}
+                    </p>
+                  )}
+
+                  {movieDescription && (
+                    <p className="mt-2 max-w-xl rounded-md bg-slate-50 px-3 py-2 text-sm leading-relaxed text-slate-700">
+                      <span className="font-semibold">Mô tả:&nbsp;</span>
+                      {movieDescription}
+                    </p>
+                  )}
+                </div>
               </div>
 
-              <div className="flex flex-col gap-3 pt-2 text-white">
-                <h2 className="text-3xl font-semibold">{movie.name}</h2>
-
-                <p className="w-fit rounded-md bg-green-50 px-3 py-1 text-sm text-green-600">
-                  Thời lượng: {movie.duration} phút
-                </p>
-
-                <p className="w-fit rounded-md bg-purple-50 px-3 py-1 text-sm text-purple-600">
-                  Thể loại: {categoryText || "Chưa cập nhật"}
-                </p>
-
-                {movie.ageRestriction && (
-                  <p className="w-fit rounded-md bg-orange-50 px-3 py-1 text-sm text-orange-600">
-                    {movie.ageRestriction}
-                  </p>
-                )}
-
-                {movieDescription && (
-                  <p className="mt-2 max-w-xl rounded-md bg-slate-50 px-3 py-2 text-sm leading-relaxed text-slate-700">
-                    <span className="font-semibold">Mô tả:&nbsp;</span>
-                    {movieDescription}
-                  </p>
-                )}
+              <div className="flex items-start">
+                <CreateShowtimeModal movie={movie}>
+                  <Button
+                    type="primary"
+                    size="large"
+                    className="rounded-xl px-6 font-semibold"
+                  >
+                    Thêm lịch chiếu
+                  </Button>
+                </CreateShowtimeModal>
               </div>
-            </div>
-
-            <div className="flex items-start">
-              <CreateShowtimeModal movie={movie}>
-                <Button
-                  type="primary"
-                  size="large"
-                  className="rounded-xl bg-blue-500 px-6 font-semibold shadow-lg shadow-blue-500/40 hover:bg-blue-600"
-                >
-                  Thêm lịch chiếu
-                </Button>
-              </CreateShowtimeModal>
             </div>
           </div>
 
           {/* Bộ lọc */}
           <div
             className="
-              mb-8 rounded-2xl border border-slate-700 bg-slate-900/90 p-6
-              shadow-lg shadow-black/40
-              [&_.ant-picker]:bg-slate-900
-              [&_.ant-picker]:border-slate-700
-              [&_.ant-picker-input>input]:text-slate-100
+              mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm
+              [&_.ant-picker]:bg-white
+              [&_.ant-picker]:border-slate-300
+              [&_.ant-picker-input>input]:text-slate-700
               [&_.ant-picker-input>input::placeholder]:text-slate-400
-              [&_.ant-select-selector]:bg-slate-900
-              [&_.ant-select-selector]:border-slate-700
-              [&_.ant-select-selection-item]:text-slate-100
+              [&_.ant-select-selector]:bg-white
+              [&_.ant-select-selector]:border-slate-300
+              [&_.ant-select-selection-item]:text-slate-700
               [&_.ant-select-selection-placeholder]:text-slate-400
-              [&_.ant-btn-default]:bg-slate-900
-              [&_.ant-btn-default]:border-slate-700
-              [&_.ant-btn-default]:text-slate-100
+              [&_.ant-btn-default]:bg-white
+              [&_.ant-btn-default]:border-slate-300
+              [&_.ant-btn-default]:text-slate-700
             "
           >
             <FilterShowtimeInMovie updateFilter={updateFilter} />
@@ -223,15 +220,15 @@ const ListShowtimeInMovie = () => {
               <Spin size="large" />
             </div>
           ) : (
-            <div className="space-y-10">
+            <div className="space-y-8">
               {data?.data &&
                 Object.entries(data.data).map(([date, showtimes]) => (
                   <div
                     key={date}
-                    className="rounded-2xl border border-slate-800 bg-slate-900/95 p-6 shadow-xl shadow-black/40"
+                    className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
                   >
-                    <div className="mb-6 flex items-center gap-3 text-xl font-semibold text-slate-50">
-                      <CalendarOutlined className="text-2xl text-blue-400" />
+                    <div className="mb-4 flex items-center gap-3 text-lg font-semibold text-slate-900">
+                      <CalendarOutlined className="text-xl text-blue-500" />
                       {DAYOFWEEK_LABEL[dayjs(date).day()]},{" "}
                       {dayjs(date).format("DD/MM")}
                     </div>
@@ -243,7 +240,7 @@ const ListShowtimeInMovie = () => {
                       {showtimes.map((item) => (
                         <div
                           key={item._id}
-                          className="transform rounded-xl transition hover:-translate-y-1 hover:shadow-2xl"
+                          className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
                         >
                           <ShowtimeCard item={item} />
                         </div>
@@ -257,12 +254,10 @@ const ListShowtimeInMovie = () => {
                 current={data?.meta?.page}
                 total={data?.meta?.total}
                 pageSize={data?.meta?.limit}
-                className="flex justify-end pt-6 text-white
+                className="flex justify-end pt-4 text-slate-700
                   [&_.ant-pagination-item-active]:border-blue-500
                   [&_.ant-pagination-item-active]:bg-blue-500
-                  [&_.ant-pagination-item-active>a]:text-white
-                  [&_.ant-pagination-prev_button]:text-white
-                  [&_.ant-pagination-next_button]:text-white"
+                  [&_.ant-pagination-item-active>a]:text-white"
               />
             </div>
           )}
