@@ -12,6 +12,72 @@ import FilterShowtimeInMovie from "./components/FilterShowtimeInMovie";
 import ShowtimeCard from "./components/ShowtimeCard";
 import CreateShowtimeModal from "./create/CreateShowtimeModal";
 
+const getCategoryTextFromMovie = (movie) => {
+  if (!movie) return "";
+
+  // 1. Ưu tiên các field quen thuộc
+  let categoriesRaw =
+    movie?.category ||
+    movie?.categories ||
+    movie?.genres ||
+    movie?.genre ||
+    null;
+
+  let categoriesArray = [];
+
+  if (Array.isArray(categoriesRaw)) {
+    categoriesArray = categoriesRaw;
+  } else if (categoriesRaw) {
+    categoriesArray = [categoriesRaw];
+  }
+
+  const pickName = (c) => {
+    if (!c) return null;
+    if (typeof c === "string") return c;
+    return (
+      c.name ||
+      c.categoryName ||
+      c.title ||
+      c.label ||
+      c.value ||
+      null
+    );
+  };
+
+  let text =
+    categoriesArray.map(pickName).filter(Boolean).join(", ") || "";
+
+  if (text) return text;
+
+  // 2. Không có → thử dò TẤT CẢ các mảng trong movie
+  for (const [key, value] of Object.entries(movie)) {
+    if (Array.isArray(value) && value.length) {
+      const first = value[0];
+      if (typeof first === "object") {
+        const arrText = value.map(pickName).filter(Boolean).join(", ");
+        if (arrText) return arrText;
+      }
+      if (typeof first === "string" && /category|genre/i.test(key)) {
+        return value.join(", ");
+      }
+    }
+  }
+
+  // 3. Thử dò object có key chứa "category" hoặc "genre"
+  for (const [key, value] of Object.entries(movie)) {
+    if (
+      value &&
+      typeof value === "object" &&
+      /category|genre/i.test(key)
+    ) {
+      const name = pickName(value);
+      if (name) return name;
+    }
+  }
+
+  return "";
+};
+
 const ListShowtimeInMovie = () => {
   const { id: movieId } = useParams();
 
@@ -37,8 +103,8 @@ const ListShowtimeInMovie = () => {
 
   const cleanedQuery = Object.fromEntries(
     Object.entries(query).filter(
-      ([_, v]) => v !== undefined && v !== null && v !== ""
-    )
+      ([_, v]) => v !== undefined && v !== null && v !== "",
+    ),
   );
 
   const { data: movieData, isLoading: isLoadingMovie } = useQuery({
@@ -61,14 +127,26 @@ const ListShowtimeInMovie = () => {
     enabled: !!movieId,
   });
 
+  // Thể loại lấy bằng hàm heuristic
+  const categoryText = getCategoryTextFromMovie(movie);
+
+  // Mô tả chi tiết phim
+  const movieDescription =
+    movie?.description ||
+    movie?.shortDescription ||
+    movie?.content ||
+    movie?.detail ||
+    "";
+
   return (
-    <div className="min-h-screen px-8 py-6 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-8 py-6">
       {isLoadingMovie ? (
-        <div className="flex justify-center items-center h-[80vh]">
+        <div className="flex h-[80vh] items-center justify-center">
           <Spin size="large" />
         </div>
       ) : (
         <>
+          {/* Header phim */}
           <div className="mb-10 flex justify-between gap-10 rounded-2xl border border-slate-800 bg-slate-900/95 p-8 shadow-2xl shadow-black/40">
             <div className="flex gap-10">
               <div className="h-[360px] w-[260px] overflow-hidden rounded-xl border border-slate-700 shadow-lg shadow-black/50">
@@ -82,24 +160,24 @@ const ListShowtimeInMovie = () => {
               <div className="flex flex-col gap-3 pt-2 text-white">
                 <h2 className="text-3xl font-semibold">{movie.name}</h2>
 
-                <p className="w-fit rounded-md bg-blue-50 px-3 py-1 text-blue-600">
-                  Phim rất hay
-                </p>
-
-                <p className="w-fit rounded-md bg-green-50 px-3 py-1 text-green-600">
+                <p className="w-fit rounded-md bg-green-50 px-3 py-1 text-sm text-green-600">
                   Thời lượng: {movie.duration} phút
                 </p>
 
-                <p className="w-fit rounded-md bg-purple-50 px-3 py-1 text-purple-600">
-                  Thể loại:{" "}
-                  {(movie?.category || [])
-                    .map((c) => c.name)
-                    .join(", ") || "Chưa cập nhật"}
+                <p className="w-fit rounded-md bg-purple-50 px-3 py-1 text-sm text-purple-600">
+                  Thể loại: {categoryText || "Chưa cập nhật"}
                 </p>
 
                 {movie.ageRestriction && (
-                  <p className="w-fit rounded-md bg-orange-50 px-3 py-1 text-orange-600">
+                  <p className="w-fit rounded-md bg-orange-50 px-3 py-1 text-sm text-orange-600">
                     {movie.ageRestriction}
+                  </p>
+                )}
+
+                {movieDescription && (
+                  <p className="mt-2 max-w-xl rounded-md bg-slate-50 px-3 py-2 text-sm leading-relaxed text-slate-700">
+                    <span className="font-semibold">Mô tả:&nbsp;</span>
+                    {movieDescription}
                   </p>
                 )}
               </div>
@@ -118,6 +196,7 @@ const ListShowtimeInMovie = () => {
             </div>
           </div>
 
+          {/* Bộ lọc */}
           <div
             className="
               mb-8 rounded-2xl border border-slate-700 bg-slate-900/90 p-6
@@ -138,8 +217,9 @@ const ListShowtimeInMovie = () => {
             <FilterShowtimeInMovie updateFilter={updateFilter} />
           </div>
 
+          {/* Danh sách lịch chiếu */}
           {isLoading ? (
-            <div className="flex justify-center items-center h-[40vh]">
+            <div className="flex h-[40vh] items-center justify-center">
               <Spin size="large" />
             </div>
           ) : (
@@ -163,7 +243,7 @@ const ListShowtimeInMovie = () => {
                       {showtimes.map((item) => (
                         <div
                           key={item._id}
-                          className="rounded-xl transition transform hover:-translate-y-1 hover:shadow-2xl"
+                          className="transform rounded-xl transition hover:-translate-y-1 hover:shadow-2xl"
                         >
                           <ShowtimeCard item={item} />
                         </div>
@@ -177,7 +257,12 @@ const ListShowtimeInMovie = () => {
                 current={data?.meta?.page}
                 total={data?.meta?.total}
                 pageSize={data?.meta?.limit}
-                className="flex justify-end pt-6 text-white [&_.ant-pagination-item-active]:border-blue-500! [&_.ant-pagination-item-active]:bg-blue-500! [&_.ant-pagination-item-active_a]:text-white! [&_.ant-pagination-prev_button]:text-white! [&_.ant-pagination-next_button]:text-white!"
+                className="flex justify-end pt-6 text-white
+                  [&_.ant-pagination-item-active]:border-blue-500
+                  [&_.ant-pagination-item-active]:bg-blue-500
+                  [&_.ant-pagination-item-active>a]:text-white
+                  [&_.ant-pagination-prev_button]:text-white
+                  [&_.ant-pagination-next_button]:text-white"
               />
             </div>
           )}
