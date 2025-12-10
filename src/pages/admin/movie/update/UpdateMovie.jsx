@@ -90,22 +90,41 @@ const UpdateMovie = () => {
           return;
         }
       } else {
-        
+        // giữ lại link/url cũ
         posterUrl = values.poster[0]?.url || values.poster[0];
       }
     }
 
+    // Tạo payload từ form
     const payload = {
       ...values,
       poster: posterUrl,
-      releaseDate: dayjs(values.releaseDate).format("YYYY-MM-DD"),
-      endDate: dayjs(values.endDate).format("YYYY-MM-DD"),
       isHot,
     };
+
+    // Chuẩn hóa endDate luôn gửi
+    if (values.endDate) {
+      payload.endDate = dayjs(values.endDate).format("YYYY-MM-DD");
+    }
+
+    // Chuẩn hóa releaseDate nếu có
+    if (values.releaseDate) {
+      payload.releaseDate = dayjs(values.releaseDate).format("YYYY-MM-DD");
+    }
+
+    // ⚠️ Nếu phim KHÔNG còn ở trạng thái COMING_SOON -> không được phép đổi ngày công chiếu
+    // => XÓA HOÀN TOÀN releaseDate khỏi payload
+    if (data && data.statusRelease && data.statusRelease !== "COMING_SOON") {
+      delete payload.releaseDate;
+    }
 
     await mutateAsync(payload);
     setLoading(false);
   };
+
+  // dùng để disable DatePicker ngày công chiếu cho đồng bộ UX
+  const isReleaseLocked =
+    data && data.statusRelease && data.statusRelease !== "COMING_SOON";
 
   return (
     <div className="w-full min-h-[85dvh] rounded-md shadow-md px-6 py-4 bg-[#f5f7fb]">
@@ -140,11 +159,9 @@ const UpdateMovie = () => {
           </div>
         </div>
 
-       
         <div className="grid grid-cols-12 gap-8">
-          
+          {/* Cột trái */}
           <div className="col-span-12 md:col-span-4 space-y-5">
-            
             <div className="border rounded-lg px-4 py-4">
               <h4 className="font-semibold text-base mb-3">Poster phim</h4>
               <Form.Item
@@ -197,7 +214,7 @@ const UpdateMovie = () => {
             </div>
           </div>
 
- 
+          {/* Cột phải */}
           <div className="col-span-12 md:col-span-8 space-y-6">
             <section className="border rounded-lg px-4 py-4 space-y-3">
               <h4 className="font-semibold text-base">1. Thông tin cơ bản</h4>
@@ -229,7 +246,6 @@ const UpdateMovie = () => {
               </Form.Item>
             </section>
 
-           
             <section className="border rounded-lg px-4 py-4 space-y-3">
               <h4 className="font-semibold text-base">2. Chi tiết phim</h4>
 
@@ -295,7 +311,10 @@ const UpdateMovie = () => {
                   name="releaseDate"
                   rules={[formRules.required("Ngày công chiếu")]}
                 >
-                  <DatePicker style={{ width: "100%" }} />
+                  <DatePicker
+                    style={{ width: "100%" }}
+                    disabled={isReleaseLocked}
+                  />
                 </Form.Item>
 
                 <Form.Item
