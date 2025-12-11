@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { useQuery } from "@tanstack/react-query";
 
-
 const { Text, Link } = Typography;
 
 const MovieCard = ({ movie, onBuy, fallback }) => {
@@ -57,17 +56,20 @@ const MovieCard = ({ movie, onBuy, fallback }) => {
           />
         </div>
         <div style={{ paddingTop: 8 }}>
-          <p className="text-base md:text-lg font-semibold text-white line-clamp-1 mb-2!">
+          <p className="text-base md:text-lg font-semibold text-blue line-clamp-1 mb-2!">
             {movie.name}
           </p>
-          <div className="text-xs text-gray-300">
-            Thể loại: {" "}
+          <div className="text-xs text-gray-800">
+            Thể loại:{" "}
             <Text strong className="text-gray-200">
               {movie?.genreIds?.map((item) => item.name)?.join(", ")}
             </Text>
           </div>
-          <div className="text-xs text-gray-300 mt-1">
-            Thời lượng: <Text strong className="text-gray-200">{movie.duration} phút</Text>
+          <div className="text-xs text-gray-800 mt-1">
+            Thời lượng:{" "}
+            <Text strong className="text-gray-200">
+              {movie.duration} phút
+            </Text>
           </div>
 
           {/* Suất chiếu hôm nay (tối đa 3) */}
@@ -102,7 +104,9 @@ const ShowtimeToday = ({ movieId }) => {
   });
 
   const payload = data?.data || {};
-  const todayKey = Object.keys(payload).find((d) => dayjs(d).isSame(dayjs(), "day"));
+  const todayKey = Object.keys(payload).find((d) =>
+    dayjs(d).isSame(dayjs(), "day"),
+  );
   const times = todayKey ? payload[todayKey] : [];
   const firstThree = Array.isArray(times) ? times.slice(0, 3) : [];
 
