@@ -68,7 +68,7 @@ const FilterShowtimeInMovie = () => {
   return (
     <div className="mt-4 flex flex-wrap items-end gap-4">
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-slate-100">Lọc theo khoảng ngày</p>
+        <p className="text-sm font-medium text-slate-700">Lọc theo khoảng ngày</p>
         <RangePicker
           value={date}
           allowClear
@@ -85,7 +85,7 @@ const FilterShowtimeInMovie = () => {
       </div>
 
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-slate-100">Ngày trong tuần</p>
+        <p className="text-sm font-medium text-slate-700">Ngày trong tuần</p>
         <Select
           placeholder="Chọn ngày trong tuần"
           allowClear
@@ -115,7 +115,7 @@ const FilterShowtimeInMovie = () => {
       </div>
 
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-slate-100">Phòng chiếu</p>
+        <p className="text-sm font-medium text-slate-700">Phòng chiếu</p>
         <Select
           placeholder="Chọn phòng chiếu"
           allowClear
@@ -144,7 +144,7 @@ const FilterShowtimeInMovie = () => {
       </div>
 
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-slate-100">Trạng thái</p>
+        <p className="text-sm font-medium text-slate-700">Trạng thái</p>
         <Select
           placeholder="Chọn trạng thái"
           allowClear
