@@ -27,7 +27,12 @@ export const createShowtime = async (payload) => {
   return data;
 };
 
-export const updateShowtime = async (payload, id) => {
-  const { data } = await api.patch(`${prefix}/update/${id}`, payload);
+export const updateShowtime = async (id, payload) => {
+  const realId = typeof id === "object" ? id._id || id.id : id;
+
+  const { data } = await api.patch(`${prefix}/update/${realId}`, payload);
   return data;
 };
+
+
+

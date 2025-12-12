@@ -29,8 +29,10 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
   });
 
   const [form] = Form.useForm();
+
   const start = dayjs(showtime.startTime);
   const end = start.add(showtime.movieId.duration, "minutes");
+
   const dateSelected = Form.useWatch("dateTime", form);
   const status = Form.useWatch("status", form);
 
@@ -60,6 +62,7 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
     const isToday = dayjs(dateSelected).isSame(now, "day");
     if (!isToday) return {};
     const oneHourLater = now.add(1, "hour");
+
     return {
       disabledHours: () => {
         const h = oneHourLater.hour();
@@ -76,8 +79,19 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
   };
 
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
-    mutationFn: (payload) => updateShowtime(payload, showtime._id),
+
+  // Chuẩn hoá id chắc chắn là string
+  const showtimeId = String(showtime?._id?.id || showtime?._id);
+  console.log("🔥 ID SAU KHI CHUẨN HOÁ =", showtimeId);
+
+  const { mutate, isLoading } = useMutation({
+    mutationFn: (payload) => {
+      console.log(">>> GỌI API updateShowtime VỚI:", {
+        id: showtimeId,
+        payload,
+      });
+      return updateShowtime(showtimeId, payload);
+    },
     onSuccess({ message }) {
       antdMessage.success(message);
       queryClient.invalidateQueries({
@@ -85,16 +99,27 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
       });
       setOpen(false);
     },
-    onError: (err) => HandleError(err),
+    onError: (err) => {
+      console.error("❌ LỖI API updateShowtime:", err);
+      HandleError(err);
+    },
   });
 
   const onFinish = (values) => {
     const typeSeat = ["NORMAL", "VIP", "COUPLE"];
+
+    // Loại bỏ _id / id ra khỏi payload, tránh backend hiểu nhầm
+    const { _id, id, movieId, ...rest } = values;
+
     const payload = {
-      ...values,
+      ...rest,
       startTime: dayjs(values.dateTime)
         .set("hour", values.fixedHour[0].hour())
         .set("minute", values.fixedHour[0].minute())
+        .format(),
+      endTime: dayjs(values.dateTime)
+        .set("hour", values.fixedHour[1].hour())
+        .set("minute", values.fixedHour[1].minute())
         .format(),
       price: values.price.map((item, index) => ({
         ...item,
@@ -105,31 +130,37 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
           ? values.cancelDescription
           : "",
     };
+
+    console.log(">>> PAYLOAD GỬI LÊN BACKEND =", payload);
     mutate(payload);
   };
 
   return (
     <>
       {React.cloneElement(children, {
-        onClick: () => setOpen(true),
+        onClick: () => {
+          form.setFieldsValue(initialValues);
+          setOpen(true);
+        },
       })}
+
       <Modal
         afterOpenChange={() => form.resetFields()}
         open={open}
+        onCancel={() => setOpen(false)}
+        width={900}
         title={
           <div className="flex flex-col gap-2">
             <p>
               Cập nhật lịch chiếu{" "}
               {dayjs(showtime.startTime).format(
-                "hh:mm [Ngày] DD [Tháng] MM [Năm] YYYY",
+                "HH:mm [ngày] DD [tháng] MM [năm] YYYY"
               )}
             </p>
             <p className="text-gray-500/80">Phim {showtime.movieId.name}</p>
           </div>
         }
-        onCancel={() => setOpen(false)}
-        width={900}
-        className="rounded-xl border border-white/10  backdrop-blur-md"
+        className="rounded-xl border border-white/10 backdrop-blur-md"
         style={{
           background: `hsl(222.2 84% 4.9%)`,
         }}
@@ -137,10 +168,13 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
       >
         <div className="mt-4">
           <Form
-            onFinish={onFinish}
-            initialValues={initialValues}
-            layout="vertical"
             form={form}
+            layout="vertical"
+            onFinish={onFinish}
+            onFinishFailed={(err) =>
+              console.log("❌ FORM VALIDATE FAIL:", err)
+            }
+            initialValues={initialValues}
           >
             <Form.Item label="Phòng chiếu" name="roomId" required>
               <Select
@@ -161,8 +195,7 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
               >
                 <InputNumber
                   addonAfter="VND"
-                  placeholder="Nhập giá tiền"
-                  className="w-full!"
+                  className="w-full"
                   {...antdInputNumberPropsCurrency()}
                 />
               </Form.Item>
@@ -175,8 +208,7 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
               >
                 <InputNumber
                   addonAfter="VND"
-                  placeholder="Nhập giá tiền"
-                  className="w-full!"
+                  className="w-full"
                   {...antdInputNumberPropsCurrency(20000)}
                 />
               </Form.Item>
@@ -189,8 +221,7 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
               >
                 <InputNumber
                   addonAfter="VND"
-                  placeholder="Nhập giá tiền"
-                  className="w-full!"
+                  className="w-full"
                   {...antdInputNumberPropsCurrency(30000)}
                 />
               </Form.Item>
@@ -201,7 +232,7 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
                 className="flex-1"
                 label="Chọn ngày chiếu"
                 name="dateTime"
-                rules={[formRules.required("Khoảng ngày chiếu", "choose")]}
+                rules={[formRules.required("Ngày chiếu", "choose")]}
               >
                 <DatePicker
                   className="w-full"
@@ -210,7 +241,7 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
                     if (!current) return false;
                     const tomorrow = dayjs().add(1, "day").startOf("day");
                     const releaseDate = dayjs(
-                      showtime.movieId.releaseDate,
+                      showtime.movieId.releaseDate
                     ).startOf("day");
                     const minDate = releaseDate.isAfter(tomorrow)
                       ? releaseDate
@@ -222,14 +253,14 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
               </Form.Item>
 
               <Form.Item
-                label="Khung giờ chiếu"
                 className="flex-1"
-                required
+                label="Khung giờ chiếu"
                 name="fixedHour"
                 rules={[formRules.required("Khung giờ", "choose")]}
               >
                 <DurationRangePicker
-                  disabled={false}
+                  value={form.getFieldValue("fixedHour")}
+                  onChange={(val) => form.setFieldsValue({ fixedHour: val })}
                   durationMinutes={showtime.movieId.duration}
                   disabledTime={disabledTimeHandler}
                 />
@@ -239,14 +270,23 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
             <Form.Item label="Trạng thái suất chiếu" name="status" required>
               <Select
                 options={[
-                  { label: "Lịch chiếu bình thường", value: "scheduled" },
-                  { label: "Đã bán hết", value: "sold_out" },
-                  { label: "Huỷ suất chiếu", value: "cancelled" },
+                  {
+                    label: "Lịch chiếu bình thường",
+                    value: SHOWTIME_STATUS.SCHEDULED,
+                  },
+                  {
+                    label: "Đã bán hết",
+                    value: SHOWTIME_STATUS.SOLD_OUT,
+                  },
+                  {
+                    label: "Huỷ suất chiếu",
+                    value: SHOWTIME_STATUS.CANCELLED,
+                  },
                 ]}
               />
             </Form.Item>
 
-            {status === "cancelled" && (
+            {status === SHOWTIME_STATUS.CANCELLED && (
               <Form.Item
                 label="Lý do huỷ suất"
                 name="cancelDescription"
@@ -256,16 +296,17 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
               >
                 <Input.TextArea
                   rows={3}
-                  placeholder="Nhập lý do hủy suất chiếu..."
+                  placeholder="Nhập lý do huỷ suất chiếu..."
                 />
               </Form.Item>
             )}
 
-            <div className="flex justify-end items-center gap-4">
+            <div className="flex justify-end gap-4">
               <Button onClick={() => form.setFieldsValue(initialValues)}>
                 Đặt lại
               </Button>
-              <Button type="primary" htmlType="submit">
+
+              <Button type="primary" htmlType="submit" loading={isLoading}>
                 Cập nhật
               </Button>
             </div>
