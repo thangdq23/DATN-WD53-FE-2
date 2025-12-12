@@ -55,7 +55,7 @@
             )}
             <Tag
               color={badge.color}
-              className="m-0 rounded-full px-2 py-[1px] text-[10px] font-semibold"
+              className="m-0 rounded-full px-2 py-px text-[10px] font-semibold"
             >
               {badge.label}
             </Tag>
@@ -78,13 +78,13 @@
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-1.5">
                 <EnvironmentOutlined className="text-[13px] text-slate-500" />
-                <span className="font-medium truncate">{item.roomId.name}</span>
+                <span className="font-medium truncate">{item?.roomId?.name}</span>
               </div>
             </div>
             <div className="mt-1 text-[11px] text-slate-500">
               Ghế trống:{" "}
               <span className="font-semibold text-slate-700">
-                0/{item.roomId.capacity}
+                0/{item?.roomId?.capacity}
               </span>
             </div>
           </div>
