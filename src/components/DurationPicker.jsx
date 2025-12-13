@@ -1,6 +1,5 @@
 import { SwapRightOutlined } from "@ant-design/icons";
 import { TimePicker, Input } from "antd";
-import dayjs from "dayjs";
 import { useState, useEffect } from "react";
 
 export const DurationRangePicker = ({

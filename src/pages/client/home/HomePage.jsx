@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Col, Empty, Row, Spin } from "antd";
 import { useState, useMemo } from "react";
 
-import bannerImg1 from "../../../assets/images/banner/banner.png";
 import bannerImg2 from "../../../assets/images/banner/banner3.png";
 import bannerImg3 from "../../../assets/images/banner/banner4.png";
 
@@ -13,9 +12,11 @@ import BannerSection from "./components/BannerSection";
 import MovieCard from "./components/MovieCard";
 import MovieTabs from "./components/MovieTabs";
 import MovieFilterBar from "./components/MovieFilterBar";
+import { useTable } from "../../../common/hooks/useTable";
 
 const HomePage = () => {
   const [tabKey, setTabKey] = useState("nowShowing");
+  const { query } = useTable();
 
   // --- Gọi API phim ---
   const { data, isLoading } = useQuery({
@@ -36,7 +37,7 @@ const HomePage = () => {
         movie.releaseDate || movie.startDate || movie.ngayKhoiChieu;
       if (!dateStr) return;
 
-      const parts = dateStr.toString().split(/[-\/.]/);
+      const parts = dateStr.toString().split(/[-/.]/);
       let releaseDate;
 
       if (parts.length === 3) {
@@ -61,15 +62,36 @@ const HomePage = () => {
     return { nowShowingMovies: now, upcomingMovies: upcoming };
   }, [data]);
 
+  // chọn list theo tab
   const moviesToShow =
     tabKey === "nowShowing" ? nowShowingMovies : upcomingMovies;
+
+  // --- Bộ lọc frontend ---
+  const filteredMovies = useMemo(() => {
+    return moviesToShow?.filter((movie) => {
+      const matchSearch = query.search
+        ? movie.name?.toLowerCase().includes(query.search.toLowerCase())
+        : true;
+
+      const matchGenre = query.genre
+        ? movie?.genreIds?.some((g) => g._id === query.genre)
+        : true;
+
+      const matchAge = query.age ? movie.age === query.age : true;
+      const matchHot =
+        query.hot !== null && query.hot !== undefined
+          ? movie.isHot === query.hot
+          : true;
+
+      return matchSearch && matchGenre && matchAge && matchHot;
+    });
+  }, [moviesToShow, query]);
 
   const handleChangeTab = (key) => {
     setTabKey(key);
   };
 
-  // --- Danh sách banner chạy slideshow ---
-  const bannerList = [bannerImg1, bannerImg2, bannerImg3];
+  const bannerList = [bannerImg2, bannerImg3];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0b1220] via-[#121826] to-[#0b1220] text-white pb-24">
@@ -83,12 +105,12 @@ const HomePage = () => {
           <div className="flex items-center justify-center min-h-[30vh]">
             <Spin />
           </div>
-        ) : moviesToShow?.length === 0 ? (
+        ) : filteredMovies?.length === 0 ? (
           <Empty description="Không có phim" />
         ) : (
           <Row gutter={[24, 28]}>
-            {moviesToShow.map((m) => (
-              <Col key={m.id} xs={12} sm={12} md={8} lg={6}>
+            {filteredMovies.map((m) => (
+              <Col key={m._id || m.id} xs={12} sm={12} md={8} lg={6}>
                 <MovieCard movie={m} fallback={posterTraiTim} />
               </Col>
             ))}

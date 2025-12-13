@@ -1,4 +1,5 @@
 import { Link, NavLink, useNavigate } from "react-router";
+import { FaFilm } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useAuthSelector } from "../../../store/useAuthStore";
 
@@ -22,8 +23,17 @@ const Header = () => {
   const [transparent, setTransparent] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setTransparent(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll);
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setTransparent(window.scrollY > 60);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -41,7 +51,10 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         {/* LOGO + MENU */}
         <div className="flex items-center gap-8">
-          <h1 className={`text-2xl font-bold ${navColorBase}`}>MPV</h1>
+          <Link to="/" className={`flex items-center gap-2 ${navColorBase}`}>
+            <FaFilm size={24} className="text-teal-300" />
+            <span className="text-2xl font-bold">MPV</span>
+          </Link>
 
           <ul className="flex items-center gap-6 m-0">
             {navItems.map((item, index) => (

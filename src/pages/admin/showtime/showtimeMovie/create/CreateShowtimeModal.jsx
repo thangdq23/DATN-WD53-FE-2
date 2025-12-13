@@ -8,59 +8,74 @@ const CreateShowtimeModal = ({ children, movie }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [form] = Form.useForm();
 
+  const activeTab =
+    "rounded-full bg-gradient-to-r from-orange-500 to-red-500 px-6 py-2 text-white font-semibold shadow";
+  const inactiveTab =
+    "rounded-full px-6 py-2 bg-white text-slate-600 border border-slate-300 hover:bg-slate-50 transition";
+
   return (
     <>
       {React.cloneElement(children, {
-        onClick: () => {
-          setOpen(true);
-        },
+        onClick: () => setOpen(true),
       })}
+
       <Modal
+        open={open}
         onCancel={() => setOpen(false)}
         afterClose={() => form.resetFields()}
-        open={open}
+        footer={null}
         width={900}
-        className="rounded-xl border border-white/10 backdrop-blur-md"
-        style={{
-          background: `hsl(222.2 84% 4.9%)`,
+        className="rounded-3xl overflow-hidden"
+        styles={{
+          content: {
+            background: "#f9fafb",     
+            borderRadius: 20,
+            padding: 0,
+            border: "1px solid #e5e7eb",
+          },
+          header: {
+            background: "#f9fafb",
+            borderBottom: "1px solid #e5e7eb",
+            padding: "18px 24px 10px",
+          },
+          body: {
+            background: "#f9fafb",
+            padding: 0,
+          },
         }}
         title={
-          <p className="text-lg font-semibold text-white/90 tracking-wide">
+          <p className="text-lg font-semibold text-slate-800">
             Thêm lịch chiếu cho phim {movie?.name}
           </p>
         }
-        footer={null}
       >
-        <div className="flex gap-2 px-4">
-          <button
-            onClick={() => setTabIndex(0)}
-            className={`px-4 py-2 rounded-md transition cursor-pointer ${
-              tabIndex === 0
-                ? "bg-primary text-white shadow-sm"
-                : "bg-white/10 text-white/70 hover:bg-white/20"
-            }`}
-          >
-            Thêm nhiều suất chiếu
-          </button>
+        
+        <div className="px-6 pt-3 pb-2">
+          <div className="inline-flex gap-2 bg-slate-100 p-1 rounded-full">
+            <button
+              onClick={() => setTabIndex(0)}
+              className={tabIndex === 0 ? activeTab : inactiveTab}
+            >
+             Thêm nhiều suất chiếu
+            </button>
 
-          <button
-            onClick={() => setTabIndex(1)}
-            className={`px-4 py-2 rounded-md transition cursor-pointer ${
-              tabIndex === 1
-                ? "bg-primary text-white shadow-sm"
-                : "bg-white/10 text-white/70 hover:bg-white/20"
-            }`}
-          >
-            Thêm một suất chiếu
-          </button>
+            <button
+              onClick={() => setTabIndex(1)}
+              className={tabIndex === 1 ? activeTab : inactiveTab}
+            >
+              Thêm một suất chiếu
+            </button>
+          </div>
         </div>
 
-        {tabIndex === 0 && (
-          <CreateManyComponent movie={movie} setOpen={setOpen} />
-        )}
-        {tabIndex === 1 && (
-          <CreateOneComponent movie={movie} setOpen={setOpen} />
-        )}
+        <div className="px-6 pb-6 pt-4 text-slate-800">
+          {tabIndex === 0 && (
+            <CreateManyComponent movie={movie} setOpen={setOpen} />
+          )}
+          {tabIndex === 1 && (
+            <CreateOneComponent movie={movie} setOpen={setOpen} />
+          )}
+        </div>
       </Modal>
     </>
   );

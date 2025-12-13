@@ -1,22 +1,108 @@
 import { CalendarOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Image, Pagination, Spin, Tag } from "antd";
+import { Button, Image, Pagination, Spin } from "antd";
 import dayjs from "dayjs";
 import { useParams } from "react-router";
+import { useState } from "react";
 import { DAYOFWEEK_LABEL } from "../../../../common/constants/dayOfWeek";
 import { QUERYKEY } from "../../../../common/constants/queryKey";
-import { useTable } from "../../../../common/hooks/useTable";
 import { getDetailMovie } from "../../../../common/services/movie.service";
 import { getShowtimeWeekday } from "../../../../common/services/showtime.service";
 import FilterShowtimeInMovie from "./components/FilterShowtimeInMovie";
 import ShowtimeCard from "./components/ShowtimeCard";
 import CreateShowtimeModal from "./create/CreateShowtimeModal";
 
+const getCategoryTextFromMovie = (movie) => {
+  if (!movie) return "";
+
+  let categoriesRaw =
+    movie?.category ||
+    movie?.categories ||
+    movie?.genres ||
+    movie?.genre ||
+    null;
+
+  let categoriesArray = [];
+
+  if (Array.isArray(categoriesRaw)) {
+    categoriesArray = categoriesRaw;
+  } else if (categoriesRaw) {
+    categoriesArray = [categoriesRaw];
+  }
+
+  const pickName = (c) => {
+    if (!c) return null;
+    if (typeof c === "string") return c;
+    return (
+      c.name ||
+      c.categoryName ||
+      c.title ||
+      c.label ||
+      c.value ||
+      null
+    );
+  };
+
+  let text =
+    categoriesArray.map(pickName).filter(Boolean).join(", ") || "";
+
+  if (text) return text;
+
+  // fallback: quét thêm các mảng/object có chứa category/genre
+  for (const [key, value] of Object.entries(movie)) {
+    if (Array.isArray(value) && value.length) {
+      const first = value[0];
+      if (typeof first === "object") {
+        const arrText = value.map(pickName).filter(Boolean).join(", ");
+        if (arrText) return arrText;
+      }
+      if (typeof first === "string" && /category|genre/i.test(key)) {
+        return value.join(", ");
+      }
+    }
+  }
+
+  for (const [key, value] of Object.entries(movie)) {
+    if (
+      value &&
+      typeof value === "object" &&
+      /category|genre/i.test(key)
+    ) {
+      const name = pickName(value);
+      if (name) return name;
+    }
+  }
+
+  return "";
+};
+
 const ListShowtimeInMovie = () => {
   const { id: movieId } = useParams();
-  const { query, onSelectPaginateChange } = useTable();
 
- 
+  const [query, setQuery] = useState({
+    page: 1,
+    limit: 10,
+  });
+
+  const updateFilter = (payload) => {
+    setQuery((prev) => ({
+      ...prev,
+      ...payload,
+      page: 1,
+    }));
+  };
+
+  const onSelectPaginateChange = (page) => {
+    setQuery((prev) => ({
+      ...prev,
+      page,
+    }));
+  };
+
+  const cleanedQuery = Object.fromEntries(
+    Object.entries(query).filter(([, v]) => v !== undefined && v !== null && v !== ""),
+  );
+
   const { data: movieData, isLoading: isLoadingMovie } = useQuery({
     queryKey: [QUERYKEY.MOVIE, movieId],
     queryFn: () => getDetailMovie(movieId),
@@ -25,139 +111,152 @@ const ListShowtimeInMovie = () => {
 
   const movie = movieData?.data || {};
 
-  
   const { data, isLoading } = useQuery({
-    queryKey: [
-      QUERYKEY.SHOWTIME,
-      movieId,
-      ...Object.values(query),
-      ...Object.keys(query),
-    ],
+    queryKey: [QUERYKEY.SHOWTIME, movieId, ...Object.values(cleanedQuery)],
     queryFn: () =>
       getShowtimeWeekday({
         movieId,
         sort: "startTime",
         order: "asc",
-        limit: 2,
-        startTimeFrom: dayjs().startOf("day").toISOString(),
-        ...query,
+        ...cleanedQuery,
       }),
     enabled: !!movieId,
   });
 
+  const categoryText = getCategoryTextFromMovie(movie);
+
+  const movieDescription =
+    movie?.description ||
+    movie?.shortDescription ||
+    movie?.content ||
+    movie?.detail ||
+    "";
+
   return (
-    <div>
-      {isLoadingMovie && movie ? (
-        <div className="flex justify-center items-center h-[80vh]">
-          <Spin />
+    <div className="min-h-screen bg-[#f5f7fb] px-8 py-6">
+      {isLoadingMovie ? (
+        <div className="flex h-[80vh] items-center justify-center">
+          <Spin size="large" />
         </div>
       ) : (
         <>
-          
-          <div className="bg-primary/5 gap-6 py-6 px-8 border-b-gray-700/80 border-b">
-            <div
-              className="grid gap-4"
-              style={{ gridTemplateColumns: "1fr 4fr" }}
-            >
-              <div className="rounded-md h-58 w-full overflow-hidden">
-                <Image src={movie.poster} className="object-cover" />
+          {/* Thông tin phim */}
+          <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+            <div className="flex justify-between gap-10">
+              <div className="flex gap-10">
+                <div className="h-[360px] w-[260px] overflow-hidden rounded-xl border border-slate-200 shadow">
+                  <Image
+                    src={movie.poster}
+                    alt={movie.name}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-3 pt-2 text-slate-900">
+                  <h2 className="text-3xl font-semibold">{movie.name}</h2>
+
+                  <p className="w-fit rounded-md bg-green-50 px-3 py-1 text-sm text-green-600">
+                    Thời lượng: {movie.duration} phút
+                  </p>
+
+                  <p className="w-fit rounded-md bg-purple-50 px-3 py-1 text-sm text-purple-600">
+                    Thể loại: {categoryText || "Chưa cập nhật"}
+                  </p>
+
+                  {movie.ageRestriction && (
+                    <p className="w-fit rounded-md bg-orange-50 px-3 py-1 text-sm text-orange-600">
+                      {movie.ageRestriction}
+                    </p>
+                  )}
+
+                  {movieDescription && (
+                    <p className="mt-2 max-w-xl rounded-md bg-slate-50 px-3 py-2 text-sm leading-relaxed text-slate-700">
+                      <span className="font-semibold">Mô tả:&nbsp;</span>
+                      {movieDescription}
+                    </p>
+                  )}
+                </div>
               </div>
 
-              <div>
-                <h3 className="line-clamp-1 text-xl font-semibold">
-                  {movie.name}
-                </h3>
-
-                <p className="line-clamp-3 mt-2 text-gray-300/70">
-                  {movie.description}
-                </p>
-
-                <p className="mt-2 text-gray-300/70 line-clamp-1">
-                  <span className="text-white">Thời lượng:</span>{" "}
-                  {movie.duration} phút
-                </p>
-
-                <p className="mt-2 text-gray-300/70 line-clamp-1">
-                  <span className="text-white">Thể loại:</span>{" "}
-                  {(movie?.category || [])
-                    .filter((c) => c.status)
-                    .map((c) => c.name)
-                    .join(", ") || "Chưa cập nhật"}
-                </p>
-
-                {movie.ageRestriction && (
-                  <Tag color="blue" className="mt-2 inline-block">
-                    {movie.ageRestriction}
-                  </Tag>
-                )}
+              <div className="flex items-start">
+                <CreateShowtimeModal movie={movie}>
+                  <Button
+                    type="primary"
+                    size="large"
+                    className="rounded-xl px-6 font-semibold"
+                  >
+                    Thêm lịch chiếu
+                  </Button>
+                </CreateShowtimeModal>
               </div>
             </div>
-
-            <FilterShowtimeInMovie />
           </div>
 
-          
+          {/* Bộ lọc */}
+          <div
+            className="
+              mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm
+              [&_.ant-picker]:bg-white
+              [&_.ant-picker]:border-slate-300
+              [&_.ant-picker-input>input]:text-slate-700
+              [&_.ant-picker-input>input::placeholder]:text-slate-400
+              [&_.ant-select-selector]:bg-white
+              [&_.ant-select-selector]:border-slate-300
+              [&_.ant-select-selection-item]:text-slate-700
+              [&_.ant-select-selection-placeholder]:text-slate-400
+              [&_.ant-btn-default]:bg-white
+              [&_.ant-btn-default]:border-slate-300
+              [&_.ant-btn-default]:text-slate-700
+            "
+          >
+            <FilterShowtimeInMovie updateFilter={updateFilter} />
+          </div>
+
+          {/* Danh sách lịch chiếu */}
           {isLoading ? (
-            <div className="flex min-h-[20vh] items-center justify-center">
-              <Spin size="default" />
+            <div className="flex h-[40vh] items-center justify-center">
+              <Spin size="large" />
             </div>
           ) : (
-            <div className="px-8 py-4">
-              <div className="mb-4 flex items-start justify-between">
-                <div>
-                  <p className="text-lg font-medium">Lịch chiếu</p>
-                  <p className="text-xs text-gray-300/50 mt-2">
-                    {data?.meta?.total} Ngày chiếu
-                  </p>
-                </div>
-                <div>
-                  <CreateShowtimeModal movie={movie}>
-                    <Button>Thêm lịch chiếu</Button>
-                  </CreateShowtimeModal>
-                </div>
-              </div>
-
-              
-              {data?.data && Object.entries(data.data).length === 0 && (
-                <div className="min-h-[35vh] flex items-center justify-center">
-                  <p className="text-red-500">Không có lịch chiếu nào</p>
-                </div>
-              )}
-
-              {/* Có lịch chiếu theo từng ngày */}
+            <div className="space-y-8">
               {data?.data &&
-                Object.entries(data.data).length !== 0 &&
                 Object.entries(data.data).map(([date, showtimes]) => (
-                  <div key={date} className="mb-6">
-                    <div className="text-base flex items-center gap-2">
-                      <CalendarOutlined className="text-primary!" />
-                      <p className="font-medium">
-                        {DAYOFWEEK_LABEL[dayjs(date).day()]},{" "}
-                        {dayjs(date).format("DD/MM")}
-                      </p>
+                  <div
+                    key={date}
+                    className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                  >
+                    <div className="mb-4 flex items-center gap-3 text-lg font-semibold text-slate-900">
+                      <CalendarOutlined className="text-xl text-blue-500" />
+                      {DAYOFWEEK_LABEL[dayjs(date).day()]},{" "}
+                      {dayjs(date).format("DD/MM")}
                     </div>
 
                     <div
-                      className="grid gap-4 mt-4"
+                      className="grid gap-6"
                       style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
                     >
                       {showtimes.map((item) => (
-                        <ShowtimeCard key={item._id} item={item} />
+                        <div
+                          key={item._id}
+                          className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
+                        >
+                          <ShowtimeCard item={item} />
+                        </div>
                       ))}
                     </div>
                   </div>
                 ))}
 
-              
-              <div>
-                <Pagination
-                  onChange={onSelectPaginateChange}
-                  current={data?.meta?.page}
-                  align="end"
-                  total={data?.meta?.total}
-                  pageSize={data?.meta?.limit}
-                />
-              </div>
+              <Pagination
+                onChange={onSelectPaginateChange}
+                current={data?.meta?.page}
+                total={data?.meta?.total}
+                pageSize={data?.meta?.limit}
+                className="flex justify-end pt-4 text-slate-700
+                  [&_.ant-pagination-item-active]:border-blue-500
+                  [&_.ant-pagination-item-active]:bg-blue-500
+                  [&_.ant-pagination-item-active>a]:text-white"
+              />
             </div>
           )}
         </>

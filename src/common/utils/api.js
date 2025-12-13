@@ -12,7 +12,9 @@ api.interceptors.request.use((config) => {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
     }
-  } catch (e) {}
+  } catch {
+    void 0;
+  }
   return config;
 });
 

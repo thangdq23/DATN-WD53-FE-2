@@ -62,7 +62,7 @@ const MovieCard = ({ movie, onBuy = () => {}, fallback }) => {
         </div>
 
         <div style={{ paddingTop: 8 }}>
-          <p className="text-base md:text-lg font-semibold text-white line-clamp-1 mb-2!">
+          <p className="text-base md:text-lg font-semibold text-white line-clamp-1 mb-2">
             {movie.name}
           </p>
 
