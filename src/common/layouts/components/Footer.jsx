@@ -21,9 +21,9 @@ const Footer = () => {
 							</Link>
 						</li>
 						<li>
-							<Link to="/flim" className="hover:text-primary! duration-200">
-								Phim
-							</Link>
+            <Link to="/phim" className="hover:text-primary! duration-200">
+              Phim
+            </Link>
 						</li>
 						<li>
 							<Link to="/showtimes" className="hover:text-primary! duration-200">

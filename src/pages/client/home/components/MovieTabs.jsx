@@ -1,29 +1,27 @@
 import React from "react";
 import { Tabs } from "antd";
 
-const { TabPane } = Tabs;
-
-const MovieTabs = ({ tabKey, onChange }) => (
-  <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
-    <Tabs activeKey={tabKey} onChange={onChange} centered>
-      <TabPane
-        tab={
-          <span style={{ fontSize: 20, fontWeight: 700, color: "#fff" }}>
-            PHIM SẮP CHIẾU
-          </span>
-        }
-        key="upcoming"
+const MovieTabs = ({ tabKey, onChange }) => {
+  const items = [
+    {
+      key: "nowShowing",
+      label: <span style={{ fontSize: 18, fontWeight: 700 }}>Đang chiếu</span>,
+    },
+    {
+      key: "upcoming",
+      label: <span style={{ fontSize: 18, fontWeight: 700 }}>Sắp chiếu</span>,
+    },
+  ];
+  return (
+    <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
+      <Tabs
+        activeKey={tabKey}
+        onChange={onChange}
+        centered
+        items={items}
       />
-      <TabPane
-        tab={
-          <span style={{ fontSize: 20, fontWeight: 700, color: "#fff" }}>
-            PHIM ĐANG CHIẾU
-          </span>
-        }
-        key="nowShowing"
-      />
-    </Tabs>
-  </div>
-);
+    </div>
+  );
+};
 
 export default MovieTabs;

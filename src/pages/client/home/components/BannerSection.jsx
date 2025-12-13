@@ -15,8 +15,8 @@ const BannerSection = ({ images = [], interval = 3000 }) => {
     bannerWrap: {
       width: "100%",
       height: 700,
-      borderRadius: 8,
-      marginBottom: 20,
+      borderRadius: 12,
+      marginBottom: 0,
       overflow: "hidden",
       position: "relative",
     },
@@ -33,12 +33,7 @@ const BannerSection = ({ images = [], interval = 3000 }) => {
 
   return (
     <div style={styles.bannerWrap}>
-      <img
-        key={images[index]}
-        src={images[index]}
-        alt="Banner"
-        style={styles.bannerImg}
-      />
+      <img key={images[index]} src={images[index]} alt="Banner" style={styles.bannerImg} />
     </div>
   );
 };

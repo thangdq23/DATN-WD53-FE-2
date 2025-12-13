@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Button, Form, Input } from "antd";
 import { Link, useNavigate } from "react-router";
+import bannerImg3 from "../../../assets/images/banner/banner4.webp";
 import { useMessage } from "../../../common/hooks/useMessage";
 import { loginService } from "../../../common/services/auth.service";
 import { formRules } from "../../../common/utils/formRule";
@@ -24,10 +25,15 @@ const LoginPage = () => {
     mutate(values);
   };
   return (
-    <div className="flex justify-center">
-      <div className="flex flex-col px-12 flex-1 max-w-3xl bg-white shadow-xl my-12 rounded-lg py-6">
-        <h3 className="text-2xl text-start">Đăng nhập</h3>
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+    <div className="min-h-screen bg-gradient-to-b from-[#0b1220] via-[#121826] to-[#0b1220] text-white">
+      <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-white/5">
+          <img src={bannerImg3} alt="Login" className="w-full h-full object-cover" />
+        </div>
+
+        <div className="bg-white text-slate-900 rounded-2xl shadow-xl border border-gray-200 px-8 py-7">
+          <h3 className="text-3xl font-extrabold m-0">Đăng nhập</h3>
+          <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Form.Item
             label={<p className="text-base font-medium">Email</p>}
             className="flex-1"
@@ -38,10 +44,7 @@ const LoginPage = () => {
               { type: "email", message: "Vui lòng nhập đúng định dạng email!" },
             ]}
           >
-            <Input
-              style={{ height: 45, boxShadow: "none" }}
-              placeholder="Email"
-            />
+            <Input className="rounded-lg" style={{ height: 45, boxShadow: "none" }} placeholder="Email" />
           </Form.Item>
           <Form.Item
             label={<p className="text-base font-medium">Mật khẩu</p>}
@@ -51,22 +54,15 @@ const LoginPage = () => {
             hasFeedback
             rules={[formRules.required("Mật khẩu")]}
           >
-            <Input.Password
-              style={{ height: 45, boxShadow: "none" }}
-              placeholder="Mật khẩu"
-            />
+            <Input.Password className="rounded-lg" style={{ height: 45, boxShadow: "none" }} placeholder="Mật khẩu" />
           </Form.Item>
-          <Form.Item className="mt-4!">
+          <Form.Item className="mt-2">
             <Button
               disabled={isPending}
               loading={isPending}
               htmlType="submit"
-              style={{
-                background: `var(--color-primary)`,
-                height: 45,
-                width: "100%",
-                color: "white",
-              }}
+              type="primary"
+              className="h-11 w-full rounded-lg"
             >
               Đăng nhập
             </Button>
@@ -80,7 +76,8 @@ const LoginPage = () => {
               Đăng ký
             </Link>
           </p>
-        </Form>
+          </Form>
+        </div>
       </div>
     </div>
   );

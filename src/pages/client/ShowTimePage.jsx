@@ -85,6 +85,8 @@ const ShowtimePage = () => {
     );
   }
 
+  const trailerUrl = normalizeYouTubeEmbed(movie.trailer);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white relative overflow-hidden">
       <div
@@ -159,12 +161,14 @@ const ShowtimePage = () => {
             </div>
           </div>
         </FM.div>
-        <div className="mt-16 text-center">
-          <h2 className="text-2xl font-bold text-red-400 mb-6">🎞 Trailer</h2>
-          <div className="relative w-full md:w-3/4 lg:w-2/3 mx-auto aspect-video rounded-2xl overflow-hidden shadow-2xl border border-red-600/30">
-            <iframe width="100%" height="100%" src={normalizeYouTubeEmbed(movie.trailer)} title="Trailer" allowFullScreen></iframe>
+        {trailerUrl ? (
+          <div className="mt-16 text-center">
+            <h2 className="text-2xl font-bold text-red-400 mb-6">🎞 Trailer</h2>
+            <div className="relative w-full md:w-3/4 lg:w-2/3 mx-auto aspect-video rounded-2xl overflow-hidden shadow-2xl border border-red-600/30">
+              <iframe width="100%" height="100%" src={trailerUrl} title="Trailer" allowFullScreen></iframe>
+            </div>
           </div>
-        </div>
+        ) : null}
 
         <div className="mt-20">
           <h2 className="text-2xl font-bold text-center text-red-400 mb-6">🎬 Các phim khác</h2>
