@@ -10,6 +10,8 @@ import RulePage from "../pages/client/home/components/RulePage";
 import ShowtimePicker from "../pages/client/movie/detail/components/ShowtimePicker";
 import ShowtimesPage from "../pages/client/home/components/ShowtimesPage";
 import MoviesPage from "../pages/client/home/components/MoviesPage";
+import NewsPage from "../pages/client/home/components/NewsPage";
+import NewsDetailPage from "../pages/client/home/components/NewsDetailPage";
 
 export const MainRoutes = [
   {
@@ -47,6 +49,14 @@ export const MainRoutes = [
       {
         path: "phim",
         element: <MoviesPage />,
+      },
+      {
+        path: "tin-tuc",
+        element: <NewsPage />,
+      },
+      {
+        path: "tin-tuc/:id",
+        element: <NewsDetailPage />,
       },
       {
         path: "ticket",

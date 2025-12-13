@@ -14,6 +14,7 @@ const Header = () => {
     { path: "/", label: "Trang Chủ" },
     { path: "/showtimes", label: "Lịch Chiếu" },
     { path: "/phim", label: "Phim" },
+    { path: "/tin-tuc", label: "Tin Tức" },
     { path: "/about", label: "Giới Thiệu" },
     { path: "/lien-he", label: "Liên Hệ" },
     { path: "/ticket", label: "Điều khoản" },

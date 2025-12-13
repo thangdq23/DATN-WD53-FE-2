@@ -69,7 +69,7 @@ const CreateManyComponent = ({ movie, setOpen }) => {
     };
 
     await mutateAsync(payload);
-    if (nav) navigate("/admin/showtime");
+    if (nav) navigate("/admin/showtimes");
   };
 
   const handleReset = () => {
