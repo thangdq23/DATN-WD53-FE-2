@@ -45,6 +45,11 @@ const SideBar = () => {
       icon: <ScheduleOutlined />,
       label: "Quản lý suất chiếu",
     },
+    {
+      key: "/admin/banners",
+      icon: <DesktopOutlined />,
+      label: "Quản lý banner",
+    },
   ];
 
   return (

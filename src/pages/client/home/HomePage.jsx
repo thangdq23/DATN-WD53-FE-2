@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Col, Empty, Row, Spin } from "antd";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 
@@ -95,7 +95,32 @@ const HomePage = () => {
     setTabKey(key);
   };
 
-  const bannerList = [bannerImgA, bannerImgB];
+  const [bannerList, setBannerList] = useState([bannerImgA, bannerImgB]);
+
+  // Đọc cấu hình banner từ localStorage và cập nhật khi thay đổi
+  useEffect(() => {
+    const readLS = () => {
+      try {
+        const raw = localStorage.getItem("app:banners");
+        const arr = JSON.parse(raw || "[]");
+        if (Array.isArray(arr) && arr.length > 0) {
+          setBannerList(arr);
+        } else {
+          setBannerList([bannerImgA, bannerImgB]);
+        }
+      } catch {
+        setBannerList([bannerImgA, bannerImgB]);
+      }
+    };
+    readLS();
+    const onStorage = (e) => {
+      if (e.key === "app:banners") readLS();
+    };
+    const onCustomUpdate = () => readLS();
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("banners:update", onCustomUpdate);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   // --- Lịch chiếu hôm nay (preview) ---
   const today = dayjs();

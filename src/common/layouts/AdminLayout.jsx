@@ -16,6 +16,7 @@ const AdminLayout = () => {
     { key: "/admin/movies", label: "Quản lý phim" },
     { key: "/admin/rooms", label: "Quản lý phòng chiếu" },
     { key: "/admin/showtimes", label: "Quản lý lịch chiếu" },
+    { key: "/admin/banners", label: "Quản lý banner" },
   ];
 
   return (
