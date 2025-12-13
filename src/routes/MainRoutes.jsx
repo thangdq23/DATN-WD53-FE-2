@@ -8,6 +8,7 @@ import AboutPage from "../pages/client/home/components/AboutPage";
 import ContactPage from "../pages/client/home/components/ContactPage";
 import RulePage from "../pages/client/home/components/RulePage";
 import ShowtimePicker from "../pages/client/movie/detail/components/ShowtimePicker";
+import ShowtimesPage from "../pages/client/home/components/ShowtimesPage";
 
 export const MainRoutes = [
   {
@@ -35,9 +36,14 @@ export const MainRoutes = [
         element: <ContactPage />,
       },
       {
-        path: "ticket",       
-        element: <RulePage />,
+        path: "showtimes",
+        element: <ShowtimesPage />,
       },
+      {
+        path: "lich-chieu",
+        element: <ShowtimesPage />,
+      },
+      
     ],
   },
   {
