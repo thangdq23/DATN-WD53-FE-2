@@ -1,4 +1,3 @@
-
 /**
  * @typedef {import("./movie").IMovie} IMovie
  * @typedef {import("./room").IRoom} IRoom
@@ -14,6 +13,7 @@
  * @property {string} firstStartTime
  * @property {string} lastStartTime
  * @property {number[]} dayOfWeeks
+ * @property {IRoom[]} [externalRoom]   // <-- ĐÃ THÊM DÒNG NÀY
  */
 
 /**

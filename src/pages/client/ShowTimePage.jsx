@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { Outlet } from "react-router";
+import SeatPicker from "./movie/detail/components/seatPicker";
+import { motion as FM } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { getDetailMovie, getAllMovie } from "../../common/services/movie.service";
@@ -64,6 +66,9 @@ const ShowtimePage = () => {
   const selectedKey = todayKey || showtimeDates[0];
   const todaysShowtimes = selectedKey ? showtimeData[selectedKey] : [];
 
+  const [openSeat, setOpenSeat] = useState(false);
+  const [selected, setSelected] = useState({ roomId: null, showtimeId: null, hour: null });
+
   if (loadingDetail) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-gray-300">
@@ -80,6 +85,8 @@ const ShowtimePage = () => {
     );
   }
 
+  const trailerUrl = normalizeYouTubeEmbed(movie.trailer);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white relative overflow-hidden">
       <div
@@ -88,13 +95,13 @@ const ShowtimePage = () => {
       ></div>
 
       <div className="relative z-10 max-w-6xl mx-auto py-14 px-6 md:px-10">
-        <motion.div
+        <FM.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-white/10"
         >
-          <motion.img
+          <FM.img
             whileHover={{ scale: 1.05 }}
             src={movie.poster}
             alt={movie.name}
@@ -132,7 +139,18 @@ const ShowtimePage = () => {
               ) : todaysShowtimes && todaysShowtimes.length > 0 ? (
                 <div className="flex flex-wrap gap-3">
               {todaysShowtimes.map((s) => (
-               <button key={s._id} className="px-4 py-2 bg-red-600/80 hover:bg-red-700 rounded-lg shadow-md font-medium transition">
+                <button
+                  key={s._id}
+                  onClick={() => {
+                    setSelected({
+                      roomId: s.roomId?._id || s.roomId,
+                      showtimeId: s._id,
+                      hour: dayjs(s.startTime).format("HH:mm"),
+                    });
+                    setOpenSeat(true);
+                  }}
+                  className="px-4 py-2 bg-red-600/80 hover:bg-red-700 rounded-lg shadow-md font-medium transition"
+                >
                   {dayjs(s.startTime).format("HH:mm")}
                 </button>
               ))}
@@ -142,13 +160,15 @@ const ShowtimePage = () => {
               )}
             </div>
           </div>
-        </motion.div>
-        <div className="mt-16 text-center">
-          <h2 className="text-2xl font-bold text-red-400 mb-6">🎞 Trailer</h2>
-          <div className="relative w-full md:w-3/4 lg:w-2/3 mx-auto aspect-video rounded-2xl overflow-hidden shadow-2xl border border-red-600/30">
-            <iframe width="100%" height="100%" src={normalizeYouTubeEmbed(movie.trailer)} title="Trailer" allowFullScreen></iframe>
+        </FM.div>
+        {trailerUrl ? (
+          <div className="mt-16 text-center">
+            <h2 className="text-2xl font-bold text-red-400 mb-6">🎞 Trailer</h2>
+            <div className="relative w-full md:w-3/4 lg:w-2/3 mx-auto aspect-video rounded-2xl overflow-hidden shadow-2xl border border-red-600/30">
+              <iframe width="100%" height="100%" src={trailerUrl} title="Trailer" allowFullScreen></iframe>
+            </div>
           </div>
-        </div>
+        ) : null}
 
         <div className="mt-20">
           <h2 className="text-2xl font-bold text-center text-red-400 mb-6">🎬 Các phim khác</h2>
@@ -158,7 +178,7 @@ const ShowtimePage = () => {
             ) : (
               otherMovies.map((m) => (
                 <Link key={m._id} to={`/showtime/${m._id}`}>
-                  <motion.div whileHover={{ scale: 1.05 }} className="relative bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg border border-white/10">
+                  <FM.div whileHover={{ scale: 1.05 }} className="relative bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden shadow-lg border border-white/10">
                     <img src={m.poster} alt={m.name} className="w-full h-60 object-cover" />
                     <button
                       onClick={(e) => {
@@ -174,11 +194,29 @@ const ShowtimePage = () => {
                       <p className="font-semibold truncate">{m.name}</p>
                       <p className="text-xs text-gray-400">{m?.genreIds?.map((g) => g.name).join(", ")}</p>
                     </div>
-                  </motion.div>
+                  </FM.div>
                 </Link>
               ))
             )}
       </div>
+      <Outlet />
+      <Modal
+        open={openSeat}
+        onCancel={() => setOpenSeat(false)}
+        width={1000}
+        footer={null}
+        className="rounded-xl border border-white/10 backdrop-blur-md"
+        style={{ background: `hsl(222.2 84% 4.9%)` }}
+      >
+        {selected.showtimeId && selected.roomId && (
+          <SeatPicker
+            showtimeId={selected.showtimeId}
+            roomId={selected.roomId}
+            hour={selected.hour}
+            onClose={() => setOpenSeat(false)}
+          />
+        )}
+      </Modal>
     </div>
     <Modal
       open={trailerModal.open}

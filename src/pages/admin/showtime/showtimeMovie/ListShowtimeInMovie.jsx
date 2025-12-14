@@ -100,9 +100,7 @@ const ListShowtimeInMovie = () => {
   };
 
   const cleanedQuery = Object.fromEntries(
-    Object.entries(query).filter(
-      ([_, v]) => v !== undefined && v !== null && v !== "",
-    ),
+    Object.entries(query).filter(([, v]) => v !== undefined && v !== null && v !== ""),
   );
 
   const { data: movieData, isLoading: isLoadingMovie } = useQuery({

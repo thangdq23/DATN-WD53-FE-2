@@ -1,18 +1,21 @@
+import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router";
-import { QUERYKEY } from "../../../../../common/constants/queryKey";
-import { getShowtimeWeekday } from "../../../../../common/services/showtime.service";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
 import { DAYOFWEEK_LABEL } from "../../../../../common/constants/dayOfWeek";
-import { LeftOutlined, RightOutlined } from "@ant-design/icons";
-import { useTableHook } from "../../../../../common/hooks/useTableHook";
+import { QUERYKEY } from "../../../../../common/constants/queryKey";
+import { useTable } from "../../../../../common/hooks/useTable";
+import { getShowtimeWeekday } from "../../../../../common/services/showtime.service";
+import ModalSelectRoom from "./ModalSelectRoom";
+import SeatPicker from "./seatPicker";
 
 const ShowtimePicker = () => {
-  const { id } = useParams();
-  const [dateSelect, setDateSelect] = useState("");
+  const nav = useNavigate();
+  const { id, roomId, showtimeId } = useParams();
+  const [dateSelect, setDateSelect] = useState();
   const [showtime, setShowtime] = useState(null);
-  const { query, onSelectPaginateChange } = useTableHook("time");
+  const { query, onSelectPaginateChange } = useTable("time");
 
   const { data, isLoading } = useQuery({
     queryKey: [QUERYKEY.SHOWTIME, id, ...Object.values(query)],
@@ -45,11 +48,13 @@ const ShowtimePicker = () => {
   return (
     <section>
       <div className="bg-[#1a1d23] h-24 relative flex items-center justify-center">
-        
         {data?.meta && data.meta.page !== 1 && (
           <button
             onClick={() =>
-              onSelectPaginateChange(data.meta.page - 1, data.meta.limit)
+              onSelectPaginateChange(
+                data.meta.page - 1,
+                data.meta.limit
+              )
             }
             className="px-5 bg-[#dc2626] h-full absolute left-0 hover:opacity-80 transition cursor-pointer"
           >
@@ -58,16 +63,15 @@ const ShowtimePicker = () => {
         )}
 
         {data?.data &&
-          Object.entries(data.data).map(([date, list]) => (
+          Object.entries(data.data).map(([date, showtime]) => (
             <div
               key={date}
               onClick={() => {
+                if (showtimeId && roomId) return;
                 setDateSelect(date);
-                setShowtime(list);
+                setShowtime(showtime);
               }}
-              className={`${
-                date === dateSelect ? "bg-[#dc2626]" : ""
-              } cursor-pointer h-full justify-center w-22 flex flex-col items-center`}
+              className={`${date === dateSelect && "bg-[#dc2626]"} cursor-pointer h-full justify-center w-22 flex flex-col items-center`}
             >
               <p>{dayjs(date).format("[Thg.] MM")}</p>
               <p className="font-semibold text-2xl">
@@ -82,7 +86,10 @@ const ShowtimePicker = () => {
           data.meta.page !== data.meta.totalPages && (
             <button
               onClick={() =>
-                onSelectPaginateChange(data.meta.page + 1, data.meta.limit)
+                onSelectPaginateChange(
+                  data.meta.page + 1,
+                  data.meta.limit
+                )
               }
               className="px-5 bg-[#dc2626] h-full absolute right-0 hover:opacity-80 transition cursor-pointer"
             >
@@ -91,17 +98,39 @@ const ShowtimePicker = () => {
           )}
       </div>
 
-      {!isLoading && (
-        <div className="grid mt-8 grid-cols-5 gap-6 max-w-7xl mx-6 xl:mx-auto">
-          {showtime?.map((item) => (
-            <button
-              key={item._id}
-              className="border border-gray-500/50 hover:bg-gray-500/50 transition cursor-pointer py-4 rounded-full"
-            >
-              {dayjs(item.startTime).format("HH:mm")}
-            </button>
-          ))}
-        </div>
+      {/* Chưa chọn showtime ⇒ render danh sách giờ chiếu */}
+      {!roomId || !showtimeId ? (
+        <>
+          {!isLoading && (
+            <div className="grid mt-8 grid-cols-5 gap-6 max-w-7xl mx-6 xl:mx-auto">
+              {showtime?.map((item) =>
+                item.externalRoom?.length > 1 ? (
+                  <ModalSelectRoom
+                    showtime={item}
+                    room={item.externalRoom}
+                    key={item._id}
+                  >
+                    <button className="border border-gray-500/50 hover:bg-gray-500/50 transition cursor-pointer py-4 rounded-full">
+                      {dayjs(item.startTime).format("HH:mm")}
+                    </button>
+                  </ModalSelectRoom>
+                ) : (
+                  <button
+                    onClick={() => {
+                      nav(`/showtime/${id}/${item._id}/${item.roomId._id}?hour=${dayjs(item.startTime).format("HH:mm")}&movieId=${item.movieId._id}`);
+                    }}
+                    key={item._id}
+                    className="border border-gray-500/50 hover:bg-gray-500/50 w-full text-white transition cursor-pointer py-4 rounded-full"
+                  >
+                    {dayjs(item.startTime).format("HH:mm")}
+                  </button>
+                )
+              )}
+            </div>
+          )}
+        </>
+      ) : (
+        <SeatPicker />
       )}
     </section>
   );

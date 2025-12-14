@@ -6,6 +6,7 @@ import {
   InputNumber,
   Modal,
   Select,
+  Space,
 } from "antd";
 import React, { useState } from "react";
 import dayjs from "dayjs";
@@ -109,7 +110,7 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
     const typeSeat = ["NORMAL", "VIP", "COUPLE"];
 
     // Loại bỏ _id / id ra khỏi payload, tránh backend hiểu nhầm
-    const { _id, id, movieId, ...rest } = values;
+    const { _id: _OMIT_ID, id: _OMIT_ID_ALT, movieId: _OMIT_MOVIEID, ...rest } = values;
 
     const payload = {
       ...rest,
@@ -193,11 +194,10 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
                 name={["price", 0, "value"]}
                 rules={[{ required: true, message: "Nhập giá ghế thường" }]}
               >
-                <InputNumber
-                  addonAfter="VND"
-                  className="w-full"
-                  {...antdInputNumberPropsCurrency()}
-                />
+                <Space.Compact className="w-full">
+                  <InputNumber className="w-full" {...antdInputNumberPropsCurrency()} />
+                  <div className="px-3 h-10 flex items-center border border-solid border-[#d9d9d9] rounded-r-md bg-[#f5f5f5]">VND</div>
+                </Space.Compact>
               </Form.Item>
 
               <Form.Item
@@ -206,11 +206,10 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
                 name={["price", 1, "value"]}
                 rules={[{ required: true, message: "Nhập giá ghế VIP" }]}
               >
-                <InputNumber
-                  addonAfter="VND"
-                  className="w-full"
-                  {...antdInputNumberPropsCurrency(20000)}
-                />
+                <Space.Compact className="w-full">
+                  <InputNumber className="w-full" {...antdInputNumberPropsCurrency(20000)} />
+                  <div className="px-3 h-10 flex items-center border border-solid border-[#d9d9d9] rounded-r-md bg-[#f5f5f5]">VND</div>
+                </Space.Compact>
               </Form.Item>
 
               <Form.Item
@@ -219,11 +218,10 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
                 name={["price", 2, "value"]}
                 rules={[{ required: true, message: "Nhập giá ghế đôi" }]}
               >
-                <InputNumber
-                  addonAfter="VND"
-                  className="w-full"
-                  {...antdInputNumberPropsCurrency(30000)}
-                />
+                <Space.Compact className="w-full">
+                  <InputNumber className="w-full" {...antdInputNumberPropsCurrency(30000)} />
+                  <div className="px-3 h-10 flex items-center border border-solid border-[#d9d9d9] rounded-r-md bg-[#f5f5f5]">VND</div>
+                </Space.Compact>
               </Form.Item>
             </div>
 

@@ -1,4 +1,5 @@
 import { Link, NavLink, useNavigate } from "react-router";
+import { FaFilm, FaUser, FaSignOutAlt } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useAuthSelector } from "../../../store/useAuthStore";
 
@@ -10,38 +11,36 @@ const Header = () => {
   }));
 
   const navItems = [
-    { path: "/", label: "Trang chủ" },
-    { path: "/showtimes", label: "Lịch chiếu" },
-    { path: "/flim", label: "Phim" },
-    { path: "/contact", label: "Liên hệ" },
-    { path: "/discount", label: "Tin mới và ưu đãi" },
+    { path: "/", label: "Trang Chủ" },
+    { path: "/showtimes", label: "Lịch Chiếu" },
+    { path: "/phim", label: "Phim" },
+    { path: "/tin-tuc", label: "Tin Tức" },
+    { path: "/about", label: "Giới Thiệu" },
+    { path: "/lien-he", label: "Liên Hệ" },
     { path: "/ticket", label: "Điều khoản" },
-    { path: "/about", label: "Giới thiệu" },
   ];
 
-  const [transparent, setTransparent] = useState(false);
+  const navColorBase = "text-white font-medium";
 
+  const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const onScroll = () => setTransparent(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll);
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Màu menu đồng bộ với tiêu đề RulePage
-  const navColorBase = "text-teal-300 hover:text-teal-400 font-semibold";
-
-  // Background header khi scroll
-  const headerBg = transparent
-    ? "bg-[#0b1a25]/70 backdrop-blur-md"
-    : "bg-[#0b1a25]";
+  const headerBg = scrolled ? "bg-black/70 backdrop-blur-md" : "bg-black";
 
   return (
     <header className={`sticky top-0 z-50 ${headerBg} transition-colors duration-300`}>
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         {/* LOGO + MENU */}
         <div className="flex items-center gap-8">
-          <h1 className={`text-2xl font-bold ${navColorBase}`}>MPV</h1>
+          <Link to="/" className={`flex items-center gap-2 ${navColorBase}`}>
+            <FaFilm size={24} className="text-white" />
+            <span className="text-2xl font-bold text-white">MPV</span>
+          </Link>
 
           <ul className="flex items-center gap-6 m-0">
             {navItems.map((item, index) => (
@@ -49,7 +48,7 @@ const Header = () => {
                 <NavLink
                   to={item.path}
                   className={({ isActive }) =>
-                    `${navColorBase} ${isActive ? "font-bold" : ""} uppercase text-[16px]`
+                    `${navColorBase} relative ${isActive ? "text-white after:content-[''] after:absolute after:left-0 after:-bottom-2 after:h-[2px] after:w-full after:bg-red-500" : ""} text-[15px]`
                   }
                 >
                   {item.label}
@@ -70,31 +69,29 @@ const Header = () => {
                   logout();
                   nav("/");
                 }}
-                className="px-4 py-1.5 rounded-lg bg-teal-900 text-teal-300 hover:bg-teal-800 hover:text-teal-400 transition-all duration-300 font-medium border border-teal-400 shadow-md"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white font-semibold shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400"
+                title="Đăng xuất"
               >
-                Đăng xuất
+                <FaSignOutAlt />
+                <span>Đăng xuất</span>
               </button>
             </>
           ) : (
             <>
             <Link
-  to={"/auth/register"}
-  className="px-4 py-1.5 rounded-lg bg-[#062d32] text-white font-semibold 
-             border border-white shadow-md 
-             hover:bg-[#09474e] hover:scale-[1.05]
-             transition-all duration-300"
->
-  Đăng ký
-</Link>
+              to={"/auth/register"}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/60 bg-transparent text-white font-semibold transition-colors duration-200 ease-out shadow-sm hover:bg-white/10 hover:border-white hover:shadow-md"
+            >
+              Đăng ký
+              <FaUser className="text-white" />
+            </Link>
 
               <Link
-  to={"/auth/login"}
-  className="px-4 py-1.5 rounded-lg border border-white text-white 
-             hover:bg-white/10 hover:scale-[1.05]
-             transition-all duration-300"
->
-  Đăng nhập
-</Link>
+                to={"/auth/login"}
+                className="inline-flex items-center px-4 py-2 rounded-full border border-white/60 bg-transparent text-white font-semibold transition-colors duration-200 ease-out shadow-sm hover:bg-white/10 hover:border-white hover:shadow-md"
+              >
+                Đăng nhập
+              </Link>
             </>
           )}
         </div>

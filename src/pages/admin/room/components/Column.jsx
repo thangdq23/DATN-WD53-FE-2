@@ -6,9 +6,8 @@ import { Link } from "react-router";
 import { updateStatusRoom } from "../../../../common/services/room.service";
 import { useMessage } from "../../../../common/hooks/useMessage";
 import { QUERY } from "../../../../common/constants/queryKey";
-import dayjs from 'dayjs';
 
-export const columnRoom = (getSorterProps) => {
+export const columnRoom = () => {
   const { antdMessage, HandleError } = useMessage();
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({

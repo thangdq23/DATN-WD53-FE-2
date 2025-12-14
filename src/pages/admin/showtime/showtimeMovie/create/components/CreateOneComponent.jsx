@@ -5,6 +5,7 @@ import {
   Form,
   InputNumber,
   Select,
+  Space,
 } from "antd";
 import {
   VideoCameraOutlined,
@@ -134,12 +135,10 @@ const CreateOneComponent = ({ movie, setOpen }) => {
               name={["price", 0, "value"]}
               rules={[{ required: true, message: "Nhập giá ghế thường" }]}
             >
-              <InputNumber
-                addonAfter="VND"
-                placeholder="Nhập giá tiền"
-                className="w-full"
-                {...antdInputNumberPropsCurrency()}
-              />
+              <Space.Compact className="w-full">
+                <InputNumber className="w-full" placeholder="Nhập giá tiền" {...antdInputNumberPropsCurrency()} />
+                <div className="px-3 h-10 flex items-center border border-solid border-[#d9d9d9] rounded-r-md bg-[#f5f5f5]">VND</div>
+              </Space.Compact>
             </Form.Item>
 
             <Form.Item
@@ -148,12 +147,10 @@ const CreateOneComponent = ({ movie, setOpen }) => {
               name={["price", 1, "value"]}
               rules={[{ required: true, message: "Nhập giá ghế VIP" }]}
             >
-              <InputNumber
-                addonAfter="VND"
-                placeholder="Nhập giá tiền"
-                className="w-full"
-                {...antdInputNumberPropsCurrency(20000)}
-              />
+              <Space.Compact className="w-full">
+                <InputNumber className="w-full" placeholder="Nhập giá tiền" {...antdInputNumberPropsCurrency(20000)} />
+                <div className="px-3 h-10 flex items-center border border-solid border-[#d9d9d9] rounded-r-md bg-[#f5f5f5]">VND</div>
+              </Space.Compact>
             </Form.Item>
 
             <Form.Item
@@ -162,12 +159,10 @@ const CreateOneComponent = ({ movie, setOpen }) => {
               name={["price", 2, "value"]}
               rules={[{ required: true, message: "Nhập giá ghế đôi" }]}
             >
-              <InputNumber
-                addonAfter="VND"
-                placeholder="Nhập giá tiền"
-                className="w-full"
-                {...antdInputNumberPropsCurrency(30000)}
-              />
+              <Space.Compact className="w-full">
+                <InputNumber className="w-full" placeholder="Nhập giá tiền" {...antdInputNumberPropsCurrency(30000)} />
+                <div className="px-3 h-10 flex items-center border border-solid border-[#d9d9d9] rounded-r-md bg-[#f5f5f5]">VND</div>
+              </Space.Compact>
             </Form.Item>
           </div>
         </div>

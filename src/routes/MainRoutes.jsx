@@ -7,6 +7,11 @@ import ShowtimePage from "../pages/client/ShowTimePage";
 import AboutPage from "../pages/client/home/components/AboutPage";
 import ContactPage from "../pages/client/home/components/ContactPage";
 import RulePage from "../pages/client/home/components/RulePage";
+import ShowtimePicker from "../pages/client/movie/detail/components/ShowtimePicker";
+import ShowtimesPage from "../pages/client/home/components/ShowtimesPage";
+import MoviesPage from "../pages/client/home/components/MoviesPage";
+import NewsPage from "../pages/client/home/components/NewsPage";
+import NewsDetailPage from "../pages/client/home/components/NewsDetailPage";
 
 export const MainRoutes = [
   {
@@ -20,6 +25,10 @@ export const MainRoutes = [
       {
         path: "showtime/:id",
         element: <ShowtimePage />,
+        children: [
+          { index: true, element: <ShowtimePicker /> },
+          { path: ":showtimeId/:roomId", element: <ShowtimePicker /> },
+        ],
       },
       {
         path: "about",       // thêm route cho AboutPage
@@ -30,9 +39,34 @@ export const MainRoutes = [
         element: <ContactPage />,
       },
       {
-        path: "ticket",       
+        path: "lien-he",       
+        element: <ContactPage />,
+      },
+      {
+        path: "showtimes",
+        element: <ShowtimesPage />,
+      },
+      {
+        path: "phim",
+        element: <MoviesPage />,
+      },
+      {
+        path: "tin-tuc",
+        element: <NewsPage />,
+      },
+      {
+        path: "tin-tuc/:id",
+        element: <NewsDetailPage />,
+      },
+      {
+        path: "ticket",
         element: <RulePage />,
       },
+      {
+        path: "lich-chieu",
+        element: <ShowtimesPage />,
+      },
+      
     ],
   },
   {

@@ -11,6 +11,7 @@ import UpdateRoom from "../pages/admin/room/update/UpdateRoom";
 import ListShowtime from "../pages/admin/showtime/ListShowTime";
 import ListShowtimeInMovie from "../pages/admin/showtime/showtimeMovie/ListShowtimeInMovie";
 import CreateMovieShowtime from "../pages/admin/showtime/create/CreateMovieShowtime";
+import BannerManager from "../pages/admin/banner/BannerManager";
 
 export const AdminRoutes = [
   {
@@ -74,6 +75,10 @@ export const AdminRoutes = [
       {
         path: "showtimes/movie/:id",
         element: <ListShowtimeInMovie />,
+      },
+      {
+        path: "banners",
+        element: <BannerManager />,
       },
     ],
   },

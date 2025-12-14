@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { registerService } from "../../../common/services/auth.service";
 import { useMessage } from "../../../common/hooks/useMessage";
 import { Link, useNavigate } from "react-router";
+import bannerImg3 from "../../../assets/images/banner/banner4.webp";
 
 const RegisterPage = () => {
   const nav= useNavigate();
@@ -24,13 +25,23 @@ const RegisterPage = () => {
     mutate({ userName, ...payload });
   };
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <div className="w-full max-w-lg bg-white/95 backdrop-blur rounded-2xl shadow-xl border border-gray-200 px-8 py-7">
-        <div className="mb-4">
-          <h3 className="text-2xl font-bold text-gray-800 m-0">Đăng ký</h3>
-          <p className="text-sm text-gray-500 mt-1">Tạo tài khoản để đặt vé nhanh hơn</p>
+    <div className="min-h-screen bg-gradient-to-b from-[#0b1220] via-[#121826] to-[#0b1220] text-white">
+      <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-white/5">
+          <img src={bannerImg3} alt="Register" className="w-full h-full object-cover" />
         </div>
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+
+        <div className="bg-white text-slate-900 rounded-2xl shadow-xl border border-gray-200 px-8 py-7">
+          <div className="mb-4">
+            <h1 className="text-3xl font-extrabold m-0">Tạo tài khoản mới</h1>
+            <p className="text-sm text-gray-600 mt-1">Đăng ký để nhận ưu đãi và đặt vé nhanh chóng</p>
+          </div>
+
+          <div className="mb-4 rounded-xl border border-yellow-200 bg-yellow-50 text-yellow-800 px-4 py-3 text-sm">
+            Để kích hoạt đầy đủ tính năng đăng nhập/đăng ký, vui lòng cấu hình hệ thống xác thực.
+          </div>
+
+          <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Form.Item
               label={<p className="text-sm font-medium text-gray-700 m-0">Họ</p>}
@@ -150,7 +161,6 @@ const RegisterPage = () => {
               Đăng ký
             </Button>
           </Form.Item>
-
           <p className="text-center text-sm text-gray-600">
             Bạn đã có tài khoản?{" "}
             <Link to={"/auth/login"} className="text-primary hover:underline">
@@ -158,6 +168,7 @@ const RegisterPage = () => {
             </Link>
           </p>
         </Form>
+        </div>
       </div>
     </div>
   );
