@@ -65,11 +65,20 @@ const ShowtimesPage = () => {
               <button
                 key={d.toISOString()}
                 onClick={() => setSelected(d)}
-                className={`px-4 py-2 rounded-xl border transition shadow-sm ${
+                className={`px-4 py-2 rounded-xl transition shadow-sm font-semibold ${
                   isActive
-                    ? "bg-red-600 border-red-600 text-white shadow-red-900/30"
-                    : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                    ? "text-white"
+                    : "bg-white border border-slate-200 text-slate-900 hover:bg-slate-50"
                 }`}
+                style={
+                  isActive
+                    ? {
+                        background: "linear-gradient(90deg, #ff4d4f, #ff2d2d)",
+                        border: "none",
+                        color: "#fff",
+                      }
+                    : undefined
+                }
               >
                 {formatDayChip(d)}
               </button>
@@ -77,9 +86,9 @@ const ShowtimesPage = () => {
           })}
         </FM.div>
 
-        {/* Chọn rạp chiếu phim */}
+        {/* Chọn Phòng Chiếu */}
         <div className="mt-8">
-          <p className="text-xl font-semibold mb-4">Chọn rạp chiếu phim.</p>
+          <p className="text-xl font-semibold mb-4">Chọn Phòng Chiếu</p>
           <FM.div
             className="flex gap-4 overflow-x-auto pb-2"
             initial={{ opacity: 0, y: 16 }}
@@ -93,11 +102,20 @@ const ShowtimesPage = () => {
                 <button
                   key={r._id}
                   onClick={() => setSelectedRoom(r._id)}
-                  className={`min-w-[280px] text-left px-5 py-4 rounded-xl border transition shadow-sm ${
+                  className={`min-w-[280px] text-left px-5 py-4 rounded-xl transition shadow-sm ${
                     isActive
-                      ? "bg-red-600 text-white border-red-600 shadow-red-900/30"
-                      : "bg-white border-slate-200 text-slate-900 hover:bg-slate-50"
+                      ? "text-white"
+                      : "bg-white border border-slate-200 text-slate-900 hover:bg-slate-50"
                   }`}
+                  style={
+                    isActive
+                      ? {
+                          background: "linear-gradient(90deg, #ff4d4f, #ff2d2d)",
+                          border: "none",
+                          color: "#fff",
+                        }
+                      : undefined
+                  }
                 >
                   <p className="text-lg font-semibold m-0">{r.name}</p>
                   <p className="text-sm opacity-80 m-0">Sức chứa: {r.capacity} ghế</p>

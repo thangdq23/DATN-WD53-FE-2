@@ -319,7 +319,7 @@ const TodayTimes = ({ movieId }) => {
   return (
     <div className="mt-3 flex flex-wrap gap-2">
       {times.slice(0, 6).map((s) => (
-        <span key={s._id} className="px-3 py-1 bg-red-600/80 hover:bg-red-700 rounded-lg shadow text-sm">
+        <span key={s._id} className="px-3 py-1 bg-red-600/80 hover:bg-red-700 rounded-lg shadow text-sm text-white font-semibold">
           {dayjs(s.startTime).format("HH:mm")}
         </span>
       ))}
