@@ -14,8 +14,8 @@ export const statusRelease = {
 };
 
 export const seatTypeColor = {
-  NORMAL: "#1F1F1F",
-  VIP: "#1677FF",
-  COUPLE: "#EB2F96",
+  NORMAL: "#2f3338",
+  VIP: "#f59e0b",
+  COUPLE: "#ef4444",
   LOCKED: "#ef4444", // Màu đỏ cho ghế bị khóa
 };
