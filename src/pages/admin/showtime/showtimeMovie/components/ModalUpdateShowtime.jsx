@@ -49,7 +49,7 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
   };
 
   const initialValues = {
-    roomId: showtime.roomId._id,
+    roomId: showtime?.roomId?._id,
     dateTime: dayjs(showtime.startTime),
     price: showtime.price.map((item) => ({ value: item.value })),
     fixedHour: [start, end],
