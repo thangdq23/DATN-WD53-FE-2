@@ -1,4 +1,6 @@
-import { Link, NavLink, useNavigate } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Modal } from "antd";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { FaFilm, FaUser, FaSignOutAlt } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useAuthSelector } from "../../../store/useAuthStore";
@@ -66,8 +68,19 @@ const Header = () => {
 
               <button
                 onClick={() => {
-                  logout();
-                  nav("/");
+                  Modal.confirm({
+                    centered: true,
+                    title: "Đăng xuất",
+                    icon: <ExclamationCircleOutlined style={{ color: "#ef4444" }} />,
+                    content: "Bạn có chắc chắn muốn đăng xuất không?",
+                    okText: "Đăng xuất",
+                    cancelText: "Hủy",
+                    okButtonProps: { danger: true },
+                    onOk: () => {
+                      logout();
+                      nav("/");
+                    },
+                  });
                 }}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white font-semibold shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400"
                 title="Đăng xuất"

@@ -6,6 +6,7 @@ import {
   InputNumber,
   Select,
   Switch,
+  Space,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import dayjs from "dayjs";
@@ -133,14 +134,15 @@ const CreateMovie = () => {
                 initialValue={10}
                 rules={[formRules.required("Thời gian chiếu phim")]}
               >
-                <InputNumber
-                  min={10}
-                  max={360}
-                  className="custom-input-number"
-                  placeholder="VD: 120"
-                  addonAfter={"Phút"}
-                  style={{ width: "100%" }}
-                />
+                <Space.Compact className="w-full">
+                  <InputNumber
+                    min={10}
+                    max={360}
+                    className="custom-input-number w-full"
+                    placeholder="VD: 120"
+                  />
+                  <div className="px-3 h-10 flex items-center border border-solid border-[#d9d9d9] rounded-r-md bg-[#f5f5f5]">Phút</div>
+                </Space.Compact>
               </Form.Item>
 
               <Form.Item
