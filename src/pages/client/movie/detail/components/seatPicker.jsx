@@ -7,7 +7,7 @@ import { QUERYKEY } from "../../../../../common/constants/queryKey";
 import { SEAT_STATUS, SEAT_STATUS_COLOR } from "../../../../../common/constants/seat";
 import { useMessage } from "../../../../../common/hooks/useMessage";
 import { useUnHoldOnBack } from "../../../../../common/hooks/useUnHoldOnBack";
-import { getSeatShowtime, toggleSeat } from "../../../../../common/services/seat.showtime.service";
+import { getSeatShowtime, toggleSeat, unHoldSeat } from "../../../../../common/services/seat.showtime.service";
 import { getSeatByRoom } from "../../../../../common/services/room.service";
 import { useAuthSelector } from "../../../../../store/useAuthStore";
 import { getStatusSeat, getStyleSeatCard } from "../../../../../common/utils/seat";
@@ -27,7 +27,7 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
   useUnHoldOnBack();
 
   const userId = useAuthSelector((state) => state.user?._id);
-  const { HandleError, antdMessage } = useMessage();
+  const { HandleError, showMessage } = useMessage();
   const queryClient = useQueryClient();
   const socket = getSocket();
 
@@ -108,7 +108,7 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
       const key = rs._id || rs.label;
       const st = statusByKey.get(key);
       return st
-        ? { ...rs, bookingStatus: st.bookingStatus, userId: st.userId }
+        ? { ...rs, bookingStatus: st.bookingStatus, userId: st.userId, price: st.price ?? rs.price }
         : rs;
     });
     return { ...room, seats: mergedSeats };
@@ -118,6 +118,7 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
     normalizeSeatMap(roomSeatData),
     normalizeSeatMap(data)
   );
+
 
   const { mutate } = useMutation({
     mutationFn: (seatId) => toggleSeat({ showtimeId, seatId }),
@@ -140,6 +141,22 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
     0
   );
 
+  const canSelectSeatAdjacent = (target) => {
+    const isReleasing = target.bookingStatus === SEAT_STATUS.HOLD && target.userId === userId;
+    if (isReleasing) return true;
+    const current = myHoldSeats || [];
+    if (current.length === 0) return true;
+    const sameRow = current.every((s) => s.row === target.row);
+    if (!sameRow) return false;
+    const seats = [...current, target];
+    const starts = seats.map((s) => s.col);
+    const ends = seats.map((s) => s.col + (s.span || 1) - 1);
+    const minStart = Math.min(...starts);
+    const maxEnd = Math.max(...ends);
+    const totalWidth = seats.reduce((acc, s) => acc + (s.span || 1), 0);
+    return maxEnd - minStart + 1 === totalWidth;
+  };
+
   useEffect(() => {
     if (!socket) return;
 
@@ -157,8 +174,36 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
     };
   }, [showtimeId, socket, queryClient]);
 
+  useEffect(() => {
+    const prevBg = document.body.style.backgroundColor;
+    const prevColor = document.body.style.color;
+    const htmlPrevBg = document.documentElement.style.backgroundColor;
+    const rootEl = document.getElementById('root');
+    const rootPrevBg = rootEl ? rootEl.style.backgroundColor : undefined;
+    document.body.style.backgroundColor = "#0b0b0d";
+    document.body.style.color = "#ffffff";
+    document.documentElement.style.backgroundColor = "#000000";
+    if (rootEl) rootEl.style.backgroundColor = "#000000";
+    return () => {
+      document.body.style.backgroundColor = prevBg;
+      document.body.style.color = prevColor;
+      document.documentElement.style.backgroundColor = htmlPrevBg;
+      if (rootEl && rootPrevBg !== undefined) rootEl.style.backgroundColor = rootPrevBg;
+    };
+  }, []);
+
+  const MPVLogo = () => (
+    <svg viewBox="0 0 120 120" width="100%" height="100%">
+      <rect x="0" y="0" width="120" height="120" rx="12" fill="#ef4444"></rect>
+      <text x="60" y="70" fontSize="42" fontWeight="800" textAnchor="middle" fill="#ffffff">MPV</text>
+    </svg>
+  );
+
   return (
-    <div className="min-h-[80vh] mt-12">
+    <div
+      className="min-h-screen mt-12"
+      style={{ backgroundColor: "#0f1625", color: "#ffffff" }}
+    >
       <div className="flex flex-col items-center">
         {isLoading ? (
           <div className="flex items-center flex-col justify-center gap-5 min-h-[40vh]">
@@ -167,36 +212,99 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
           </div>
         ) : (
           <>
-            <div>
+            <div
+              className="rounded-2xl px-6 pt-6 pb-8"
+              style={{
+                backgroundColor: "#0f1625",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
+              }}
+            >
               <div className="mb-2 flex items-center justify-between">
-                <p className="text-base">
+                <p className="text-base text-white">
                   Giờ chiếu: <span className="font-bold text-lg">{hour}</span>
                 </p>
-                <div className="flex items-end">
-                  <p className="text-base">Thời gian còn lại:</p>
-                  <CountTime />
+                <div
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl"
+                  style={{ border: "1px solid #ef4444" }}
+                >
+                  <p className="text-base text-white">Thời gian chọn ghế:</p>
+                  <span className="text-white">
+                    <CountTime
+                      onTimeout={async () => {
+                        try {
+                          await unHoldSeat();
+                        } catch (err) {
+                          HandleError(err, { silent: true });
+                        }
+                        try {
+                          const holds = (seatPayload?.seats || []).filter(
+                            (s) => s.bookingStatus === SEAT_STATUS.HOLD && s.userId === userId
+                          );
+                          if (holds.length) {
+                            await Promise.all(
+                              holds.map((s) => toggleSeat({ showtimeId, seatId: s._id }))
+                            );
+                          }
+                        } catch (err) {
+                          HandleError(err, { silent: true });
+                        }
+                        showMessage({ type: "warning", title: "Hết thời gian", description: "Đã hủy giữ ghế của bạn" });
+                        queryClient.invalidateQueries({
+                          predicate: ({ queryKey }) => queryKey.includes(QUERYKEY.SEAT),
+                        });
+                        setTimeout(() => {
+                          window.location.reload();
+                        }, 800);
+                      }}
+                    />
+                  </span>
                 </div>
               </div>
 
               {/* SCREEN */}
               <div
-                className="mb-6 text-center font-semibold text-black"
                 style={{
                   width: `${
                     seatPayload?.cols
                       ? seatPayload.cols * 50 + (seatPayload.cols - 1) * 8 + 30
                       : 600
                   }px`,
-                  height: "40px",
-                  background: "linear-gradient(to bottom, #facc15, #eab308)",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-                  clipPath: "polygon(0 0, 100% 0, 90% 100%, 10% 100%)",
+                  position: "relative",
+                  marginBottom: 24,
                 }}
               >
-                MÀN HÌNH
+                <div
+                  className="text-center font-semibold text-black"
+                  style={{
+                    height: 48,
+                    background:
+                      "linear-gradient(to bottom, #fbbf24, #f59e0b)",
+                    borderTopLeftRadius: 12,
+                    borderTopRightRadius: 12,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    boxShadow: "0 6px 18px rgba(0, 0, 0, 0.25)",
+                    clipPath: "polygon(0 0, 100% 0, 92% 100%, 8% 100%)",
+                  }}
+                >
+                  MÀN HÌNH
+                </div>
+                <div
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    right: 0,
+                    bottom: -8,
+                    height: 56,
+                    background:
+                      "radial-gradient(closest-side at 50% -20px, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 70%)",
+                    filter: "blur(1px)",
+                  }}
+                />
+              </div>
+              <div className="text-center font-semibold text-white text-xl mt-2">
+                Phòng chiếu {seatPayload?.name || roomId}
               </div>
             </div>
 
@@ -246,12 +354,16 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
                       key={seat._id}
                       onClick={() => {
                         if (!userId) {
-                          antdMessage.error("Vui lòng đăng nhập để chọn ghế");
+                          showMessage({ type: "error", title: "Đăng nhập", description: "Vui lòng đăng nhập để chọn ghế" });
                           nav("/auth/login");
                           return;
                         }
                         if (seat.bookingStatus === SEAT_STATUS.HOLD && !isMyHold) return;
                         if (seat.bookingStatus === SEAT_STATUS.BOOKED) return;
+                        if (!canSelectSeatAdjacent(seat)) {
+                          showMessage({ type: "warning", title: "Chọn ghế", description: "Vui lòng chọn các ghế liền nhau trong cùng hàng" });
+                          return;
+                        }
                         mutate(seat._id);
                       }}
                       style={{
@@ -262,11 +374,8 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
                       }}
                       title={seat.label}
                     >
-                      {seat.bookingStatus === SEAT_STATUS.BOOKED ? (
-                        <img
-                          src="https://res.cloudinary.com/dpplfiyki/image/upload/v1764580281/The%CC%82m_tie%CC%82u_%C4%91e%CC%82%CC%80_lbgdt5.png"
-                          alt=""
-                        />
+                      {seat.bookingStatus === SEAT_STATUS.BOOKED || (seat.bookingStatus === SEAT_STATUS.HOLD && !isMyHold) ? (
+                        <MPVLogo />
                       ) : (
                         seat.label
                       )}
@@ -281,65 +390,40 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
 
       {/* LEGENDS + TOTAL */}
       <div className="max-w-7xl xl:mx-auto mx-6">
-        <p className="mt-6">Tình trạng ghế:</p>
-
-        {/* STATUS LEGENDS */}
-        <div className="mt-4 flex gap-4">
-          {[
-            ["Ghế đã đặt", SEAT_STATUS_COLOR.BOOKED],
-            ["Ghế của bạn", SEAT_STATUS_COLOR.MYBOOKED],
-          ].map(([label, color], index) => (
-            <div className="flex items-center gap-2" key={index}>
-              <div
-                className="rounded-md"
-                style={{
-                  backgroundColor: color,
-                  width: 40,
-                  height: 40,
-                  backgroundImage:
-                    'url("https://res.cloudinary.com/dpplfiyki/image/upload/v1764580281/The%CC%82m_tie%CC%82u_%C4%91e%CC%82%CC%80_lbgdt5.png")',
-                  backgroundSize: "cover",
-                }}
-              />
-              <p>{label}</p>
-            </div>
-          ))}
-
+        <div className="mt-6 flex items-center gap-6">
           <div className="flex items-center gap-2">
-            <div
-              className="rounded-md"
-              style={{ background: SEAT_STATUS_COLOR.HOLD, width: 40, height: 40 }}
-            />
-            <p>Ghế đang giữ</p>
+            <div className="rounded-md" style={{ width: 40, height: 40, overflow: 'hidden' }}>
+              <MPVLogo />
+            </div>
+            <p>Đã đặt</p>
           </div>
-
           <div className="flex items-center gap-2">
             <div
               className="rounded-md"
               style={{ background: SEAT_STATUS_COLOR.MYHOLD, width: 40, height: 40 }}
             />
-            <p>Ghế bạn đang giữ</p>
+            <p>Ghế bạn chọn</p>
           </div>
-        </div>
-
-        {/* TYPE LEGENDS */}
-        <p className="mt-6">Loại ghế:</p>
-        <div className="flex items-center gap-4 mt-4">
-          {["NORMAL", "VIP", "COUPLE"].map((type) => (
-            <div className="flex items-center gap-2" key={type}>
-              <div
-                className="rounded-md"
-                style={{ background: seatTypeColor[type], width: 40, height: 40 }}
-              />
-              <p>Ghế {type === "NORMAL" ? "thường" : type}</p>
-            </div>
-          ))}
           <div className="flex items-center gap-2">
             <div
               className="rounded-md"
-              style={{ background: "#ef4444", width: 40, height: 40 }}
+              style={{ background: seatTypeColor.NORMAL, width: 40, height: 40 }}
             />
-            <p>Ghế không khả dụng</p>
+            <p>Ghế thường</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <div
+              className="rounded-md"
+              style={{ background: seatTypeColor.VIP, width: 40, height: 40 }}
+            />
+            <p>Ghế VIP</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <div
+              className="rounded-md"
+              style={{ background: seatTypeColor.COUPLE, width: 40, height: 40 }}
+            />
+            <p>Ghế đôi</p>
           </div>
         </div>
       </div>
@@ -366,19 +450,27 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
           <Button
             onClick={() => (onClose ? onClose() : nav(-1))}
             style={{
-              padding: "20px 30px",
+              padding: "18px 28px",
               borderRadius: "9999px",
+              backgroundColor: "#0f172a",
+              color: "#fff",
+              border: "1px solid #1f2937",
             }}
           >
-            Quay về
+            Quay lại
           </Button>
 
           <Button
             disabled={!myHoldSeats?.length}
             type="primary"
             style={{
-              padding: "20px 30px",
+              padding: "18px 28px",
               borderRadius: "9999px",
+              background: "linear-gradient(to right, #ef4444, #dc2626)",
+              border: "none",
+              color: "#ffffff",
+              fontWeight: 700,
+              opacity: 1,
             }}
           >
             Thanh toán

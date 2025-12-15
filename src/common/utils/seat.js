@@ -166,6 +166,8 @@ export const getStyleSeatCard = (seat, color) => {
     cursor: "pointer",
     position: "relative",
     transition: "all 0.2s ease",
+    fontWeight: 600,
+    fontSize: 12,
   };
 
   if (seat.locked) {
@@ -191,7 +193,7 @@ export const getStyleSeatCard = (seat, color) => {
       backgroundColor: "#f3f4f6",
       color: "#9ca3af",
       border: "1px dashed #d1d5db",
-      borderRadius: "4px",
+      borderRadius: "10px",
       boxShadow: "none",
       cursor: "default",
       "&:hover": {
@@ -202,33 +204,18 @@ export const getStyleSeatCard = (seat, color) => {
 
   // Active seat style
   const bgColor = color || seatTypeColor[seat.type];
-  const isVip = seat.type === "VIP";
   const baseSeatStyle = {
     ...baseStyle,
     backgroundColor: bgColor,
     color: "#fff",
     border: `1px solid ${darkenColor(bgColor, 10)}`,
-    borderRadius: "4px",
+    borderRadius: "10px",
     boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
     "&:hover": {
       transform: "translateY(-2px)",
       boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
     },
   };
-
-  if (isVip) {
-    return {
-      ...baseSeatStyle,
-      position: "relative",
-      border: "2px solid #FF4D4F",
-      boxShadow: "0 0 0 1px #FF4D4F, 0 0 0 3px rgba(255, 77, 79, 0.3)",
-      "&:hover": {
-        transform: "translateY(-2px)",
-        boxShadow:
-          "0 0 0 2px #FF4D4F, 0 0 0 4px rgba(255, 77, 79, 0.3), 0 4px 8px rgba(0,0,0,0.15)",
-      },
-    };
-  }
 
   return baseSeatStyle;
   //   '&:hover': {
@@ -237,6 +224,9 @@ export const getStyleSeatCard = (seat, color) => {
 export const getStatusSeat = (status, isMyHold) => {
   if (status === SEAT_STATUS.HOLD && isMyHold) {
     return SEAT_STATUS_COLOR[SEAT_STATUS.MYHOLD];
+  }
+  if (status === SEAT_STATUS.HOLD && !isMyHold) {
+    return SEAT_STATUS_COLOR[SEAT_STATUS.BOOKED];
   }
   if (status === SEAT_STATUS.BOOKED && isMyHold) {
     return SEAT_STATUS_COLOR[SEAT_STATUS.MYBOOKED];

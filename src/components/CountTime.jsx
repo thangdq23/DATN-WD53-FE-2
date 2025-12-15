@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 
-const CountTime = ({ navCount, time }) => {
-  const [timeLeft, setTimeLeft] = useState(time ? time : 300);
+const CountTime = ({ navCount, time, onTimeout }) => {
+  const DEFAULT = typeof time === "number" ? time : 300;
+  const [timeLeft, setTimeLeft] = useState(DEFAULT);
+  const triggeredRef = useRef(false);
+  const endTsRef = useRef(Date.now() + DEFAULT * 1000);
   const nav = useNavigate();
 
   const checkingNavigate = () => {
@@ -14,21 +17,36 @@ const CountTime = ({ navCount, time }) => {
   };
 
   useEffect(() => {
-    if (timeLeft <= 0) {
-      checkingNavigate();
-      return;
+    // Reset when incoming time changes
+    if (typeof time === "number") {
+      triggeredRef.current = false;
+      endTsRef.current = Date.now() + time * 1000;
+      setTimeLeft(time);
     }
+  }, [time]);
 
+  useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
+      const remaining = Math.ceil((endTsRef.current - Date.now()) / 1000);
+      const safe = remaining > 0 ? remaining : 0;
+      setTimeLeft(safe);
+      if (safe === 0 && !triggeredRef.current) {
+        triggeredRef.current = true;
+        if (typeof onTimeout === "function") {
+          onTimeout();
+        } else {
+          checkingNavigate();
+        }
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timeLeft]);
+  }, []);
 
   const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
+    const safe = Math.max(0, seconds || 0);
+    const m = Math.floor(safe / 60);
+    const s = safe % 60;
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 

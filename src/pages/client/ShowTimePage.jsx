@@ -205,8 +205,10 @@ const ShowtimePage = () => {
         onCancel={() => setOpenSeat(false)}
         width={1000}
         footer={null}
-        className="rounded-xl border border-white/10 backdrop-blur-md"
-        style={{ background: `hsl(222.2 84% 4.9%)` }}
+        className="rounded-xl"
+        styles={{ content: { backgroundColor: '#0f1625' } }}
+        bodyStyle={{ backgroundColor: '#0f1625' }}
+        maskStyle={{ backgroundColor: 'rgba(0,0,0,0.75)' }}
       >
         {selected.showtimeId && selected.roomId && (
           <SeatPicker
