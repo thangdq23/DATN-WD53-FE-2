@@ -9,7 +9,14 @@ export const useAuthStore = create(
         user: null,
         token: null,
         doLogin: (token, user) => set({ user, token }),
-        doLogout: () => set({ user: null, token: null }),
+        doLogout: () => {
+          set({ user: null, token: null });
+          try {
+            localStorage.removeItem("authenticate-storage");
+          } catch {
+            void 0;
+          }
+        },
       }),
       { name: "authenticate-storage" },
     ),

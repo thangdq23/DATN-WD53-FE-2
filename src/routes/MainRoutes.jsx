@@ -12,6 +12,7 @@ import ShowtimesPage from "../pages/client/home/components/ShowtimesPage";
 import MoviesPage from "../pages/client/home/components/MoviesPage";
 import NewsPage from "../pages/client/home/components/NewsPage";
 import NewsDetailPage from "../pages/client/home/components/NewsDetailPage";
+import CheckoutPage from "../pages/client/checkout/CheckoutPage";
 
 export const MainRoutes = [
   {
@@ -65,6 +66,10 @@ export const MainRoutes = [
       {
         path: "lich-chieu",
         element: <ShowtimesPage />,
+      },
+      {
+        path: "checkout/:showtimeId/:roomId",
+        element: <CheckoutPage />,
       },
       
     ],

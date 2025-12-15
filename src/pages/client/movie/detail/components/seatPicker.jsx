@@ -23,6 +23,7 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
   const showtimeId = showtimeIdProp || showtimeIdParam;
   const roomId = roomIdProp || roomIdParam;
   const hour = hourProp || hourParam;
+  const movieIdParam = searchParams.get("movieId");
 
   useUnHoldOnBack();
 
@@ -146,15 +147,25 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
     if (isReleasing) return true;
     const current = myHoldSeats || [];
     if (current.length === 0) return true;
-    const sameRow = current.every((s) => s.row === target.row);
-    if (!sameRow) return false;
-    const seats = [...current, target];
-    const starts = seats.map((s) => s.col);
-    const ends = seats.map((s) => s.col + (s.span || 1) - 1);
-    const minStart = Math.min(...starts);
-    const maxEnd = Math.max(...ends);
-    const totalWidth = seats.reduce((acc, s) => acc + (s.span || 1), 0);
-    return maxEnd - minStart + 1 === totalWidth;
+
+    const range = (s) => ({ start: s.col, end: s.col + (s.span || 1) - 1, row: s.row });
+    const isAdjacent = (a, b) => {
+      const ra = range(a);
+      const rb = range(b);
+      const sameRow = ra.row === rb.row;
+      const rowsDiff = Math.abs(ra.row - rb.row);
+      const overlapCols = !(ra.end < rb.start || rb.end < ra.start);
+
+      if (sameRow) {
+        return ra.end + 1 === rb.start || rb.end + 1 === ra.start;
+      }
+      if (rowsDiff === 1) {
+        return overlapCols;
+      }
+      return false;
+    };
+
+    return current.some((s) => isAdjacent(target, s));
   };
 
   useEffect(() => {
@@ -361,7 +372,7 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
                         if (seat.bookingStatus === SEAT_STATUS.HOLD && !isMyHold) return;
                         if (seat.bookingStatus === SEAT_STATUS.BOOKED) return;
                         if (!canSelectSeatAdjacent(seat)) {
-                          showMessage({ type: "warning", title: "Chọn ghế", description: "Vui lòng chọn các ghế liền nhau trong cùng hàng" });
+                          showMessage({ type: "warning", title: "Chọn ghế", description: "Vui lòng chọn các ghế liền kề nhau" });
                           return;
                         }
                         mutate(seat._id);
@@ -471,6 +482,10 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
               color: "#ffffff",
               fontWeight: 700,
               opacity: 1,
+            }}
+            onClick={() => {
+              if (!myHoldSeats?.length) return;
+              nav(`/checkout/${showtimeId}/${roomId}?hour=${hour || ""}&movieId=${movieIdParam || ""}`);
             }}
           >
             Thanh toán

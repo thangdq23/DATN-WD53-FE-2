@@ -8,7 +8,7 @@ import { Spin, Tag } from "antd";
 import { getMovieHasShowtime, getShowtimeWeekday } from "../../../../common/services/showtime.service";
 import { getAgeBadge } from "../../../../common/utils/age";
 import { getAllRoom } from "../../../../common/services/room.service";
-import bannerHero from "../../../../assets/images/banner/banner4.png";
+// bannerHero removed in dark layout
 
 const ShowtimesPage = () => {
   dayjs.locale("vi");
@@ -25,7 +25,7 @@ const ShowtimesPage = () => {
   });
   const rooms = roomsRes?.data || [];
   const [selectedRoom, setSelectedRoom] = useState(null);
-  const selectedDateLabel = selected.format("dddd, DD [tháng] MM [năm] YYYY");
+  // selectedDateLabel removed in dark layout
 
   const { data, isLoading } = useQuery({
     queryKey: ["client-showtimes", selected.toISOString()],
@@ -40,24 +40,16 @@ const ShowtimesPage = () => {
   const movies = data?.data || [];
 
   const VI_DAY = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-  const formatDayChip = (d) => `${VI_DAY[d.day()]}, ${d.format("DD/MM")}`;
+  const formatDayChip = (d) => d.format("DD-MM-YYYY");
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      {/* Hero */}
-      <section className="relative h-[360px] flex items-center justify-center text-center overflow-hidden">
-        <img src={bannerHero} alt="Showtimes banner" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="relative z-10 max-w-5xl px-6">
-          <h1 className="text-5xl font-extrabold text-white mb-2">Phim</h1>
-          <p className="text-white/90">{selectedDateLabel}</p>
-        </div>
-      </section>
-
-      <div className="max-w-7xl mx-auto px-6 py-10">
-        <div className="mb-6">
-          <h2 className="text-2xl font-extrabold text-slate-900 tracking-wide">Chọn ngày chiếu</h2>
-          <p className="text-slate-600 mt-1">Chọn ngày để xem các phim có suất chiếu</p>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-red-500"></span>
+            Phim đang chiếu
+          </h2>
         </div>
 
         <FM.div
@@ -73,11 +65,20 @@ const ShowtimesPage = () => {
               <button
                 key={d.toISOString()}
                 onClick={() => setSelected(d)}
-                className={`px-4 py-2 rounded-xl border transition shadow-sm ${
+                className={`px-4 py-2 rounded-xl transition shadow-sm font-semibold ${
                   isActive
-                    ? "bg-red-600 border-red-600 text-white shadow-red-900/30"
-                    : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+                    ? "text-white"
+                    : "bg-white border border-slate-200 text-slate-900 hover:bg-slate-50"
                 }`}
+                style={
+                  isActive
+                    ? {
+                        background: "linear-gradient(90deg, #ff4d4f, #ff2d2d)",
+                        border: "none",
+                        color: "#fff",
+                      }
+                    : undefined
+                }
               >
                 {formatDayChip(d)}
               </button>
@@ -85,9 +86,9 @@ const ShowtimesPage = () => {
           })}
         </FM.div>
 
-        {/* Chọn rạp chiếu phim */}
+        {/* Chọn Phòng Chiếu */}
         <div className="mt-8">
-          <p className="text-xl font-semibold mb-4">Chọn rạp chiếu phim.</p>
+          <p className="text-xl font-semibold mb-4">Chọn Phòng Chiếu</p>
           <FM.div
             className="flex gap-4 overflow-x-auto pb-2"
             initial={{ opacity: 0, y: 16 }}
@@ -101,11 +102,20 @@ const ShowtimesPage = () => {
                 <button
                   key={r._id}
                   onClick={() => setSelectedRoom(r._id)}
-                  className={`min-w-[280px] text-left px-5 py-4 rounded-xl border transition shadow-sm ${
+                  className={`min-w-[280px] text-left px-5 py-4 rounded-xl transition shadow-sm ${
                     isActive
-                      ? "bg-red-600 text-white border-red-600 shadow-red-900/30"
-                      : "bg-white border-slate-200 text-slate-900 hover:bg-slate-50"
+                      ? "text-white"
+                      : "bg-white border border-slate-200 text-slate-900 hover:bg-slate-50"
                   }`}
+                  style={
+                    isActive
+                      ? {
+                          background: "linear-gradient(90deg, #ff4d4f, #ff2d2d)",
+                          border: "none",
+                          color: "#fff",
+                        }
+                      : undefined
+                  }
                 >
                   <p className="text-lg font-semibold m-0">{r.name}</p>
                   <p className="text-sm opacity-80 m-0">Sức chứa: {r.capacity} ghế</p>
@@ -131,7 +141,7 @@ const ShowtimesPage = () => {
                 return (
                   <FM.div
                     key={m._id}
-                    className="rounded-2xl bg-white border border-slate-200 shadow-md overflow-hidden cursor-pointer"
+                    className="rounded-2xl bg-[#0f172a] border border-white/10 overflow-hidden cursor-pointer"
                     onClick={() => navigate(`/showtime/${m._id}`)}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -145,13 +155,24 @@ const ShowtimesPage = () => {
                         className="w-40 h-56 object-cover rounded-xl"
                       />
                       <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <p className="text-xl font-semibold truncate">{m.name}</p>
-                          <Tag color={age.color}>{age.label}</Tag>
+                        <div className="flex items-start justify-between">
+                          <div className="pr-3">
+                            <p className="text-xl font-semibold truncate text-white">{m.name}</p>
+                            <p className="text-sm text-gray-300 mt-1">{m.duration} phút</p>
+                          </div>
+                          <div className="px-2 py-1 rounded-md border border-white/20 text-white text-xs">2D</div>
                         </div>
-                        <p className="text-sm text-slate-600 mt-1">
-                          {m.duration} phút • {m.showtimeCount} suất chiếu
-                        </p>
+                        <div className="mt-2 text-sm text-gray-300">
+                          <p>
+                            Xuất xứ: {m.origin || m.country || m.language || "Việt Nam"}
+                          </p>
+                          <p>
+                            Khởi chiếu: {formatReleaseDate(m)}
+                          </p>
+                          <p className="text-red-400">
+                            {ageText(age, m.ageRequire)}
+                          </p>
+                        </div>
                         <MovieTimes movieId={m._id} selected={selected} roomId={selectedRoom} />
                       </div>
                     </div>
@@ -186,7 +207,7 @@ const MovieTimes = ({ movieId, selected, roomId }) => {
   if (!times || times.length === 0)
     return <div className="text-xs text-gray-400">Không có giờ chiếu trong ngày</div>;
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="mt-3 flex flex-wrap gap-3">
       {times.map((s) => {
         const values = Array.isArray(s.price) ? s.price.map((p) => p.value) : [];
         const minPrice = values.length ? Math.min(...values) : null;
@@ -194,12 +215,12 @@ const MovieTimes = ({ movieId, selected, roomId }) => {
         const isToday = dayjs(selected).isSame(dayjs(), "day");
         const isPast = isToday && start.isBefore(dayjs());
         const baseClass = isPast
-          ? "bg-slate-200 text-slate-500"
-          : "bg-red-600 text-white hover:bg-red-700";
+          ? "border-white/10 text-gray-500"
+          : "border-white/30 text-white hover:border-red-500 hover:text-red-400";
         return (
           <div
             key={s._id}
-            className={`min-w-[84px] px-3 py-2 rounded-lg shadow text-sm flex flex-col items-center ${baseClass}`}
+            className={`min-w-[84px] px-3 py-2 rounded-lg text-sm flex flex-col items-center border ${baseClass}`}
             title={minPrice ? `Giá từ ${minPrice.toLocaleString()}đ` : undefined}
           >
             <span className="font-semibold">{start.format("HH:mm")}</span>
@@ -210,5 +231,27 @@ const MovieTimes = ({ movieId, selected, roomId }) => {
     </div>
   );
 };
+
+// Helpers for text mapping
+const formatReleaseDate = (m) => {
+  const dateStr = m?.releaseDate || m?.startDate || m?.ngayKhoiChieu;
+  if (!dateStr) return "";
+  try {
+    return dayjs(dateStr).format("DD/MM/YYYY");
+  } catch {
+    return String(dateStr);
+  }
+};
+
+const ageText = (ageBadge, raw) => {
+  const label = (raw || ageBadge?.label || "P").toString().toUpperCase();
+  if (label.startsWith("K")) return "K - Phim dành cho mọi độ tuổi";
+  if (label.includes("13")) return "T13 - Phim được phổ biến đến người xem từ đủ 13 tuổi trở lên (13+)";
+  if (label.includes("16")) return "T16 - Phim được phổ biến đến người xem từ đủ 16 tuổi trở lên (16+)";
+  if (label.includes("18")) return "T18 - Chỉ dành cho khán giả từ đủ 18 tuổi trở lên (18+)";
+  return "Phim dành cho mọi độ tuổi";
+};
+
+// Helpers removed in white layout
 
 export default ShowtimesPage;

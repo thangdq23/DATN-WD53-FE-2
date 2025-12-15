@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { FaFilm, FaUser, FaSignOutAlt } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useAuthSelector } from "../../../store/useAuthStore";
@@ -38,8 +38,8 @@ const Header = () => {
         {/* LOGO + MENU */}
         <div className="flex items-center gap-8">
           <Link to="/" className={`flex items-center gap-2 ${navColorBase}`}>
-            <FaFilm size={24} className="text-white" />
-            <span className="text-2xl font-bold text-white">MPV</span>
+            <FaFilm size={24} className="text-red-500" />
+            <span className="text-2xl font-bold text-red-500">MPV</span>
           </Link>
 
           <ul className="flex items-center gap-6 m-0">
@@ -50,6 +50,7 @@ const Header = () => {
                   className={({ isActive }) =>
                     `${navColorBase} relative ${isActive ? "text-white after:content-[''] after:absolute after:left-0 after:-bottom-2 after:h-[2px] after:w-full after:bg-red-500" : ""} text-[15px]`
                   }
+                  style={{ color: "#fff" }}
                 >
                   {item.label}
                 </NavLink>
@@ -65,11 +66,19 @@ const Header = () => {
               <p className={`${navColorBase} m-0`}>Xin chào, {user.userName}</p>
 
               <button
+                type="button"
                 onClick={() => {
-                  logout();
-                  nav("/");
+                  try {
+                    logout();
+                    nav("/");
+                    nav(0);
+                  } catch {
+                    logout();
+                    window.location.href = "/";
+                  }
                 }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white font-semibold shadow-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-full text-white font-semibold shadow-sm hover:opacity-90"
+                style={{ background: "linear-gradient(90deg, #ff4d4f, #ff2d2d)", border: "none", color: "#fff" }}
                 title="Đăng xuất"
               >
                 <FaSignOutAlt />
@@ -80,7 +89,8 @@ const Header = () => {
             <>
             <Link
               to={"/auth/register"}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/60 bg-transparent text-white font-semibold transition-colors duration-200 ease-out shadow-sm hover:bg-white/10 hover:border-white hover:shadow-md"
+              className="inline-flex items-center justify-center px-5 py-2 rounded-full border border-white bg-transparent text-white font-semibold transition-opacity duration-200 shadow-sm hover:opacity-90"
+              style={{ color: "#fff" }}
             >
               Đăng ký
               <FaUser className="text-white" />
@@ -88,7 +98,8 @@ const Header = () => {
 
               <Link
                 to={"/auth/login"}
-                className="inline-flex items-center px-4 py-2 rounded-full border border-white/60 bg-transparent text-white font-semibold transition-colors duration-200 ease-out shadow-sm hover:bg-white/10 hover:border-white hover:shadow-md"
+                className="inline-flex items-center justify-center px-5 py-2 rounded-full text-white font-semibold shadow-sm hover:opacity-90"
+                style={{ background: "linear-gradient(90deg, #ff4d4f, #ff2d2d)", border: "none", color: "#fff" }}
               >
                 Đăng nhập
               </Link>

@@ -17,6 +17,8 @@ import MovieTabs from "./components/MovieTabs";
 import MovieFilterBar from "./components/MovieFilterBar";
 import { useTable } from "../../../common/hooks/useTable";
 import { motion as FM } from "framer-motion";
+import comboImgA from "../../../assets/images/poster/Combo.webp";
+import comboImgB from "../../../assets/images/poster/combo2.webp";
 
 const HomePage = () => {
   const [tabKey, setTabKey] = useState("nowShowing");
@@ -229,7 +231,6 @@ const HomePage = () => {
           </div>
         </FM.section>
 
-        {/* KHUYẾN MÃI */}
         <FM.section
           className="mt-12"
           initial={{ opacity: 0, y: 32 }}
@@ -240,41 +241,56 @@ const HomePage = () => {
           <h2 className="text-3xl font-extrabold text-slate-900">KHUYẾN MÃI</h2>
           <p className="text-slate-600">Ưu đãi hấp dẫn dành cho bạn</p>
 
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <FM.div
-                className="rounded-2xl p-6 bg-gradient-to-br from-pink-600 to-red-600 text-white shadow-lg"
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                viewport={{ once: true, amount: 0.2 }}
-              >
-                <p className="text-xl font-bold">Combo Popcorn + Drink</p>
-                <p className="mt-1 opacity-90">Mua vé kèm combo tiết kiệm đến 20%</p>
-                <Link to="/about" className="inline-block mt-3 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg">Xem chi tiết</Link>
-              </FM.div>
-              <FM.div
-                className="rounded-2xl p-6 bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-lg"
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                viewport={{ once: true, amount: 0.2 }}
-              >
-                <p className="text-xl font-bold">Thành viên thân thiết</p>
-                <p className="mt-1 opacity-90">Tích điểm đổi quà, nhận ưu đãi hằng tuần</p>
-                <Link to="/about" className="inline-block mt-3 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg">Xem chi tiết</Link>
-              </FM.div>
-              <FM.div
-                className="rounded-2xl p-6 bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-lg"
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                viewport={{ once: true, amount: 0.2 }}
-              >
-                <p className="text-xl font-bold">Giảm giá học sinh - sinh viên</p>
-                <p className="mt-1 opacity-90">Giảm 15% khi xuất trình thẻ sinh viên</p>
-                <Link to="/about" className="inline-block mt-3 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg">Xem chi tiết</Link>
-              </FM.div>
-            </div>
+          <div className="mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            <FM.div
+              className="relative rounded-xl overflow-hidden shadow-sm border border-slate-200"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              viewport={{ once: true, amount: 0.2 }}
+            >
+              <img src={comboImgA} alt="Combo Popcorn + Drink" className="w-full h-40 object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+              <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-red-600 text-white text-[11px] font-semibold">-20%</div>
+              <div className="p-4 text-white">
+                <p className="text-lg font-bold">Combo Popcorn + Drink</p>
+                <p className="mt-1 opacity-90 text-sm">Mua vé kèm combo tiết kiệm đến 20%</p>
+                <Link to="/about" className="inline-block mt-3 px-3 py-1.5 border border-red-500 text-red-100 hover:bg-red-600/20 rounded-md text-sm">Xem chi tiết</Link>
+              </div>
+            </FM.div>
+
+            <FM.div
+              className="relative rounded-xl overflow-hidden shadow-sm border border-slate-200"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              viewport={{ once: true, amount: 0.2 }}
+            >
+              <img src={comboImgB} alt="Combo Couple" className="w-full h-40 object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+              <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-emerald-600 text-white text-[11px] font-semibold">Hot</div>
+              <div className="p-4 text-white">
+                <p className="text-lg font-bold">Combo Couple</p>
+                <p className="mt-1 opacity-90 text-sm">Ưu đãi dành cho cặp đôi cuối tuần</p>
+                <Link to="/about" className="inline-block mt-3 px-3 py-1.5 border border-emerald-500 text-emerald-100 hover:bg-emerald-600/20 rounded-md text-sm">Xem chi tiết</Link>
+              </div>
+            </FM.div>
+
+            <FM.div
+              className="relative rounded-xl overflow-hidden shadow-sm border border-slate-200"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              viewport={{ once: true, amount: 0.2 }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-violet-600" />
+              <div className="p-4 relative z-10 text-white">
+                <p className="text-lg font-bold">Giảm giá học sinh – sinh viên</p>
+                <p className="mt-1 opacity-90 text-sm">Giảm 15% khi xuất trình thẻ sinh viên</p>
+                <Link to="/about" className="inline-block mt-3 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-md text-sm">Xem chi tiết</Link>
+              </div>
+            </FM.div>
+          </div>
         </FM.section>
       </div>
     </div>
@@ -303,7 +319,7 @@ const TodayTimes = ({ movieId }) => {
   return (
     <div className="mt-3 flex flex-wrap gap-2">
       {times.slice(0, 6).map((s) => (
-        <span key={s._id} className="px-3 py-1 bg-red-600/80 hover:bg-red-700 rounded-lg shadow text-sm">
+        <span key={s._id} className="px-3 py-1 bg-red-600/80 hover:bg-red-700 rounded-lg shadow text-sm text-white font-semibold">
           {dayjs(s.startTime).format("HH:mm")}
         </span>
       ))}
