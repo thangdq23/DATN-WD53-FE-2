@@ -39,9 +39,9 @@ const ShowtimesPage = () => {
   return (
     <div className="min-h-screen bg-white text-slate-900">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="mb-4">
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-red-500"></span>
+        <div className="mb-6">
+          <h2 className="text-3xl font-extrabold flex items-center gap-3 uppercase text-red-600">
+            <span className="w-3 h-3 rounded-full bg-red-600 shadow-lg shadow-red-500/50"></span>
             Phim đang chiếu
           </h2>
         </div>
@@ -181,21 +181,27 @@ const MovieTimes = ({ movieId, selected }) => {
         const isToday = dayjs(selected).isSame(dayjs(), "day");
         const isPast = isToday && start.isBefore(dayjs());
         const baseClass = isPast
-          ? "border-white/10 text-gray-500"
-          : "border-white/30 text-white hover:border-red-500 hover:text-red-400";
+          ? "border-white/10 text-gray-500 pointer-events-none"
+          : "border-red-500 text-red-500 hover:bg-red-500 hover:text-white shadow-red-500/20 shadow-sm";
+        const roomId = s.roomId?._id || s.roomId;
         return (
-          <div
+          <Link
             key={s._id}
-            className={`min-w-[84px] px-3 py-2 rounded-lg text-sm flex flex-col items-center border ${baseClass}`}
+            to={`/showtime/${movieId}/${s._id}/${roomId}?hour=${start.format("HH:mm")}&movieId=${movieId}`}
+            className={`min-w-[84px] px-3 py-2 rounded-lg text-sm flex flex-col items-center border transition-all ${baseClass} group`}
             title={
               minPrice ? `Giá từ ${minPrice.toLocaleString()}đ` : undefined
             }
+            onClick={(e) => {
+              if (isPast) e.preventDefault();
+              e.stopPropagation();
+            }}
           >
-            <span className="font-semibold">{start.format("HH:mm")}</span>
-            <span className="text-[11px] opacity-90">
+            <span className="font-semibold text-red-500 group-hover:text-white">{start.format("HH:mm")}</span>
+            <span className="text-[11px] opacity-90 text-red-500 group-hover:text-white">
               {minPrice ? `${minPrice.toLocaleString()}đ` : ""}
             </span>
-          </div>
+          </Link>
         );
       })}
     </div>
