@@ -5,6 +5,7 @@ import "dayjs/locale/vi";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { Spin, Tag } from "antd";
+import { getAllRoom } from "../../../../common/services/room.service";
 import {
   getMovieHasShowtime,
   getShowtimeWeekday,
@@ -19,8 +20,16 @@ const ShowtimesPage = () => {
     [],
   );
   const [selected, setSelected] = useState(days[0]);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+
+  const { data: roomData } = useQuery({
+    queryKey: ["rooms"],
+    queryFn: () => getAllRoom({ status: true }),
+  });
+  const rooms = roomData?.data || [];
+
   const { data, isLoading } = useQuery({
-    queryKey: ["client-showtimes", selected.toISOString()],
+    queryKey: ["client-showtimes", selected.toISOString(), selectedRoom],
     queryFn: () =>
       getMovieHasShowtime({
         limit: 100,
@@ -28,6 +37,7 @@ const ShowtimesPage = () => {
           ? selected.add(1, "hour").toISOString()
           : selected.startOf("day").toISOString(),
         startTimeTo: selected.endOf("day").toISOString(),
+        roomId: selectedRoom,
       }),
   });
 
@@ -45,6 +55,52 @@ const ShowtimesPage = () => {
             Phim đang chiếu
           </h2>
         </div>
+
+        {rooms.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            <button
+              onClick={() => setSelectedRoom(null)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                selectedRoom === null
+                  ? "text-white shadow-lg shadow-red-500/30"
+                  : "bg-white text-slate-600 border border-slate-200 hover:border-red-400 hover:text-red-500"
+              }`}
+              style={
+                selectedRoom === null
+                  ? {
+                      background: "linear-gradient(90deg, #ff4d4f, #ff2d2d)",
+                      border: "none",
+                      color: "#fff",
+                    }
+                  : undefined
+              }
+            >
+              Tất cả phòng
+            </button>
+            {rooms.map((r) => (
+              <button
+                key={r._id}
+                onClick={() => setSelectedRoom(r._id)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  selectedRoom === r._id
+                    ? "text-white shadow-lg shadow-red-500/30"
+                    : "bg-white text-slate-600 border border-slate-200 hover:border-red-400 hover:text-red-500"
+                }`}
+                style={
+                  selectedRoom === r._id
+                    ? {
+                        background: "linear-gradient(90deg, #ff4d4f, #ff2d2d)",
+                        border: "none",
+                        color: "#fff",
+                      }
+                    : undefined
+                }
+              >
+                {r.name}
+              </button>
+            ))}
+          </div>
+        )}
 
         <FM.div
           className="flex gap-3 overflow-x-auto pb-2"
@@ -133,7 +189,7 @@ const ShowtimesPage = () => {
                             {ageText(age, m.ageRequire)}
                           </p>
                         </div>
-                        <MovieTimes movieId={m._id} selected={selected} />
+                        <MovieTimes movieId={m._id} selected={selected} roomId={selectedRoom} />
                       </div>
                     </div>
                   </FM.div>
@@ -147,9 +203,9 @@ const ShowtimesPage = () => {
   );
 };
 
-const MovieTimes = ({ movieId, selected }) => {
+const MovieTimes = ({ movieId, selected, roomId }) => {
   const { data, isLoading } = useQuery({
-    queryKey: ["movie-times", movieId, selected.toISOString()],
+    queryKey: ["movie-times", movieId, selected.toISOString(), roomId],
     queryFn: () =>
       getShowtimeWeekday({
         movieId,
@@ -159,6 +215,7 @@ const MovieTimes = ({ movieId, selected }) => {
           ? selected.add(1, "hour").toISOString()
           : selected.startOf("day").toISOString(),
         startTimeTo: selected.endOf("day").toISOString(),
+        roomId,
       }),
     enabled: !!selected,
   });
@@ -182,7 +239,7 @@ const MovieTimes = ({ movieId, selected }) => {
         const isPast = isToday && start.isBefore(dayjs());
         const baseClass = isPast
           ? "border-white/10 text-gray-500 pointer-events-none"
-          : "border-red-500 text-red-500 hover:bg-red-500 hover:text-white shadow-red-500/20 shadow-sm";
+          : "border-red-500 text-red-500 hover:bg-gradient-to-r hover:from-[#ff4d4f] hover:to-[#ff2d2d] hover:text-white hover:border-[#ff4d4f] shadow-red-500/20 shadow-sm";
         const roomId = s.roomId?._id || s.roomId;
         return (
           <Link
@@ -197,8 +254,8 @@ const MovieTimes = ({ movieId, selected }) => {
               e.stopPropagation();
             }}
           >
-            <span className="font-semibold text-red-500 group-hover:text-white">{start.format("HH:mm")}</span>
-            <span className="text-[11px] opacity-90 text-red-500 group-hover:text-white">
+            <span className={`font-semibold ${isPast ? "" : "text-red-500 group-hover:text-white"}`}>{start.format("HH:mm")}</span>
+            <span className={`text-[11px] opacity-90 ${isPast ? "" : "text-red-500 group-hover:text-white"}`}>
               {minPrice ? `${minPrice.toLocaleString()}đ` : ""}
             </span>
           </Link>

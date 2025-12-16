@@ -100,7 +100,7 @@ const MovieFilterBar = ({ status }) => {
         </Select>
       </Col>
 
-      {/* ✅ Phim Hot */}
+      {/* Phim hot */}
       <Col xs={12} sm={6} md={4}>
         <Select
           placeholder="Phim hot"
@@ -109,8 +109,8 @@ const MovieFilterBar = ({ status }) => {
           onChange={handleHotChange}
           style={{ width: "100%" }}
         >
-          <Option value={true}>🔥 Phim Hot</Option>
-          <Option value={false}>Không hot</Option>
+          <Option value={true}>Phim hot</Option>
+          <Option value={false}>Bình thường</Option>
         </Select>
       </Col>
     </Row>

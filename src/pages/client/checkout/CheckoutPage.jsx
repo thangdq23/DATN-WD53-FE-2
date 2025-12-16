@@ -46,6 +46,14 @@ const CheckoutPage = () => {
     return raw?.name || raw?.data?.name || "";
   }, [movieRes]);
 
+  const movieDetail = useMemo(() => {
+    const raw = movieRes?.data ?? movieRes;
+    if (!raw) return null;
+    if (raw?.name) return raw;
+    if (raw?.data?.name) return raw.data;
+    return null;
+  }, [movieRes]);
+
   const seatPayload = useMemo(() => {
     const norm = (payload) => {
       const raw = payload?.data ?? payload;
@@ -97,6 +105,15 @@ const CheckoutPage = () => {
                   <div>
                     <span className="opacity-80">Phim</span>
                     <div className="font-bold text-lg">{movieName || "—"}</div>
+                    {movieDetail && (
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 mt-1">
+                        {movieDetail.age && (
+                          <span className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 font-bold text-slate-600">
+                            {movieDetail.age}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="rounded-xl border border-slate-200 p-4">
