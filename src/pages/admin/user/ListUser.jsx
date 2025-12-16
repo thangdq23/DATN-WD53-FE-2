@@ -6,6 +6,7 @@ import { getAllUser } from "../../../common/services/user.service";
 import { useTable } from "../../../common/hooks/useTable";
 import { columnUser } from "./components/Column";
 import { USER_ROLE } from "../../../common/constants/user";
+import ModalCreateUser  from "./components/ModalCreateUser";
 
 const ListUser = () => {
   const { query, getSorterProps, onFilter } = useTable();
@@ -25,9 +26,9 @@ const ListUser = () => {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold">Quản lý người dùng</h3>
-        <Link to={"/admin/showtimes/create"}>
+        <ModalCreateUser>
           <Button type="primary">Thêm người dùng</Button>
-        </Link>
+        </ModalCreateUser>
       </div>
       <div className="flex itesm-center gap-6">
         <Input.Search onSearch={(e) => onFilter({ search: e })} />

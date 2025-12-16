@@ -4,3 +4,7 @@ export const getAllUser = async (params) => {
   const { data } = await api.get(`/user`, { params });
   return data;
 };
+export const createUser = async(payload)=>{
+  const {data} = await api.post(`/user`, payload);
+  return data;
+};
