@@ -1,96 +1,141 @@
 import React from "react";
 import { Link } from "react-router";
+import { FacebookOutlined, TwitterOutlined, InstagramOutlined, YoutubeOutlined, PhoneOutlined, MailOutlined, EnvironmentOutlined } from '@ant-design/icons';
 
 const Footer = () => {
-	return (
-		<footer className="bg-gray-900 text-white py-10">
-			<div className="max-w-7xl mx-6 xl:mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-				<div>
-					<h2 className="text-2xl font-bold">MPV</h2>
-					<p className="mt-2 text-sm text-gray-300">
-						Rạp chiếu phim hàng đầu — trải nghiệm điện ảnh tuyệt vời.
-					</p>
-				</div>
+  const currentYear = new Date().getFullYear();
+  const socialLinks = [
+    { 
+      icon: <FacebookOutlined className="text-xl" />, 
+      url: "https://facebook.com", 
+      label: "Facebook" 
+    },
+    { 
+      icon: <TwitterOutlined className="text-xl" />, 
+      url: "https://twitter.com", 
+      label: "Twitter" 
+    },
+    { 
+      icon: <InstagramOutlined className="text-xl" />, 
+      url: "https://instagram.com", 
+      label: "Instagram" 
+    },
+    { 
+      icon: <YoutubeOutlined className="text-xl" />, 
+      url: "https://youtube.com", 
+      label: "YouTube" 
+    }
+  ];
 
-				<div>
-					<h3 className="font-semibold mb-3">Liên kết</h3>
-					<ul className="space-y-2 text-gray-300">
-						<li>
-							<Link to="/" className="hover:text-primary! duration-200">
-								Trang chủ
-							</Link>
-						</li>
-						<li>
-            <Link to="/phim" className="hover:text-primary! duration-200">
-              Phim
-            </Link>
-						</li>
-						<li>
-							<Link to="/showtimes" className="hover:text-primary! duration-200">
-								Lịch chiếu
-							</Link>
-						</li>
-						<li>
-							<Link to="/news" className="hover:text-primary! duration-200">
-								Tin tức
-							</Link>
-						</li>
-					</ul>
-				</div>
+  const quickLinks = [
+    { title: "Trang chủ", path: "/" },
+    { title: "Phim đang chiếu", path: "/phim?status=nowShowing" },
+    { title: "Phim sắp chiếu", path: "/phim?status=upcoming" },
+    { title: "Lịch chiếu", path: "/lich-chieu" },
+    { title: "Khuyến mãi", path: "/khuyen-mai" },
+    { title: "Tin tức", path: "/tin-tuc" }
+  ];
 
-				<div>
-					<h3 className="font-semibold mb-3">Liên hệ</h3>
-					<p className="text-gray-300 text-sm">Email: info@mpv.vn</p>
-					<p className="text-gray-300 text-sm">Hotline: 1900 1234</p>
-					<div className="flex gap-3 mt-3">
-						<a
-							href="https://facebook.com"
-							target="_blank"
-							rel="noreferrer"
-							aria-label="Facebook"
-							className="text-gray-300 hover:text-white"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="20"
-								height="20"
-								viewBox="0 0 24 24"
-								fill="currentColor"
-								aria-hidden="true"
-							>
-								<path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.988H7.898v-2.89h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.242 0-1.63.772-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
-							</svg>
-						</a>
-						<a
-							href="https://twitter.com"
-							target="_blank"
-							rel="noreferrer"
-							aria-label="Twitter"
-							className="text-gray-300 hover:text-white"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="20"
-								height="20"
-								viewBox="0 0 24 24"
-								fill="currentColor"
-								aria-hidden="true"
-							>
-								<path d="M22.162 5.656c-.637.283-1.322.475-2.043.56.734-.44 1.296-1.136 1.562-1.966-.687.407-1.45.703-2.262.862C18.77 4.89 17.836 4.5 16.796 4.5c-1.842 0-3.335 1.495-3.335 3.336 0 .262.03.516.086.76-2.772-.14-5.234-1.466-6.88-3.485-.287.492-.45 1.064-.45 1.674 0 1.154.587 2.173 1.48 2.768-.544-.017-1.056-.167-1.503-.417v.042c0 1.612 1.148 2.957 2.672 3.262-.28.077-.576.118-.88.118-.215 0-.424-.02-.627-.06.425 1.327 1.656 2.293 3.116 2.32-1.14.894-2.576 1.427-4.137 1.427-.269 0-.535-.016-.797-.047 1.475.945 3.226 1.495 5.111 1.495 6.134 0 9.49-5.082 9.49-9.488 0-.145-.003-.289-.01-.432.652-.472 1.216-1.06 1.664-1.731-.597.265-1.238.444-1.906.524.686-.411 1.21-1.062 1.458-1.836z" />
-							</svg>
-						</a>
-					</div>
-				</div>
-			</div>
+  const contactInfo = [
+    { 
+      icon: <EnvironmentOutlined className="text-lg" />, 
+      text: "123 Đường Số 1, Quận 1, TP. Hồ Chí Minh" 
+    },
+    { 
+      icon: <PhoneOutlined className="text-lg" />, 
+      text: "1900 1234" 
+    },
+    { 
+      icon: <MailOutlined className="text-lg" />, 
+      text: "info@mpv.vn" 
+    }
+  ];
 
-			<div className="border-t border-gray-800 mt-8 pt-6">
-				<div className="max-w-7xl mx-6 xl:mx-auto text-center text-gray-400 text-sm">
-					&copy; {new Date().getFullYear()} MPV. All rights reserved.
-				</div>
-			</div>
-		</footer>
-	);
+  return (
+    <footer className="bg-gray-900 text-gray-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center md:text-left">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 justify-items-center md:justify-items-start">
+          <div className="space-y-4 max-w-xs mx-auto md:mx-0">
+            <h2 className="text-2xl font-bold text-white flex items-center justify-center md:justify-start">
+              <span className="bg-red-600 text-white px-2 py-1 rounded mr-2">MPV</span>
+              <span>CINEMA</span>
+            </h2>
+            <p className="text-sm leading-relaxed">
+              Hệ thống rạp chiếu phim hiện đại với chất lượng hình ảnh và âm thanh vượt trội.
+            </p>
+            <div className="flex space-x-4 pt-2 justify-center md:justify-start">
+              {socialLinks.map((social, index) => (
+                <a
+                  key={index}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-white transition-colors duration-300"
+                  aria-label={social.label}
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
+          </div>
+          <div className="text-center md:text-left">
+            <h3 className="text-white text-lg font-semibold mb-4 pb-2 border-b border-gray-700 inline-block">
+              Liên kết nhanh
+            </h3>
+            <ul className="space-y-3">
+              {quickLinks.map((link, index) => (
+                <li key={index}>
+                  <Link 
+                    to={link.path} 
+                    className="hover:text-red-500 transition-colors duration-300"
+                  >
+                    {link.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="text-center md:text-left">
+            <h3 className="text-white text-lg font-semibold mb-4 pb-2 border-b border-gray-700 inline-block">
+              Thông tin liên hệ
+            </h3>
+            <ul className="space-y-3">
+              {contactInfo.map((item, index) => (
+                <li key={index} className="flex items-center justify-center md:justify-start">
+                  <span className="text-red-500 mr-3">{item.icon}</span>
+                  <span className="text-sm">{item.text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-gray-800 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <p className="text-sm text-gray-500">
+              &copy; {currentYear} MPV Cinema. Tất cả các quyền được bảo lưu.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link to="/dieu-khoan" className="text-gray-500 hover:text-white transition-colors duration-300 text-sm">
+                Điều khoản sử dụng
+              </Link>
+              <span className="text-gray-600">|</span>
+              <Link to="/chinh-sach" className="text-gray-500 hover:text-white transition-colors duration-300 text-sm">
+                Chính sách bảo mật
+              </Link>
+              <span className="text-gray-600">|</span>
+              <Link to="/lien-he" className="text-gray-500 hover:text-white transition-colors duration-300 text-sm">
+                Liên hệ
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
 };
 
 export default Footer;
-

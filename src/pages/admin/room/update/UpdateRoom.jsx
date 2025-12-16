@@ -725,7 +725,7 @@ const UpdateRoom = () => {
                           Ghế đôi
                         </Tag>
                         <Tag
-                          color="error"
+                          color="#dc2626"
                           className="m-0 px-3 py-1 rounded-md font-medium"
                         >
                           Ghế bị khoá
