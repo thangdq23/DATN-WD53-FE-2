@@ -4,12 +4,15 @@ import { useState, useMemo, useEffect } from "react";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 
-import bannerImgA from "../../../assets/images/banner/banner.png";
+import bannerImgA from "../../../assets/images/banner/banner4.png";
 import bannerImgB from "../../../assets/images/banner/banner3.png";
 
 import posterTraiTim from "../../../assets/images/poster/trai-tim-que-quat.jpg";
 import { getAllMovie } from "../../../common/services/movie.service";
-import { getMovieHasShowtime, getShowtimeWeekday } from "../../../common/services/showtime.service";
+import {
+  getMovieHasShowtime,
+  getShowtimeWeekday,
+} from "../../../common/services/showtime.service";
 
 import BannerSection from "./components/BannerSection";
 import MovieCard from "./components/MovieCard";
@@ -143,7 +146,14 @@ const HomePage = () => {
         <BannerSection images={bannerList} interval={3000} />
       </div>
 
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", paddingBottom: 48 }}>
+      <div
+        style={{
+          maxWidth: 1280,
+          margin: "0 auto",
+          padding: "0 24px",
+          paddingBottom: 48,
+        }}
+      >
         <FM.div
           initial={{ opacity: 0, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -152,7 +162,9 @@ const HomePage = () => {
           className="mt-8 rounded-3xl bg-white text-slate-900 shadow-md px-6 py-6"
         >
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-2xl font-extrabold tracking-wide">PHIM ĐANG CHIẾU</h2>
+            <h2 className="text-2xl font-extrabold tracking-wide">
+              PHIM ĐANG CHIẾU
+            </h2>
           </div>
           <MovieTabs tabKey={tabKey} onChange={handleChangeTab} />
           <MovieFilterBar status={tabKey} />
@@ -189,7 +201,9 @@ const HomePage = () => {
           transition={{ duration: 0.6, ease: "easeOut" }}
           viewport={{ once: true, amount: 0.2 }}
         >
-          <h2 className="text-3xl font-extrabold text-slate-900">LỊCH CHIẾU HÔM NAY</h2>
+          <h2 className="text-3xl font-extrabold text-slate-900">
+            LỊCH CHIẾU HÔM NAY
+          </h2>
           <p className="text-slate-600">Chọn suất chiếu phù hợp với bạn</p>
 
           {loadingToday ? (
@@ -211,11 +225,20 @@ const HomePage = () => {
                   transition={{ duration: 0.5, ease: "easeOut" }}
                   viewport={{ once: true, amount: 0.2 }}
                 >
-                  <img src={m.poster} alt={m.name} className="w-full h-52 object-cover" />
+                  <img
+                    src={m.poster}
+                    alt={m.name}
+                    className="w-full h-52 object-cover"
+                  />
                   <div className="p-4">
                     <div className="flex items-center justify-between">
                       <p className="text-lg font-semibold truncate">{m.name}</p>
-                      <Link to={`/showtime/${m._id}`} className="text-sm text-red-600 hover:text-red-500">Chi tiết</Link>
+                      <Link
+                        to={`/showtime/${m._id}`}
+                        className="text-sm text-red-600 hover:text-red-500"
+                      >
+                        Chi tiết
+                      </Link>
                     </div>
                     <TodayTimes movieId={m._id} />
                   </div>
@@ -225,7 +248,10 @@ const HomePage = () => {
           )}
 
           <div className="mt-4">
-            <Link to="/showtimes" className="inline-block px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg shadow-md font-medium">
+            <Link
+              to="/showtimes"
+              className="inline-block px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg shadow-md font-medium"
+            >
               Xem tất cả lịch chiếu
             </Link>
           </div>
@@ -249,13 +275,26 @@ const HomePage = () => {
               transition={{ duration: 0.5, ease: "easeOut" }}
               viewport={{ once: true, amount: 0.2 }}
             >
-              <img src={comboImgA} alt="Combo Popcorn + Drink" className="w-full h-40 object-cover" />
+              <img
+                src={comboImgA}
+                alt="Combo Popcorn + Drink"
+                className="w-full h-40 object-cover"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
-              <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-red-600 text-white text-[11px] font-semibold">-20%</div>
+              <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-red-600 text-white text-[11px] font-semibold">
+                -20%
+              </div>
               <div className="p-4 text-white">
                 <p className="text-lg font-bold">Combo Popcorn + Drink</p>
-                <p className="mt-1 opacity-90 text-sm">Mua vé kèm combo tiết kiệm đến 20%</p>
-                <Link to="/about" className="inline-block mt-3 px-3 py-1.5 border border-red-500 text-red-100 hover:bg-red-600/20 rounded-md text-sm">Xem chi tiết</Link>
+                <p className="mt-1 opacity-90 text-sm">
+                  Mua vé kèm combo tiết kiệm đến 20%
+                </p>
+                <Link
+                  to="/about"
+                  className="inline-block mt-3 px-3 py-1.5 border border-red-500 text-red-100 hover:bg-red-600/20 rounded-md text-sm"
+                >
+                  Xem chi tiết
+                </Link>
               </div>
             </FM.div>
 
@@ -266,13 +305,26 @@ const HomePage = () => {
               transition={{ duration: 0.5, ease: "easeOut" }}
               viewport={{ once: true, amount: 0.2 }}
             >
-              <img src={comboImgB} alt="Combo Couple" className="w-full h-40 object-cover" />
+              <img
+                src={comboImgB}
+                alt="Combo Couple"
+                className="w-full h-40 object-cover"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
-              <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-emerald-600 text-white text-[11px] font-semibold">Hot</div>
+              <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-emerald-600 text-white text-[11px] font-semibold">
+                Hot
+              </div>
               <div className="p-4 text-white">
                 <p className="text-lg font-bold">Combo Couple</p>
-                <p className="mt-1 opacity-90 text-sm">Ưu đãi dành cho cặp đôi cuối tuần</p>
-                <Link to="/about" className="inline-block mt-3 px-3 py-1.5 border border-emerald-500 text-emerald-100 hover:bg-emerald-600/20 rounded-md text-sm">Xem chi tiết</Link>
+                <p className="mt-1 opacity-90 text-sm">
+                  Ưu đãi dành cho cặp đôi cuối tuần
+                </p>
+                <Link
+                  to="/about"
+                  className="inline-block mt-3 px-3 py-1.5 border border-emerald-500 text-emerald-100 hover:bg-emerald-600/20 rounded-md text-sm"
+                >
+                  Xem chi tiết
+                </Link>
               </div>
             </FM.div>
 
@@ -285,9 +337,18 @@ const HomePage = () => {
             >
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-violet-600" />
               <div className="p-4 relative z-10 text-white">
-                <p className="text-lg font-bold">Giảm giá học sinh – sinh viên</p>
-                <p className="mt-1 opacity-90 text-sm">Giảm 15% khi xuất trình thẻ sinh viên</p>
-                <Link to="/about" className="inline-block mt-3 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-md text-sm">Xem chi tiết</Link>
+                <p className="text-lg font-bold">
+                  Giảm giá học sinh – sinh viên
+                </p>
+                <p className="mt-1 opacity-90 text-sm">
+                  Giảm 15% khi xuất trình thẻ sinh viên
+                </p>
+                <Link
+                  to="/about"
+                  className="inline-block mt-3 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-md text-sm"
+                >
+                  Xem chi tiết
+                </Link>
               </div>
             </FM.div>
           </div>
@@ -300,7 +361,11 @@ const HomePage = () => {
 const TodayTimes = ({ movieId }) => {
   const today = dayjs();
   const { data, isLoading } = useQuery({
-    queryKey: ["homepage-movie-times", movieId, today.startOf("day").toISOString()],
+    queryKey: [
+      "homepage-movie-times",
+      movieId,
+      today.startOf("day").toISOString(),
+    ],
     queryFn: () =>
       getShowtimeWeekday({
         movieId,
@@ -313,13 +378,19 @@ const TodayTimes = ({ movieId }) => {
   });
   const grouped = data?.data || {};
   const times = Object.values(grouped).flat();
-  if (isLoading) return <div className="text-xs text-gray-400 mt-2">Đang tải giờ chiếu...</div>;
+  if (isLoading)
+    return (
+      <div className="text-xs text-gray-400 mt-2">Đang tải giờ chiếu...</div>
+    );
   if (!times || times.length === 0)
     return <div className="text-xs text-gray-400 mt-2">Không có giờ chiếu</div>;
   return (
     <div className="mt-3 flex flex-wrap gap-2">
       {times.slice(0, 6).map((s) => (
-        <span key={s._id} className="px-3 py-1 bg-red-600/80 hover:bg-red-700 rounded-lg shadow text-sm text-white font-semibold">
+        <span
+          key={s._id}
+          className="px-3 py-1 bg-red-600/80 hover:bg-red-700 rounded-lg shadow text-sm text-white font-semibold"
+        >
           {dayjs(s.startTime).format("HH:mm")}
         </span>
       ))}
