@@ -24,14 +24,20 @@ const MoviesPage = () => {
 
   const filtered = useMemo(() => {
     if (!selectedGenre) return movies;
-    return movies.filter((m) => m?.genreIds?.some((g) => g._id === selectedGenre));
+    return movies.filter((m) =>
+      m?.genreIds?.some((g) => g._id === selectedGenre),
+    );
   }, [movies, selectedGenre]);
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
       {/* Hero */}
       <section className="relative h-[420px] flex items-center justify-center text-center overflow-hidden">
-        <img src={bannerImg} alt="Movies banner" className="absolute inset-0 w-full h-full object-cover" />
+        <img
+          src={bannerImg}
+          alt="Movies banner"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-black/60" />
         <FM.div
           className="relative z-10 max-w-5xl px-6"
@@ -40,36 +46,16 @@ const MoviesPage = () => {
           transition={{ duration: 0.6, ease: "easeOut" }}
           viewport={{ once: true, amount: 0.2 }}
         >
-          <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-2">Phim Đang Chiếu</h1>
-          <p className="text-lg md:text-xl text-white/90">Khám phá những bộ phim đỉnh cao đang được chiếu tại rạp</p>
+          <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-2">
+            Phim Đang Chiếu
+          </h1>
+          <p className="text-lg md:text-xl text-white/90">
+            Khám phá những bộ phim đỉnh cao đang được chiếu tại rạp
+          </p>
         </FM.div>
       </section>
 
-      {/* Genre chips */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <FM.div
-          className="flex flex-wrap gap-3"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          <Chip
-            label="Tất cả"
-            active={!selectedGenre}
-            onClick={() => setSelectedGenre(null)}
-          />
-          {genres.map((g) => (
-            <Chip
-              key={g._id}
-              label={g.name}
-              active={selectedGenre === g._id}
-              onClick={() => setSelectedGenre(g._id)}
-            />
-          ))}
-        </FM.div>
-      </div>
-
+      <div className="" style={{ padding: 20 }}></div>
       {/* Movies grid */}
       <div className="max-w-7xl mx-auto px-6 pb-16">
         {isLoading ? (

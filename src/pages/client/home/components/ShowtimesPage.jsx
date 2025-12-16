@@ -5,7 +5,10 @@ import "dayjs/locale/vi";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { Spin, Tag } from "antd";
-import { getMovieHasShowtime, getShowtimeWeekday } from "../../../../common/services/showtime.service";
+import {
+  getMovieHasShowtime,
+  getShowtimeWeekday,
+} from "../../../../common/services/showtime.service";
 import { getAgeBadge } from "../../../../common/utils/age";
 import { getAllRoom } from "../../../../common/services/room.service";
 // bannerHero removed in dark layout
@@ -86,45 +89,6 @@ const ShowtimesPage = () => {
           })}
         </FM.div>
 
-        {/* Chọn Phòng Chiếu */}
-        <div className="mt-8">
-          <p className="text-xl font-semibold mb-4">Chọn Phòng Chiếu</p>
-          <FM.div
-            className="flex gap-4 overflow-x-auto pb-2"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            {rooms.map((r) => {
-              const isActive = selectedRoom === r._id;
-              return (
-                <button
-                  key={r._id}
-                  onClick={() => setSelectedRoom(r._id)}
-                  className={`min-w-[280px] text-left px-5 py-4 rounded-xl transition shadow-sm ${
-                    isActive
-                      ? "text-white"
-                      : "bg-white border border-slate-200 text-slate-900 hover:bg-slate-50"
-                  }`}
-                  style={
-                    isActive
-                      ? {
-                          background: "linear-gradient(90deg, #ff4d4f, #ff2d2d)",
-                          border: "none",
-                          color: "#fff",
-                        }
-                      : undefined
-                  }
-                >
-                  <p className="text-lg font-semibold m-0">{r.name}</p>
-                  <p className="text-sm opacity-80 m-0">Sức chứa: {r.capacity} ghế</p>
-                </button>
-              );
-            })}
-          </FM.div>
-        </div>
-
         <div className="mt-8">
           {isLoading ? (
             <div className="flex items-center gap-2 text-slate-600">
@@ -157,23 +121,32 @@ const ShowtimesPage = () => {
                       <div className="flex-1">
                         <div className="flex items-start justify-between">
                           <div className="pr-3">
-                            <p className="text-xl font-semibold truncate text-white">{m.name}</p>
-                            <p className="text-sm text-gray-300 mt-1">{m.duration} phút</p>
+                            <p className="text-xl font-semibold truncate text-white">
+                              {m.name}
+                            </p>
+                            <p className="text-sm text-gray-300 mt-1">
+                              {m.duration} phút
+                            </p>
                           </div>
-                          <div className="px-2 py-1 rounded-md border border-white/20 text-white text-xs">2D</div>
+                          <div className="px-2 py-1 rounded-md border border-white/20 text-white text-xs">
+                            2D
+                          </div>
                         </div>
                         <div className="mt-2 text-sm text-gray-300">
                           <p>
-                            Xuất xứ: {m.origin || m.country || m.language || "Việt Nam"}
+                            Xuất xứ:{" "}
+                            {m.origin || m.country || m.language || "Việt Nam"}
                           </p>
-                          <p>
-                            Khởi chiếu: {formatReleaseDate(m)}
-                          </p>
+                          <p>Khởi chiếu: {formatReleaseDate(m)}</p>
                           <p className="text-red-400">
                             {ageText(age, m.ageRequire)}
                           </p>
                         </div>
-                        <MovieTimes movieId={m._id} selected={selected} roomId={selectedRoom} />
+                        <MovieTimes
+                          movieId={m._id}
+                          selected={selected}
+                          roomId={selectedRoom}
+                        />
                       </div>
                     </div>
                   </FM.div>
@@ -203,13 +176,18 @@ const MovieTimes = ({ movieId, selected, roomId }) => {
   });
   const grouped = data?.data || {};
   const times = Object.values(grouped).flat();
-  if (isLoading) return <div className="text-xs text-gray-400">Đang tải giờ chiếu...</div>;
+  if (isLoading)
+    return <div className="text-xs text-gray-400">Đang tải giờ chiếu...</div>;
   if (!times || times.length === 0)
-    return <div className="text-xs text-gray-400">Không có giờ chiếu trong ngày</div>;
+    return (
+      <div className="text-xs text-gray-400">Không có giờ chiếu trong ngày</div>
+    );
   return (
     <div className="mt-3 flex flex-wrap gap-3">
       {times.map((s) => {
-        const values = Array.isArray(s.price) ? s.price.map((p) => p.value) : [];
+        const values = Array.isArray(s.price)
+          ? s.price.map((p) => p.value)
+          : [];
         const minPrice = values.length ? Math.min(...values) : null;
         const start = dayjs(s.startTime);
         const isToday = dayjs(selected).isSame(dayjs(), "day");
@@ -221,10 +199,14 @@ const MovieTimes = ({ movieId, selected, roomId }) => {
           <div
             key={s._id}
             className={`min-w-[84px] px-3 py-2 rounded-lg text-sm flex flex-col items-center border ${baseClass}`}
-            title={minPrice ? `Giá từ ${minPrice.toLocaleString()}đ` : undefined}
+            title={
+              minPrice ? `Giá từ ${minPrice.toLocaleString()}đ` : undefined
+            }
           >
             <span className="font-semibold">{start.format("HH:mm")}</span>
-            <span className="text-[11px] opacity-90">{minPrice ? `${minPrice.toLocaleString()}đ` : ""}</span>
+            <span className="text-[11px] opacity-90">
+              {minPrice ? `${minPrice.toLocaleString()}đ` : ""}
+            </span>
           </div>
         );
       })}
@@ -246,9 +228,12 @@ const formatReleaseDate = (m) => {
 const ageText = (ageBadge, raw) => {
   const label = (raw || ageBadge?.label || "P").toString().toUpperCase();
   if (label.startsWith("K")) return "K - Phim dành cho mọi độ tuổi";
-  if (label.includes("13")) return "T13 - Phim được phổ biến đến người xem từ đủ 13 tuổi trở lên (13+)";
-  if (label.includes("16")) return "T16 - Phim được phổ biến đến người xem từ đủ 16 tuổi trở lên (16+)";
-  if (label.includes("18")) return "T18 - Chỉ dành cho khán giả từ đủ 18 tuổi trở lên (18+)";
+  if (label.includes("13"))
+    return "T13 - Phim được phổ biến đến người xem từ đủ 13 tuổi trở lên (13+)";
+  if (label.includes("16"))
+    return "T16 - Phim được phổ biến đến người xem từ đủ 16 tuổi trở lên (16+)";
+  if (label.includes("18"))
+    return "T18 - Chỉ dành cho khán giả từ đủ 18 tuổi trở lên (18+)";
   return "Phim dành cho mọi độ tuổi";
 };
 
