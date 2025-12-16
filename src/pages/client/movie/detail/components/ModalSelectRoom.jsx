@@ -21,8 +21,8 @@ const ModalSelectRoom = ({ children, room, showtime }) => {
           background: `hsl(222.2 84% 4.9%)`,
         }}
         title={
-          <p className="text-lg font-semibold text-white/90 tracking-wide">
-            Lựa chọn phòng chiếu
+          <p className="text-2xl font-bold text-white uppercase tracking-wide">
+            Chọn Phòng Chiếu
           </p>
         }
         footer={null}

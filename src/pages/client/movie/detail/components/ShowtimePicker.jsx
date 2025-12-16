@@ -45,8 +45,17 @@ const ShowtimePicker = () => {
     }
   }, [data?.data]);
 
+  useEffect(() => {
+    if (showtimeId && roomId) {
+      const seatPickerElement = document.getElementById("seat-picker-container");
+      if (seatPickerElement) {
+        seatPickerElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }, [showtimeId, roomId]);
+
   return (
-    <section>
+    <section id="seat-picker-container">
       <div className="bg-[#1a1d23] h-24 relative flex items-center justify-center">
         {data?.meta && data.meta.page !== 1 && (
           <button
