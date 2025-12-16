@@ -81,6 +81,18 @@ const FilterMovie = () => {
           { value: "upcoming", label: "Phim chưa chiếu" },
         ]}
       />
+      <Select
+        style={{ height: 35, minWidth: 150 }}
+        value={query.isHot || ""}
+        onChange={(e) => onFilter({ isHot: e })}
+        allowClear
+        placeholder="Lọc phim nổi bật"
+        options={[
+          { value: "", label: "Tất cả phim" },
+          { value: "true", label: "Phim nổi bật" },
+          { value: "false", label: "Phim thường" },
+        ]}
+      />
     </div>
   );
 };

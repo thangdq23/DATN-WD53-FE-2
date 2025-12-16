@@ -53,6 +53,13 @@ const HomePage = () => {
     queryFn: () => getAllMovie({ status: true }),
   });
 
+  // --- Gọi API phim nổi bật ---
+  const { data: featuredData, isLoading: loadingFeatured } = useQuery({
+    queryKey: ["movies-featured"],
+    queryFn: () => getAllMovie({ isHot: true, status: true, limit: 4 }),
+  });
+  const featuredMovies = featuredData?.data || [];
+
   // --- Tách phim theo ngày ---
   const { nowShowingMovies, upcomingMovies } = useMemo(() => {
     const today = new Date();
@@ -174,6 +181,43 @@ const HomePage = () => {
           paddingBottom: 48,
         }}
       >
+        {/* PHIM NỔI BẬT */}
+        {loadingFeatured ? (
+           <div className="flex items-center justify-center min-h-[200px]">
+             <Spin />
+           </div>
+        ) : featuredMovies.length > 0 && (
+          <FM.div
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            viewport={{ once: true, amount: 0.2 }}
+            className="mt-8 rounded-3xl bg-white text-slate-900 shadow-lg shadow-slate-200/50 px-8 py-8 border border-slate-100"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-3xl font-extrabold flex items-center gap-3 uppercase text-red-600">
+                <span className="w-3 h-3 rounded-full bg-red-600 shadow-lg shadow-red-500/50"></span>
+                Phim nổi bật
+              </h2>
+            </div>
+            
+            <Row gutter={[24, 28]}>
+              {featuredMovies.map((m) => (
+                <Col key={m._id || m.id} xs={12} sm={12} md={8} lg={6}>
+                  <FM.div
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    viewport={{ once: true, amount: 0.2 }}
+                  >
+                    <MovieCard movie={m} fallback={posterTraiTim} />
+                  </FM.div>
+                </Col>
+              ))}
+            </Row>
+          </FM.div>
+        )}
+
         <FM.div
           initial={{ opacity: 0, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
