@@ -63,7 +63,7 @@ const ShowtimePage = () => {
         movieId: id,
         sort: "startTime",
         order: "asc",
-        startTimeFrom: dayjs().startOf("day").toISOString(),
+        startTimeFrom: dayjs().add(1, "hour").toISOString(),
       }),
     enabled: !!movie,
   });
@@ -98,7 +98,7 @@ const ShowtimePage = () => {
   const trailerUrl = normalizeYouTubeEmbed(movie.trailer);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-b from-black via-gray-900 to-black text-white relative overflow-hidden">
       <div
         className="absolute inset-0 opacity-20 blur-2xl bg-cover bg-center"
         style={{ backgroundImage: `url(${movie.poster})` }}

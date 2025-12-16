@@ -10,32 +10,23 @@ import {
   getShowtimeWeekday,
 } from "../../../../common/services/showtime.service";
 import { getAgeBadge } from "../../../../common/utils/age";
-import { getAllRoom } from "../../../../common/services/room.service";
-// bannerHero removed in dark layout
 
 const ShowtimesPage = () => {
   dayjs.locale("vi");
   const navigate = useNavigate();
   const days = useMemo(
-    () =>
-      Array.from({ length: 7 }, (_, i) => dayjs().add(i, "day").startOf("day")),
+    () => Array.from({ length: 7 }, (_, i) => dayjs().add(i, "day")),
     [],
   );
   const [selected, setSelected] = useState(days[0]);
-  const { data: roomsRes } = useQuery({
-    queryKey: ["rooms-active"],
-    queryFn: () => getAllRoom({ status: true }),
-  });
-  const rooms = roomsRes?.data || [];
-  const [selectedRoom, setSelectedRoom] = useState(null);
-  // selectedDateLabel removed in dark layout
-
   const { data, isLoading } = useQuery({
     queryKey: ["client-showtimes", selected.toISOString()],
     queryFn: () =>
       getMovieHasShowtime({
         limit: 100,
-        startTimeFrom: selected.startOf("day").toISOString(),
+        startTimeFrom: selected.isSame(dayjs(), "day")
+          ? selected.add(1, "hour").toISOString()
+          : selected.startOf("day").toISOString(),
         startTimeTo: selected.endOf("day").toISOString(),
       }),
   });
@@ -142,11 +133,7 @@ const ShowtimesPage = () => {
                             {ageText(age, m.ageRequire)}
                           </p>
                         </div>
-                        <MovieTimes
-                          movieId={m._id}
-                          selected={selected}
-                          roomId={selectedRoom}
-                        />
+                        <MovieTimes movieId={m._id} selected={selected} />
                       </div>
                     </div>
                   </FM.div>
@@ -160,19 +147,20 @@ const ShowtimesPage = () => {
   );
 };
 
-const MovieTimes = ({ movieId, selected, roomId }) => {
+const MovieTimes = ({ movieId, selected }) => {
   const { data, isLoading } = useQuery({
-    queryKey: ["movie-times", movieId, selected.toISOString(), roomId],
+    queryKey: ["movie-times", movieId, selected.toISOString()],
     queryFn: () =>
       getShowtimeWeekday({
         movieId,
         sort: "startTime",
         order: "asc",
-        startTimeFrom: selected.startOf("day").toISOString(),
+        startTimeFrom: selected.isSame(dayjs(), "day")
+          ? selected.add(1, "hour").toISOString()
+          : selected.startOf("day").toISOString(),
         startTimeTo: selected.endOf("day").toISOString(),
-        roomId: roomId || undefined,
       }),
-    enabled: !!movieId && !!selected,
+    enabled: !!selected,
   });
   const grouped = data?.data || {};
   const times = Object.values(grouped).flat();
