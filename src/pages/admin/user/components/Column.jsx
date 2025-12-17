@@ -8,8 +8,11 @@ import {
   LockOutlined,
   UnlockOutlined,
 } from "@ant-design/icons";
+import ModalUpdateUser from "./ModalUpdateUser";
+import { useAuthSelector } from "../../../../store/useAuthStore";
 
 export const columnUser = (getSorterProps) => {
+  const userId = useAuthSelector((state) => state.user._id);
   return [
     {
       title: <p style={{ whiteSpace: "nowrap", margin: 0 }}>Mã</p>,
@@ -76,16 +79,14 @@ export const columnUser = (getSorterProps) => {
             </Link>
           </Tooltip>
 
-          <Space>
-            {/* ------------------ Cập nhật ------------------ */}
-            <Tooltip title="Cập nhật">
-              <Link className="mx-1" to={`/admin/movies/update/${record._id}`}>
+         {/* ----------cập nhật---- */}
+         {record._id !==userId && (
+          <ModalUpdateUser user={record}> 
+          <Tooltip title="Cập nhật"> 
                 <EditOutlined style={{ color: "blue" }} />
-              </Link>
             </Tooltip>
-
-            {/* ------------------ Khoá / mở khoá ------------------ */}
-          </Space>
+            </ModalUpdateUser>
+         )}
         </Space>
       ),
     },
