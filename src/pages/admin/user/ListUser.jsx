@@ -7,6 +7,7 @@ import { useTable } from "../../../common/hooks/useTable";
 import { columnUser } from "./components/Column";
 import { USER_ROLE } from "../../../common/constants/user";
 import ModalCreateUser  from "./components/ModalCreateUser";
+import FilterUser from "./components/FilterUser";
 
 const ListUser = () => {
   const { query, getSorterProps, onFilter } = useTable();
@@ -30,23 +31,8 @@ const ListUser = () => {
           <Button type="primary">Thêm người dùng</Button>
         </ModalCreateUser>
       </div>
-      <div className="flex itesm-center gap-6">
-        <Input.Search onSearch={(e) => onFilter({ search: e })} />
-        <Select
-          style={{
-            width: 150,
-          }}
-          onChange={(e) => onFilter({ role: e })}
-          allowClear
-          placeholder="Chọn vai trò"
-          options={[
-            ...Object.entries(USER_ROLE).map(([value, label]) => ({
-              value,
-              label,
-            })),
-          ]}
-        />
-      </div>
+      <FilterUser />
+
       <div className="mt-4">
         <Table
           bordered
