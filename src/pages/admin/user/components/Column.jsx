@@ -10,6 +10,7 @@ import {
 } from "@ant-design/icons";
 import ModalUpdateUser from "./ModalUpdateUser";
 import { useAuthSelector } from "../../../../store/useAuthStore";
+import ModalDetailUser from "./ModalDetailUser";
 
 export const columnUser = (getSorterProps) => {
   const userId = useAuthSelector((state) => state.user._id);
@@ -73,11 +74,11 @@ export const columnUser = (getSorterProps) => {
       render: (_, record) => (
         <Space style={{ display: "flex", gap: 12 }}>
           {/* ------------------ Xem chi tiết ------------------ */}
+        <ModalDetailUser user={record}>
           <Tooltip title="Xem chi tiết">
-            <Link to={`/admin/movies/${record._id}`}>
-              <EyeOutlined style={{ cursor: "pointer", fontSize: 18 }} />
-            </Link>
+            <EyeOutlined style={{cursor: "pointer", fontSize: 18}} />
           </Tooltip>
+        </ModalDetailUser>
 
          {/* ----------cập nhật---- */}
          {record._id !==userId && (
