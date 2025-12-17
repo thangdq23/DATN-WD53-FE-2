@@ -27,4 +27,17 @@ export const formRules = {
       return Promise.resolve();
     },
   }),
+  phone: (label, min = 6, max = 18) => ({
+  validator: (_, value) => {
+    if (!value) return Promise.resolve();
+    const regex = new RegExp(`^[0-9]{${min},${max}}$`);
+    if (!regex.test(value)) {
+      return Promise.reject(
+        new Error(`${label} phải từ ${min}–${max} chữ số`)
+      );
+    }
+    return Promise.resolve();
+  },
+}),
+
 };
