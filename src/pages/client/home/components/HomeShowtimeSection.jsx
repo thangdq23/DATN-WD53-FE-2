@@ -82,27 +82,13 @@ const HomeShowtimeSection = () => {
                             {m.name}
                           </p>
                           <p className="text-sm text-gray-300 mt-1">
-                            {m.duration} phút
+                            {m.duration} phút • {m.genreIds?.map((g) => g.name).join(", ")}
                           </p>
                         </div>
                         <div className="px-2 py-1 rounded-md border border-white/20 text-white text-xs">
                           2D
                         </div>
                       </div>
-                      <div className="mt-2 text-sm text-gray-300">
-                        <p>
-                          Xuất xứ:{" "}
-                          {m.origin || m.country || m.language || "Việt Nam"}
-                        </p>
-                        <p>Khởi chiếu: {formatReleaseDate(m)}</p>
-                        <p className="text-red-400">
-                          {ageText(age, m.ageRequire)}
-                        </p>
-                      </div>
-                      <MovieTimes
-                        movieId={m._id}
-                        selected={selected}
-                      />
                     </div>
                   </div>
                 </FM.div>
@@ -139,12 +125,6 @@ const MovieTimes = ({ movieId, selected }) => {
   });
   const grouped = data?.data || {};
   const times = Object.values(grouped).flat();
-  if (isLoading)
-    return <div className="text-xs text-gray-400">Đang tải giờ chiếu...</div>;
-  if (!times || times.length === 0)
-    return (
-      <div className="text-xs text-gray-400">Không có giờ chiếu trong ngày</div>
-    );
   return (
     <div className="mt-3 flex flex-wrap gap-3">
       {times.map((s) => {

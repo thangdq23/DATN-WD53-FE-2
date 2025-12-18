@@ -56,52 +56,6 @@ const ShowtimesPage = () => {
           </h2>
         </div>
 
-        {rooms.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
-            <button
-              onClick={() => setSelectedRoom(null)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                selectedRoom === null
-                  ? "text-white shadow-lg shadow-red-500/30"
-                  : "bg-white text-slate-600 border border-slate-200 hover:border-red-400 hover:text-red-500"
-              }`}
-              style={
-                selectedRoom === null
-                  ? {
-                      background: "linear-gradient(90deg, #ff4d4f, #ff2d2d)",
-                      border: "none",
-                      color: "#fff",
-                    }
-                  : undefined
-              }
-            >
-              Tất cả phòng
-            </button>
-            {rooms.map((r) => (
-              <button
-                key={r._id}
-                onClick={() => setSelectedRoom(r._id)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  selectedRoom === r._id
-                    ? "text-white shadow-lg shadow-red-500/30"
-                    : "bg-white text-slate-600 border border-slate-200 hover:border-red-400 hover:text-red-500"
-                }`}
-                style={
-                  selectedRoom === r._id
-                    ? {
-                        background: "linear-gradient(90deg, #ff4d4f, #ff2d2d)",
-                        border: "none",
-                        color: "#fff",
-                      }
-                    : undefined
-                }
-              >
-                {r.name}
-              </button>
-            ))}
-          </div>
-        )}
-
         <FM.div
           className="flex gap-3 overflow-x-auto pb-2"
           initial={{ opacity: 0, y: 16 }}
