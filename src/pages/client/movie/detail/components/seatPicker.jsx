@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Spin } from "antd";
 import { useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router";
+import dayjs from "dayjs";
+import "dayjs/locale/vi";
 import { seatTypeColor } from "../../../../../common/constants";
 import { QUERYKEY } from "../../../../../common/constants/queryKey";
 import { SEAT_STATUS, SEAT_STATUS_COLOR } from "../../../../../common/constants/seat";
@@ -15,7 +17,7 @@ import CountTime from "../../../../../components/CountTime";
 import { getSocket } from "../../../../../socket/socket-client";
 import { formatCurrency, getSeatPrice } from "../../../../../common/utils";
 
-const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hourProp, onClose }) => {
+const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hourProp, onClose, days, selectedDate }) => {
   const nav = useNavigate();
   const { showtimeId: showtimeIdParam, roomId: roomIdParam } = useParams();
   const [searchParams] = useSearchParams();
@@ -43,6 +45,16 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
     queryFn: () => getSeatByRoom(roomId),
     enabled: !!roomId,
   });
+
+  // Handle Date Click
+  const handleDateClick = (date) => {
+    if (movieIdParam) {
+      nav(`/showtime/${movieIdParam}`);
+    } else {
+      // Fallback if movieId is missing (shouldn't happen in this flow)
+      nav(-1); 
+    }
+  };
 
   const normalizeSeatMap = (payload) => {
     const raw = payload?.data ?? payload;
@@ -216,6 +228,39 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
       style={{ backgroundColor: "#0f1625", color: "#ffffff" }}
     >
       <div className="flex flex-col items-center">
+        {/* Date Schedule Header */}
+        {days && selectedDate && (
+          <div className="w-full max-w-7xl mx-auto px-6 mb-8">
+            <div className="flex items-center justify-center relative">
+              <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide py-2 px-4 max-w-full">
+                {days.map((d) => {
+                  const isSelected = d.isSame(selectedDate, 'day');
+                  const dayName = d.format("dddd"); 
+                  const dayNameCap = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+                  
+                  return (
+                    <div
+                      key={d.toISOString()}
+                      className={`flex-shrink-0 w-24 text-center py-3 px-2 rounded-xl transition-all duration-300 border ${
+                        isSelected 
+                          ? "bg-gradient-to-br from-red-600 to-red-700 text-white border-red-500 shadow-lg shadow-red-900/50 scale-105" 
+                          : "bg-[#1a2332] text-slate-500 border-slate-800"
+                      }`}
+                    >
+                      <div className={`text-xs font-medium mb-1 uppercase tracking-wide ${isSelected ? "text-white/90" : "text-slate-600"}`}>
+                        {dayNameCap}
+                      </div>
+                      <div className="text-xl font-bold">
+                        {d.format("DD/MM")}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
         {isLoading ? (
           <div className="flex items-center flex-col justify-center gap-5 min-h-[40vh]">
             <p className="text-base">Đang tải phòng chiếu</p>
@@ -277,11 +322,12 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
                 style={{
                   width: `${
                     seatPayload?.cols
-                      ? seatPayload.cols * 50 + (seatPayload.cols - 1) * 8 + 30
-                      : 600
+                      ? seatPayload.cols * 40 + (seatPayload.cols - 1) * 8
+                      : 472
                   }px`,
                   position: "relative",
                   marginBottom: 24,
+                  marginLeft: 42, // Compensate for row labels (30px) + gap (12px) to align with grid
                 }}
               >
                 <div
@@ -440,7 +486,7 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
       </div>
 
       {/* FOOTER */}
-      <div className="flex items-center justify-between max-w-7xl xl:mx-auto mx-6 mt-8">
+      <div className="flex items-center justify-between w-full px-12 mt-8 pb-12">
         <div>
           <p className="text-lg">
             Ghế đã chọn: {" "}

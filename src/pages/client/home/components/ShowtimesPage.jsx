@@ -20,13 +20,7 @@ const ShowtimesPage = () => {
     [],
   );
   const [selected, setSelected] = useState(days[0]);
-  const [selectedRoom, setSelectedRoom] = useState(null);
-
-  const { data: roomData } = useQuery({
-    queryKey: ["rooms"],
-    queryFn: () => getAllRoom({ status: true }),
-  });
-  const rooms = roomData?.data || [];
+  const selectedRoom = null;
 
   const { data, isLoading } = useQuery({
     queryKey: ["client-showtimes", selected.toISOString(), selectedRoom],
