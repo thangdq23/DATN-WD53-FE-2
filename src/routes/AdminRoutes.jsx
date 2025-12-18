@@ -12,6 +12,7 @@ import ListShowtime from "../pages/admin/showtime/ListShowTime";
 import ListShowtimeInMovie from "../pages/admin/showtime/showtimeMovie/ListShowtimeInMovie";
 import CreateMovieShowtime from "../pages/admin/showtime/create/CreateMovieShowtime";
 import ListUser from "../pages/admin/user/ListUser";
+import BannerManager from "../pages/admin/banner/BannerManager";
 
 export const AdminRoutes = [
   {
@@ -79,6 +80,10 @@ export const AdminRoutes = [
       {
         path: "users",
         element: <ListUser />,
+      },
+      {
+        path: "banners",
+        element: <BannerManager />,
       },
     ],
   },
