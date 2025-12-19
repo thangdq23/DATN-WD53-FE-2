@@ -56,6 +56,13 @@ const CreateManyComponent = ({ movie, setOpen }) => {
     const startDate = dayjs(values.dateRange[0]).format("YYYY-MM-DD");
     const endDate = dayjs(values.dateRange[1]).format("YYYY-MM-DD");
 
+    const normalizeValue = (v) => {
+      if (v === undefined || v === null) return 0;
+      if (typeof v === "number") return v;
+      const digits = String(v).replace(/\D+/g, "");
+      return Number(digits) || 0;
+    };
+
     const payload = {
       ...values,
       startDate,
@@ -63,8 +70,8 @@ const CreateManyComponent = ({ movie, setOpen }) => {
       movieId: movie._id,
       fixedHour: dayjs(values.fixedHour[0]).format("HH:mm"),
       price: values.price.map((item, index) => ({
-        ...item,
         seatType: typeSeat[index],
+        value: normalizeValue(item?.value),
       })),
     };
 

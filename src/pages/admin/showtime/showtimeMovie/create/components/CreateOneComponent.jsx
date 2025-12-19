@@ -55,6 +55,13 @@ const CreateOneComponent = ({ movie, setOpen }) => {
     const values = await form.validateFields();
     const typeSeat = ["NORMAL", "VIP", "COUPLE"];
 
+    const normalizeValue = (v) => {
+      if (v === undefined || v === null) return 0;
+      if (typeof v === "number") return v;
+      const digits = String(v).replace(/\D+/g, "");
+      return Number(digits) || 0;
+    };
+
     const payload = {
       ...values,
       movieId: movie._id,
@@ -63,8 +70,8 @@ const CreateOneComponent = ({ movie, setOpen }) => {
         .set("minute", values.fixedHour[0].minute())
         .format(),
       price: values.price.map((item, index) => ({
-        ...item,
         seatType: typeSeat[index],
+        value: normalizeValue(item?.value),
       })),
     };
 
