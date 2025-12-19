@@ -65,14 +65,14 @@ const DetailMovie = () => {
               </div>
 
               <p
-                className="mt-2 line-clamp-1"
+                className="mt-2 line-clamp-1 break-words whitespace-normal"
                 title={`${movie?.actor?.join(", ")} và một số diễn viên khác.`}
               >
                 Diễn viên: {movie?.actor?.join(", ")} và một số diễn viên khác.
               </p>
 
               <p
-                className="mt-2 line-clamp-1"
+                className="mt-2 line-clamp-1 break-words whitespace-normal"
                 title={movie?.category?.map((item) => item.name).join(", ")}
               >
                 Thể loại:{" "}
@@ -81,7 +81,7 @@ const DetailMovie = () => {
                   .join(", ")}
               </p>
 
-              <p className="mt-2 line-clamp-5" title={movie?.description}>
+              <p className="mt-2 line-clamp-5 break-words whitespace-normal" title={movie?.description}>
                 Nội dung: {movie?.description || "Chưa cập nhật"}
               </p>
             </div>

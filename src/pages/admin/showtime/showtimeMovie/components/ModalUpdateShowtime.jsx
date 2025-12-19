@@ -81,7 +81,6 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
 
   const queryClient = useQueryClient();
 
-  // Chuẩn hoá id chắc chắn là string
   const showtimeId = String(showtime?._id?.id || showtime?._id);
   console.log("🔥 ID SAU KHI CHUẨN HOÁ =", showtimeId);
 
@@ -109,8 +108,19 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
   const onFinish = (values) => {
     const typeSeat = ["NORMAL", "VIP", "COUPLE"];
 
-    // Loại bỏ _id / id ra khỏi payload, tránh backend hiểu nhầm
-    const { _id: _OMIT_ID, id: _OMIT_ID_ALT, movieId: _OMIT_MOVIEID, ...rest } = values;
+    const {
+      _id: _OMIT_ID,
+      id: _OMIT_ID_ALT,
+      movieId: _OMIT_MOVIEID,
+      ...rest
+    } = values;
+
+    const normalizeValue = (v) => {
+      if (v === undefined || v === null) return 0;
+      if (typeof v === "number") return v;
+      const digits = String(v).replace(/\D+/g, "");
+      return Number(digits) || 0;
+    };
 
     const payload = {
       ...rest,
@@ -123,8 +133,8 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
         .set("minute", values.fixedHour[1].minute())
         .format(),
       price: values.price.map((item, index) => ({
-        ...item,
         seatType: typeSeat[index],
+        value: normalizeValue(item?.value),
       })),
       cancelDescription:
         values.status === SHOWTIME_STATUS.CANCELLED
@@ -155,7 +165,7 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
             <p>
               Cập nhật lịch chiếu{" "}
               {dayjs(showtime.startTime).format(
-                "HH:mm [ngày] DD [tháng] MM [năm] YYYY"
+                "HH:mm [ngày] DD [tháng] MM [năm] YYYY",
               )}
             </p>
             <p className="text-gray-500/80">Phim {showtime.movieId.name}</p>
@@ -172,9 +182,7 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
             form={form}
             layout="vertical"
             onFinish={onFinish}
-            onFinishFailed={(err) =>
-              console.log("❌ FORM VALIDATE FAIL:", err)
-            }
+            onFinishFailed={(err) => console.log("❌ FORM VALIDATE FAIL:", err)}
             initialValues={initialValues}
           >
             <Form.Item label="Phòng chiếu" name="roomId" required>
@@ -195,8 +203,13 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
                 rules={[{ required: true, message: "Nhập giá ghế thường" }]}
               >
                 <Space.Compact className="w-full">
-                  <InputNumber className="w-full" {...antdInputNumberPropsCurrency()} />
-                  <div className="px-3 h-10 flex items-center border border-solid border-[#d9d9d9] rounded-r-md bg-[#f5f5f5]">VND</div>
+                  <InputNumber
+                    className="w-full"
+                    {...antdInputNumberPropsCurrency()}
+                  />
+                  <div className="px-3 h-10 flex items-center border border-solid border-[#d9d9d9] rounded-r-md bg-[#f5f5f5]">
+                    VND
+                  </div>
                 </Space.Compact>
               </Form.Item>
 
@@ -207,8 +220,13 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
                 rules={[{ required: true, message: "Nhập giá ghế VIP" }]}
               >
                 <Space.Compact className="w-full">
-                  <InputNumber className="w-full" {...antdInputNumberPropsCurrency(20000)} />
-                  <div className="px-3 h-10 flex items-center border border-solid border-[#d9d9d9] rounded-r-md bg-[#f5f5f5]">VND</div>
+                  <InputNumber
+                    className="w-full"
+                    {...antdInputNumberPropsCurrency(20000)}
+                  />
+                  <div className="px-3 h-10 flex items-center border border-solid border-[#d9d9d9] rounded-r-md bg-[#f5f5f5]">
+                    VND
+                  </div>
                 </Space.Compact>
               </Form.Item>
 
@@ -219,8 +237,13 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
                 rules={[{ required: true, message: "Nhập giá ghế đôi" }]}
               >
                 <Space.Compact className="w-full">
-                  <InputNumber className="w-full" {...antdInputNumberPropsCurrency(30000)} />
-                  <div className="px-3 h-10 flex items-center border border-solid border-[#d9d9d9] rounded-r-md bg-[#f5f5f5]">VND</div>
+                  <InputNumber
+                    className="w-full"
+                    {...antdInputNumberPropsCurrency(30000)}
+                  />
+                  <div className="px-3 h-10 flex items-center border border-solid border-[#d9d9d9] rounded-r-md bg-[#f5f5f5]">
+                    VND
+                  </div>
                 </Space.Compact>
               </Form.Item>
             </div>
@@ -239,7 +262,7 @@ const ModalUpdateShowtime = ({ children, showtime }) => {
                     if (!current) return false;
                     const tomorrow = dayjs().add(1, "day").startOf("day");
                     const releaseDate = dayjs(
-                      showtime.movieId.releaseDate
+                      showtime.movieId.releaseDate,
                     ).startOf("day");
                     const minDate = releaseDate.isAfter(tomorrow)
                       ? releaseDate
