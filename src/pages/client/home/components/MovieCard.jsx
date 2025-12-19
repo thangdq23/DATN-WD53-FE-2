@@ -2,9 +2,6 @@ import React from "react";
 import { Card, Button, Typography, Tag } from "antd";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import dayjs from "dayjs";
-import { useQuery } from "@tanstack/react-query";
-import { getShowtimeWeekday } from "../../../../common/services/showtime.service";
 
 const { Text, Link } = Typography;
 
@@ -100,9 +97,6 @@ const MovieCard = ({ movie, onBuy = () => {}, fallback }) => {
             <Text strong className="text-slate-800">{movie.duration} phút</Text>
           </div>
 
-          {/* Suất chiếu hôm nay */}
-          <ShowtimeToday movieId={movie._id} />
-
           {movie.statusRelease === "nowShowing" && (
             <Button
               icon={<ShoppingCartOutlined />}
@@ -115,49 +109,6 @@ const MovieCard = ({ movie, onBuy = () => {}, fallback }) => {
         </div>
       </Link>
     </Card>
-  );
-};
-
-const ShowtimeToday = ({ movieId }) => {
-  const { data, isLoading } = useQuery({
-    queryKey: ["movie-showtimes-card", movieId],
-    queryFn: () =>
-      getShowtimeWeekday({
-        movieId,
-        sort: "startTime",
-        order: "asc",
-        startTimeFrom: dayjs().startOf("day").toISOString(),
-      }),
-    enabled: !!movieId,
-  });
-
-  const payload = data?.data || {};
-  const todayKey = Object.keys(payload).find((d) =>
-    dayjs(d).isSame(dayjs(), "day")
-  );
-  const times = todayKey ? payload[todayKey] : [];
-  const firstThree = Array.isArray(times) ? times.slice(0, 3) : [];
-
-  return (
-    <div className="mt-3">
-      {isLoading ? (
-        <p className="text-[12px] text-gray-400">Đang tải suất chiếu...</p>
-      ) : firstThree.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {firstThree.map((s) => (
-            <span
-              key={s._id}
-              className="px-2 py-1 text-[12px] rounded-md bg-red-600/80 text-white"
-            >
-              {dayjs(s.startTime).format("HH:mm")}
-            </span>
-          ))}
-          <span className="text-[12px] text-blue-300 ml-1">Xem tất cả</span>
-        </div>
-      ) : (
-        <p className="text-[12px] text-gray-400">Không có suất chiếu hôm nay</p>
-      )}
-    </div>
   );
 };
 

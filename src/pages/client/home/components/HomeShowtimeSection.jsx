@@ -58,9 +58,8 @@ const HomeShowtimeSection = () => {
         ) : (
           <div className="space-y-6">
             {movies.map((m) => {
-              const age = getAgeBadge(m.ageRequire);
-              return (
-                <FM.div
+                      return (
+                        <FM.div
                   key={m._id}
                   className="rounded-2xl bg-[#0f172a] border border-white/10 overflow-hidden cursor-pointer"
                   onClick={() => navigate(`/showtime/${m._id}`)}
@@ -82,27 +81,13 @@ const HomeShowtimeSection = () => {
                             {m.name}
                           </p>
                           <p className="text-sm text-gray-300 mt-1">
-                            {m.duration} phút
+                            {m.duration} phút • {m.genreIds?.map((g) => g.name).join(", ")}
                           </p>
                         </div>
                         <div className="px-2 py-1 rounded-md border border-white/20 text-white text-xs">
                           2D
                         </div>
                       </div>
-                      <div className="mt-2 text-sm text-gray-300">
-                        <p>
-                          Xuất xứ:{" "}
-                          {m.origin || m.country || m.language || "Việt Nam"}
-                        </p>
-                        <p>Khởi chiếu: {formatReleaseDate(m)}</p>
-                        <p className="text-red-400">
-                          {ageText(age, m.ageRequire)}
-                        </p>
-                      </div>
-                      <MovieTimes
-                        movieId={m._id}
-                        selected={selected}
-                      />
                     </div>
                   </div>
                 </FM.div>
@@ -125,8 +110,8 @@ const HomeShowtimeSection = () => {
 };
 
 const MovieTimes = ({ movieId, selected }) => {
-  const { data, isLoading } = useQuery({
-    queryKey: ["movie-times", movieId, selected.toISOString()],
+          const { data } = useQuery({
+            queryKey: ["movie-times", movieId, selected.toISOString()],
     queryFn: () =>
       getShowtimeWeekday({
         movieId,
@@ -139,12 +124,6 @@ const MovieTimes = ({ movieId, selected }) => {
   });
   const grouped = data?.data || {};
   const times = Object.values(grouped).flat();
-  if (isLoading)
-    return <div className="text-xs text-gray-400">Đang tải giờ chiếu...</div>;
-  if (!times || times.length === 0)
-    return (
-      <div className="text-xs text-gray-400">Không có giờ chiếu trong ngày</div>
-    );
   return (
     <div className="mt-3 flex flex-wrap gap-3">
       {times.map((s) => {
@@ -191,29 +170,6 @@ const MovieTimes = ({ movieId, selected }) => {
       })}
     </div>
   );
-};
-
-// Helpers for text mapping
-const formatReleaseDate = (m) => {
-  const dateStr = m?.releaseDate || m?.startDate || m?.ngayKhoiChieu;
-  if (!dateStr) return "";
-  try {
-    return dayjs(dateStr).format("DD/MM/YYYY");
-  } catch {
-    return String(dateStr);
-  }
-};
-
-const ageText = (ageBadge, raw) => {
-  const label = (raw || ageBadge?.label || "P").toString().toUpperCase();
-  if (label.startsWith("K")) return "K - Phim dành cho mọi độ tuổi";
-  if (label.includes("13"))
-    return "T13 - Phim được phổ biến đến người xem từ đủ 13 tuổi trở lên (13+)";
-  if (label.includes("16"))
-    return "T16 - Phim được phổ biến đến người xem từ đủ 16 tuổi trở lên (16+)";
-  if (label.includes("18"))
-    return "T18 - Chỉ dành cho khán giả từ đủ 18 tuổi trở lên (18+)";
-  return "Phim dành cho mọi độ tuổi";
 };
 
 export default HomeShowtimeSection;
