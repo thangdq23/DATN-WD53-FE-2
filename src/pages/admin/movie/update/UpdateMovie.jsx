@@ -40,8 +40,9 @@ const UpdateMovie = () => {
 
   const { data: genre } = useQuery({
     queryKey: [QUERY.GENRE],
-    queryFn: () => getAllGenre(),
+    queryFn: () => getAllGenre({ status: true }),
   });
+
 
   const { data } = useQuery({
     queryKey: [QUERY.MOVIE, id],
@@ -60,6 +61,31 @@ const UpdateMovie = () => {
       return data;
     },
   });
+
+  const genreOptions = (() => {
+    const active = genre?.data || [];
+    const existing = data ? data.genreIds || [] : [];
+
+    // Normalize existing items to objects { _id, name }
+    const existingNormalized = existing
+      .map((g) => {
+        if (!g) return null;
+        if (typeof g === "string") {
+          const found = active.find((a) => String(a._id) === String(g));
+          return found ? found : { _id: g, name: "(Đã khoá)" };
+        }
+        // assume object with _id and name
+        return g;
+      })
+      .filter(Boolean);
+
+    const mergedById = new Map();
+    active.forEach((a) => mergedById.set(String(a._id), a));
+    existingNormalized.forEach((e) => mergedById.set(String(e._id), e));
+
+    const merged = Array.from(mergedById.values());
+    return merged.map((g) => ({ label: g.name, value: g._id }));
+  })();
 
   const { mutateAsync } = useMutation({
     mutationFn: (payload) => updateMovieAPI(id, payload),
@@ -241,10 +267,7 @@ const UpdateMovie = () => {
                 <Select
                   mode="multiple"
                   placeholder="Chọn thể loại"
-                  options={genre?.data.map((g) => ({
-                    label: g.name,
-                    value: g._id,
-                  }))}
+                  options={genreOptions}
                 />
               </Form.Item>
             </section>
