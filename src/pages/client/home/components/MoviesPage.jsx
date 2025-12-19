@@ -8,12 +8,14 @@ import MovieCard from "./MovieCard";
 import posterFallback from "../../../../assets/images/poster/trai-tim-que-quat.jpg";
 
 const MoviesPage = () => {
+  const [selectedGenre, setSelectedGenre] = useState(null);
+
   const { data: moviesData, isLoading } = useQuery({
     queryKey: ["client-movies", selectedGenre],
     queryFn: () => getAllMovie({ status: true }),
   });
 
-  const [selectedGenre, setSelectedGenre] = useState(null);
+  const movies = moviesData?.data || [];
 
   const filtered = useMemo(() => {
     if (!selectedGenre) return movies;
