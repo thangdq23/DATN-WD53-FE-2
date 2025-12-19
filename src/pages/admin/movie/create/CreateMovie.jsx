@@ -36,7 +36,7 @@ const CreateMovie = () => {
 
   const { data: genre } = useQuery({
     queryKey: [QUERY.GENRE],
-    queryFn: () => getAllGenre(),
+    queryFn: () => getAllGenre({ status: true }),
   });
 
   const { mutateAsync } = useMutation({
