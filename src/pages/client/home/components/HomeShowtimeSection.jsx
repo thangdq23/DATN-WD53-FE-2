@@ -58,8 +58,9 @@ const HomeShowtimeSection = () => {
         ) : (
           <div className="space-y-6">
             {movies.map((m) => {
-                      return (
-                        <FM.div
+              const age = getAgeBadge(m.ageRequire);
+              return (
+                <FM.div
                   key={m._id}
                   className="rounded-2xl bg-[#0f172a] border border-white/10 overflow-hidden cursor-pointer"
                   onClick={() => navigate(`/showtime/${m._id}`)}
@@ -81,13 +82,24 @@ const HomeShowtimeSection = () => {
                             {m.name}
                           </p>
                           <p className="text-sm text-gray-300 mt-1">
-                            {m.duration} phút • {m.genreIds?.map((g) => g.name).join(", ")}
+                            {m.duration} phút
                           </p>
                         </div>
                         <div className="px-2 py-1 rounded-md border border-white/20 text-white text-xs">
                           2D
                         </div>
                       </div>
+                      <div className="mt-2 text-sm text-gray-300">
+                        <p>
+                          Xuất xứ:{" "}
+                          {m.origin || m.country || m.language || "Việt Nam"}
+                        </p>
+                        <p>Khởi chiếu: {formatReleaseDate(m)}</p>
+                        <p className="text-red-400">
+                          {ageText(age, m.ageRequire)}
+                        </p>
+                      </div>
+                      <MovieTimes movieId={m._id} selected={selected} />
                     </div>
                   </div>
                 </FM.div>
@@ -110,8 +122,8 @@ const HomeShowtimeSection = () => {
 };
 
 const MovieTimes = ({ movieId, selected }) => {
-          const { data } = useQuery({
-            queryKey: ["movie-times", movieId, selected.toISOString()],
+  const { data } = useQuery({
+    queryKey: ["movie-times", movieId, selected.toISOString()],
     queryFn: () =>
       getShowtimeWeekday({
         movieId,
@@ -158,18 +170,34 @@ const MovieTimes = ({ movieId, selected }) => {
             >
               {start.format("HH:mm")}
             </span>
-            <span
-              className={`text-[11px] opacity-90 ${
-                isPast ? "" : "text-red-500 group-hover:text-white"
-              }`}
-            >
-              {minPrice ? `${minPrice.toLocaleString()}đ` : ""}
-            </span>
           </Link>
         );
       })}
     </div>
   );
+};
+
+// Helpers
+const formatReleaseDate = (m) => {
+  const dateStr = m?.releaseDate || m?.startDate || m?.ngayKhoiChieu;
+  if (!dateStr) return "";
+  try {
+    return dayjs(dateStr).format("DD/MM/YYYY");
+  } catch {
+    return String(dateStr);
+  }
+};
+
+const ageText = (ageBadge, raw) => {
+  const label = (raw || ageBadge?.label || "P").toString().toUpperCase();
+  if (label.startsWith("K")) return "K - Phim dành cho mọi độ tuổi";
+  if (label.includes("13"))
+    return "T13 - Phim được phổ biến đến người xem từ đủ 13 tuổi trở lên (13+)";
+  if (label.includes("16"))
+    return "T16 - Phim được phổ biến đến người xem từ đủ 16 tuổi trở lên (16+)";
+  if (label.includes("18"))
+    return "T18 - Chỉ dành cho khán giả từ đủ 18 tuổi trở lên (18+)";
+  return "Phim dành cho mọi độ tuổi";
 };
 
 export default HomeShowtimeSection;

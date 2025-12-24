@@ -203,9 +203,6 @@ const MovieTimes = ({ movieId, selected, roomId }) => {
             }}
           >
             <span className={`font-semibold ${isPast ? "" : "text-red-500 group-hover:text-white"}`}>{start.format("HH:mm")}</span>
-            <span className={`text-[11px] opacity-90 ${isPast ? "" : "text-red-500 group-hover:text-white"}`}>
-              {minPrice ? `${minPrice.toLocaleString()}đ` : ""}
-            </span>
           </Link>
         );
       })}

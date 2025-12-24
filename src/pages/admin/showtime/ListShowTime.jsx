@@ -65,13 +65,28 @@ const ListShowtime = () => {
     },
     {
       title: "Trạng thái",
-      dataIndex: "statusRelease",
+      key: "statusRelease",
       width: 130,
-      render: (status) => (
-        <Tag color={statusRelease[status].color}>
-          {statusRelease[status].label}
-        </Tag>
-      ),
+      render: (_, record) => {
+        const now = dayjs();
+        const releaseDate = dayjs(record.releaseDate);
+        const endDate = dayjs(record.endDate);
+        
+        let status = "nowShowing";
+        if (now.isBefore(releaseDate)) {
+          status = "upcoming";
+        } else if (now.isAfter(endDate)) {
+          status = "released";
+        }
+
+        const statusInfo = statusRelease[status] || statusRelease.released;
+        
+        return (
+          <Tag color={statusInfo.color}>
+            {statusInfo.label}
+          </Tag>
+        );
+      },
     },
   ];
 
