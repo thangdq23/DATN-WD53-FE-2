@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Select } from "antd";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { QUERYKEY } from "../../../../../common/constants/queryKey";
 import { getAllShowtime, getShowtimeWeekday } from "../../../../../common/services/showtime.service";
@@ -54,16 +54,39 @@ const ShowtimePicker = () => {
 
   const [selectedDate, setSelectedDate] = useState(null);
 
-  // Update selectedDate when days change
-  useMemo(() => {
-      if (days.length > 0) {
-          if (!selectedDate || !days.some(d => d.isSame(selectedDate, 'day'))) {
-             setSelectedDate(days[0]);
+  // Update selectedDate when days change or showtimeId changes
+  useEffect(() => {
+      let newDate = null;
+      
+      // 1. Try to sync with showtimeId
+      if (showtimeId && allShowtimesData) {
+           const raw = allShowtimesData?.data?.docs || allShowtimesData?.data || [];
+           const currentShowtime = raw.find(s => s._id === showtimeId);
+           if (currentShowtime) {
+               newDate = dayjs(currentShowtime.startTime).startOf('day');
+           }
+      }
+
+      // 2. Fallback to existing logic
+      if (!newDate) {
+           if (days.length > 0) {
+              if (selectedDate && days.some(d => d.isSame(selectedDate, 'day'))) {
+                  newDate = selectedDate;
+              } else {
+                  newDate = days[0];
+              }
+           }
+      }
+
+      // 3. Update state if different
+      if (newDate) {
+          if (!selectedDate || !newDate.isSame(selectedDate, 'day')) {
+              setSelectedDate(newDate);
           }
       } else {
-          setSelectedDate(null);
+          if (selectedDate) setSelectedDate(null);
       }
-  }, [days]);
+  }, [days, showtimeId, allShowtimesData, selectedDate]);
 
   // Ensure selectedDate is valid before querying
   const queryDate = selectedDate || dayjs();
@@ -234,7 +257,9 @@ const ShowtimePicker = () => {
                           }}
                           className="min-w-[80px] px-4 py-2 border border-slate-300 rounded-lg text-slate-700 font-semibold hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition bg-white"
                         >
-                          {dayjs(s.startTime).format("HH:mm")}
+                          <span className={`font-semibold ${dayjs(s.startTime).isBefore(dayjs()) ? "" : "text-red-500 group-hover:text-white"}`}>
+                            {dayjs(s.startTime).format("HH:mm")}
+                          </span>
                         </button>
                       ))}
                     </div>
