@@ -6,18 +6,35 @@ import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import { seatTypeColor } from "../../../../../common/constants";
 import { QUERYKEY } from "../../../../../common/constants/queryKey";
-import { SEAT_STATUS, SEAT_STATUS_COLOR } from "../../../../../common/constants/seat";
+import {
+  SEAT_STATUS,
+  SEAT_STATUS_COLOR,
+} from "../../../../../common/constants/seat";
 import { useMessage } from "../../../../../common/hooks/useMessage";
 import { useUnHoldOnBack } from "../../../../../common/hooks/useUnHoldOnBack";
-import { getSeatShowtime, toggleSeat, unHoldSeat } from "../../../../../common/services/seat.showtime.service";
+import {
+  getSeatShowtime,
+  toggleSeat,
+  unHoldSeat,
+} from "../../../../../common/services/seat.showtime.service";
 import { getSeatByRoom } from "../../../../../common/services/room.service";
 import { useAuthSelector } from "../../../../../store/useAuthStore";
-import { getStatusSeat, getStyleSeatCard } from "../../../../../common/utils/seat";
+import {
+  getStatusSeat,
+  getStyleSeatCard,
+} from "../../../../../common/utils/seat";
 import CountTime from "../../../../../components/CountTime";
 import { getSocket } from "../../../../../socket/socket-client";
 import { formatCurrency, getSeatPrice } from "../../../../../common/utils";
 
-const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hourProp, onClose, days, selectedDate }) => {
+const SeatPicker = ({
+  showtimeId: showtimeIdProp,
+  roomId: roomIdProp,
+  hour: hourProp,
+  onClose,
+  days,
+  selectedDate,
+}) => {
   const nav = useNavigate();
   const { showtimeId: showtimeIdParam, roomId: roomIdParam } = useParams();
   const [searchParams] = useSearchParams();
@@ -52,7 +69,7 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
       nav(`/showtime/${movieIdParam}`);
     } else {
       // Fallback if movieId is missing (shouldn't happen in this flow)
-      nav(-1); 
+      nav(-1);
     }
   };
 
@@ -79,8 +96,10 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
         const status = typeof s.status === "boolean" ? s.status : true;
         return { ...s, row: r, col: c, type, span, status };
       });
-      const rows = raw.rows ?? Math.max(0, ...normalizedSeats.map((s) => s.row || 0));
-      const cols = raw.cols ?? Math.max(0, ...normalizedSeats.map((s) => s.col || 0));
+      const rows =
+        raw.rows ?? Math.max(0, ...normalizedSeats.map((s) => s.row || 0));
+      const cols =
+        raw.cols ?? Math.max(0, ...normalizedSeats.map((s) => s.col || 0));
       return { ...raw, seats: normalizedSeats, rows, cols };
     }
     if (Array.isArray(raw)) {
@@ -105,8 +124,12 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
         const status = typeof s.status === "boolean" ? s.status : true;
         return { ...s, row: r, col: c, type, span, status };
       });
-      const rows = raw.seatMap.rows ?? Math.max(0, ...normalizedSeats.map((s) => s.row || 0));
-      const cols = raw.seatMap.cols ?? Math.max(0, ...normalizedSeats.map((s) => s.col || 0));
+      const rows =
+        raw.seatMap.rows ??
+        Math.max(0, ...normalizedSeats.map((s) => s.row || 0));
+      const cols =
+        raw.seatMap.cols ??
+        Math.max(0, ...normalizedSeats.map((s) => s.col || 0));
       return { seats: normalizedSeats, rows, cols };
     }
     return null;
@@ -115,13 +138,18 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
   const mergeRoomWithStatus = (room, status) => {
     if (!room) return status || null;
     const statusByKey = new Map(
-      (status?.seats || []).map((s) => [s._id || s.label, s])
+      (status?.seats || []).map((s) => [s._id || s.label, s]),
     );
     const mergedSeats = (room.seats || []).map((rs) => {
       const key = rs._id || rs.label;
       const st = statusByKey.get(key);
       return st
-        ? { ...rs, bookingStatus: st.bookingStatus, userId: st.userId, price: st.price ?? rs.price }
+        ? {
+            ...rs,
+            bookingStatus: st.bookingStatus,
+            userId: st.userId,
+            price: st.price ?? rs.price,
+          }
         : rs;
     });
     return { ...room, seats: mergedSeats };
@@ -129,12 +157,18 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
 
   const seatPayload = mergeRoomWithStatus(
     normalizeSeatMap(roomSeatData),
-    normalizeSeatMap(data)
+    normalizeSeatMap(data),
   );
 
-
   const { mutate } = useMutation({
-    mutationFn: (seatId) => toggleSeat({ showtimeId, seatId }),
+    mutationFn: (seatId) =>
+      toggleSeat({
+        showtimeId,
+        seatId: seatId._id,
+        roomId: roomIdParam,
+        row: seatId.row,
+        col: seatId.col,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({
         predicate: ({ queryKey }) => queryKey.includes(QUERYKEY.SEAT),
@@ -144,23 +178,23 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
   });
 
   const myHoldSeats = seatPayload?.seats.filter(
-    (seat) =>
-      seat.bookingStatus === SEAT_STATUS.HOLD &&
-      seat.userId === userId
+    (seat) => seat.bookingStatus === SEAT_STATUS.HOLD && seat.userId === userId,
   );
 
-  const total = myHoldSeats?.reduce(
-    (sum, seat) => sum + getSeatPrice(seat),
-    0
-  );
+  const total = myHoldSeats?.reduce((sum, seat) => sum + getSeatPrice(seat), 0);
 
   const canSelectSeatAdjacent = (target) => {
-    const isReleasing = target.bookingStatus === SEAT_STATUS.HOLD && target.userId === userId;
+    const isReleasing =
+      target.bookingStatus === SEAT_STATUS.HOLD && target.userId === userId;
     if (isReleasing) return true;
     const current = myHoldSeats || [];
     if (current.length === 0) return true;
 
-    const range = (s) => ({ start: s.col, end: s.col + (s.span || 1) - 1, row: s.row });
+    const range = (s) => ({
+      start: s.col,
+      end: s.col + (s.span || 1) - 1,
+      row: s.row,
+    });
     const isAdjacent = (a, b) => {
       const ra = range(a);
       const rb = range(b);
@@ -201,7 +235,7 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
     const prevBg = document.body.style.backgroundColor;
     const prevColor = document.body.style.color;
     const htmlPrevBg = document.documentElement.style.backgroundColor;
-    const rootEl = document.getElementById('root');
+    const rootEl = document.getElementById("root");
     const rootPrevBg = rootEl ? rootEl.style.backgroundColor : undefined;
     document.body.style.backgroundColor = "#0b0b0d";
     document.body.style.color = "#ffffff";
@@ -211,14 +245,24 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
       document.body.style.backgroundColor = prevBg;
       document.body.style.color = prevColor;
       document.documentElement.style.backgroundColor = htmlPrevBg;
-      if (rootEl && rootPrevBg !== undefined) rootEl.style.backgroundColor = rootPrevBg;
+      if (rootEl && rootPrevBg !== undefined)
+        rootEl.style.backgroundColor = rootPrevBg;
     };
   }, []);
 
   const MPVLogo = () => (
     <svg viewBox="0 0 120 120" width="100%" height="100%">
       <rect x="0" y="0" width="120" height="120" rx="12" fill="#ef4444"></rect>
-      <text x="60" y="70" fontSize="42" fontWeight="800" textAnchor="middle" fill="#ffffff">MPV</text>
+      <text
+        x="60"
+        y="70"
+        fontSize="42"
+        fontWeight="800"
+        textAnchor="middle"
+        fill="#ffffff"
+      >
+        MPV
+      </text>
     </svg>
   );
 
@@ -234,20 +278,25 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
             <div className="flex items-center justify-center relative">
               <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide py-2 px-4 max-w-full">
                 {days.map((d) => {
-                  const isSelected = d.isSame(selectedDate, 'day');
-                  const dayName = d.format("dddd"); 
-                  const dayNameCap = dayName.charAt(0).toUpperCase() + dayName.slice(1);
-                  
+                  const isSelected = d.isSame(selectedDate, "day");
+                  const dayName = d.format("dddd");
+                  const dayNameCap =
+                    dayName.charAt(0).toUpperCase() + dayName.slice(1);
+
                   return (
                     <div
                       key={d.toISOString()}
                       className={`flex-shrink-0 w-24 text-center py-3 px-2 rounded-xl transition-all duration-300 border ${
-                        isSelected 
-                          ? "bg-gradient-to-br from-red-600 to-red-700 text-white border-red-500 shadow-lg shadow-red-900/50 scale-105" 
+                        isSelected
+                          ? "bg-gradient-to-br from-red-600 to-red-700 text-white border-red-500 shadow-lg shadow-red-900/50 scale-105"
                           : "bg-[#1a2332] text-slate-500 border-slate-800"
                       }`}
                     >
-                      <div className={`text-xs font-medium mb-1 uppercase tracking-wide ${isSelected ? "text-white/90" : "text-slate-600"}`}>
+                      <div
+                        className={`text-xs font-medium mb-1 uppercase tracking-wide ${
+                          isSelected ? "text-white/90" : "text-slate-600"
+                        }`}
+                      >
                         {dayNameCap}
                       </div>
                       <div className="text-xl font-bold">
@@ -294,19 +343,28 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
                         }
                         try {
                           const holds = (seatPayload?.seats || []).filter(
-                            (s) => s.bookingStatus === SEAT_STATUS.HOLD && s.userId === userId
+                            (s) =>
+                              s.bookingStatus === SEAT_STATUS.HOLD &&
+                              s.userId === userId,
                           );
                           if (holds.length) {
                             await Promise.all(
-                              holds.map((s) => toggleSeat({ showtimeId, seatId: s._id }))
+                              holds.map((s) =>
+                                toggleSeat({ showtimeId, seatId: s._id }),
+                              ),
                             );
                           }
                         } catch (err) {
                           HandleError(err, { silent: true });
                         }
-                        showMessage({ type: "warning", title: "Hết thời gian", description: "Đã hủy giữ ghế của bạn" });
+                        showMessage({
+                          type: "warning",
+                          title: "Hết thời gian",
+                          description: "Đã hủy giữ ghế của bạn",
+                        });
                         queryClient.invalidateQueries({
-                          predicate: ({ queryKey }) => queryKey.includes(QUERYKEY.SEAT),
+                          predicate: ({ queryKey }) =>
+                            queryKey.includes(QUERYKEY.SEAT),
                         });
                         setTimeout(() => {
                           window.location.reload();
@@ -334,8 +392,7 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
                   className="text-center font-semibold text-black"
                   style={{
                     height: 48,
-                    background:
-                      "linear-gradient(to bottom, #fbbf24, #f59e0b)",
+                    background: "linear-gradient(to bottom, #fbbf24, #f59e0b)",
                     borderTopLeftRadius: 12,
                     borderTopRightRadius: 12,
                     display: "flex",
@@ -394,7 +451,9 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: `repeat(${seatPayload?.cols || 12}, 40px)`,
+                  gridTemplateColumns: `repeat(${
+                    seatPayload?.cols || 12
+                  }, 40px)`,
                   gridTemplateRows: `repeat(${seatPayload?.rows || 10}, 40px)`,
                   gap: "8px",
                 }}
@@ -411,33 +470,46 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
                       key={seat._id}
                       onClick={() => {
                         if (!userId) {
-                          showMessage({ type: "error", title: "Đăng nhập", description: "Vui lòng đăng nhập để chọn ghế" });
+                          showMessage({
+                            type: "error",
+                            title: "Đăng nhập",
+                            description: "Vui lòng đăng nhập để chọn ghế",
+                          });
                           nav("/auth/login");
                           return;
                         }
-                        if (seat.bookingStatus === SEAT_STATUS.HOLD && !isMyHold) return;
+                        if (
+                          seat.bookingStatus === SEAT_STATUS.HOLD &&
+                          !isMyHold
+                        )
+                          return;
                         if (seat.bookingStatus === SEAT_STATUS.BOOKED) return;
                         if (!canSelectSeatAdjacent(seat)) {
-                          showMessage({ type: "warning", title: "Chọn ghế", description: "Vui lòng chọn các ghế liền kề nhau" });
+                          showMessage({
+                            type: "warning",
+                            title: "Chọn ghế",
+                            description: "Vui lòng chọn các ghế liền kề nhau",
+                          });
                           return;
                         }
-                        mutate(seat._id);
+                        mutate(seat);
                       }}
                       style={{
                         ...getStyleSeatCard(
                           seat,
-                          getStatusSeat(seat.bookingStatus, isMyHold)
+                          getStatusSeat(seat.bookingStatus, isMyHold),
                         ),
                       }}
                       title={seat.label}
                     >
-                      {seat.bookingStatus === SEAT_STATUS.BOOKED || (seat.bookingStatus === SEAT_STATUS.HOLD && !isMyHold) ? (
+                      {seat.bookingStatus === SEAT_STATUS.BOOKED ||
+                      (seat.bookingStatus === SEAT_STATUS.HOLD && !isMyHold) ? (
                         <MPVLogo />
                       ) : (
                         seat.label
                       )}
                     </div>
-                );
+                  );
                 })}
               </div>
             </div>
@@ -449,7 +521,10 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
       <div className="max-w-7xl xl:mx-auto mx-6">
         <div className="mt-6 flex items-center gap-6">
           <div className="flex items-center gap-2">
-            <div className="rounded-md" style={{ width: 40, height: 40, overflow: 'hidden' }}>
+            <div
+              className="rounded-md"
+              style={{ width: 40, height: 40, overflow: "hidden" }}
+            >
               <MPVLogo />
             </div>
             <p>Đã đặt</p>
@@ -457,14 +532,22 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
           <div className="flex items-center gap-2">
             <div
               className="rounded-md"
-              style={{ background: SEAT_STATUS_COLOR.MYHOLD, width: 40, height: 40 }}
+              style={{
+                background: SEAT_STATUS_COLOR.MYHOLD,
+                width: 40,
+                height: 40,
+              }}
             />
             <p>Ghế bạn chọn</p>
           </div>
           <div className="flex items-center gap-2">
             <div
               className="rounded-md"
-              style={{ background: seatTypeColor.NORMAL, width: 40, height: 40 }}
+              style={{
+                background: seatTypeColor.NORMAL,
+                width: 40,
+                height: 40,
+              }}
             />
             <p>Ghế thường</p>
           </div>
@@ -478,7 +561,11 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
           <div className="flex items-center gap-2">
             <div
               className="rounded-md"
-              style={{ background: seatTypeColor.COUPLE, width: 40, height: 40 }}
+              style={{
+                background: seatTypeColor.COUPLE,
+                width: 40,
+                height: 40,
+              }}
             />
             <p>Ghế đôi</p>
           </div>
@@ -489,7 +576,7 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
       <div className="flex items-center justify-between w-full px-12 mt-8 pb-12">
         <div>
           <p className="text-lg">
-            Ghế đã chọn: {" "}
+            Ghế đã chọn:{" "}
             <span className="font-semibold">
               {myHoldSeats?.map((item) => item.label).join(", ")}
             </span>
@@ -497,9 +584,7 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
 
           <p className="text-lg">
             Tổng tiền:{" "}
-            <span className="font-semibold">
-              {formatCurrency(total || 0)}
-            </span>
+            <span className="font-semibold">{formatCurrency(total || 0)}</span>
           </p>
         </div>
 
@@ -531,7 +616,11 @@ const SeatPicker = ({ showtimeId: showtimeIdProp, roomId: roomIdProp, hour: hour
             }}
             onClick={() => {
               if (!myHoldSeats?.length) return;
-              nav(`/checkout/${showtimeId}/${roomId}?hour=${hour || ""}&movieId=${movieIdParam || ""}`);
+              nav(
+                `/checkout/${showtimeId}/${roomId}?hour=${hour || ""}&movieId=${
+                  movieIdParam || ""
+                }`,
+              );
             }}
           >
             Thanh toán
