@@ -1,14 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Spin, Modal } from "antd";
-import { useEffect, useMemo } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router";
-import dayjs from "dayjs";
+import { Button, Spin } from "antd";
 import "dayjs/locale/vi";
-import { CloseOutlined, LeftOutlined } from "@ant-design/icons";
+import { useEffect } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { QUERYKEY } from "../../../../../common/constants/queryKey";
-import {
-  SEAT_STATUS,
-} from "../../../../../common/constants/seat";
+import { SEAT_STATUS } from "../../../../../common/constants/seat";
 import { useMessage } from "../../../../../common/hooks/useMessage";
 import { useUnHoldOnBack } from "../../../../../common/hooks/useUnHoldOnBack";
 import {
@@ -16,19 +12,17 @@ import {
   toggleSeat,
   unHoldSeat,
 } from "../../../../../common/services/seat.showtime.service";
-import { getSeatByRoom } from "../../../../../common/services/room.service";
-import { useAuthSelector } from "../../../../../store/useAuthStore";
+import { formatCurrency, getSeatPrice } from "../../../../../common/utils";
 import CountTime from "../../../../../components/CountTime";
 import { getSocket } from "../../../../../socket/socket-client";
-import { formatCurrency, getSeatPrice } from "../../../../../common/utils";
+import { useAuthSelector } from "../../../../../store/useAuthStore";
+import { CloseOutlined, LeftOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 const SeatPicker = ({
   showtimeId: showtimeIdProp,
   roomId: roomIdProp,
   hour: hourProp,
-  onClose,
-  days,
-  selectedDate,
   showtimeInfo,
 }) => {
   const nav = useNavigate();
@@ -49,120 +43,34 @@ const SeatPicker = ({
 
   const { data, isLoading } = useQuery({
     queryKey: [QUERYKEY.SEAT, showtimeId, roomId],
-    queryFn: () => getSeatShowtime(roomId, showtimeId, { status: true }),
+    queryFn: async () => {
+      const { data } = await getSeatShowtime(roomId, showtimeId, {
+        status: true,
+      });
+      return data;
+    },
     enabled: !!showtimeId && !!roomId,
   });
 
-  const { data: roomSeatData } = useQuery({
-    queryKey: [QUERYKEY.ROOM, roomId, "seat-map"],
-    queryFn: () => getSeatByRoom(roomId),
-    enabled: !!roomId,
-  });
+  const myHoldSeats =
+    data?.seats?.filter(
+      (seat) =>
+        seat.bookingStatus === SEAT_STATUS.HOLD && seat.userId === userId,
+    ) || [];
 
-  // Handle Date Click
-  const handleDateClick = (date) => {
-    if (movieIdParam) {
-      nav(`/showtime/${movieIdParam}`);
-    } else {
-      nav(-1);
-    }
-  };
-
-  const normalizeSeatMap = (payload) => {
-    const raw = payload?.data ?? payload;
-    if (!raw) return null;
-    const parseRC = (seat) => {
-      if (seat.row && seat.col) return [seat.row, seat.col];
-      const baseLabel = String(seat.label || "").split("-")[0];
-      const match = baseLabel.match(/^([A-Z])(\d+)$/i);
-      if (match) {
-        const r = match[1].toUpperCase().charCodeAt(0) - 64;
-        const c = parseInt(match[2], 10);
-        return [r, c];
-      }
-      return [seat.row || 0, seat.col || 0];
-    };
-    if (Array.isArray(raw.seats)) {
-      const normalizedSeats = raw.seats.map((s) => {
-        const [r, c] = parseRC(s);
-        const isCouple = String(s.label || "").includes("-");
-        const type = s.type || (isCouple ? "COUPLE" : "NORMAL");
-        const span = s.span ?? (type === "COUPLE" ? 2 : 1);
-        const status = typeof s.status === "boolean" ? s.status : true;
-        return { ...s, row: r, col: c, type, span, status };
-      });
-      const rows =
-        raw.rows ?? Math.max(0, ...normalizedSeats.map((s) => s.row || 0));
-      const cols =
-        raw.cols ?? Math.max(0, ...normalizedSeats.map((s) => s.col || 0));
-      return { ...raw, seats: normalizedSeats, rows, cols };
-    }
-    if (Array.isArray(raw)) {
-      const normalizedSeats = raw.map((s) => {
-        const [r, c] = parseRC(s);
-        const isCouple = String(s.label || "").includes("-");
-        const type = s.type || (isCouple ? "COUPLE" : "NORMAL");
-        const span = s.span ?? (type === "COUPLE" ? 2 : 1);
-        const status = typeof s.status === "boolean" ? s.status : true;
-        return { ...s, row: r, col: c, type, span, status };
-      });
-      const rows = Math.max(0, ...normalizedSeats.map((s) => s.row || 0));
-      const cols = Math.max(0, ...normalizedSeats.map((s) => s.col || 0));
-      return { seats: normalizedSeats, rows, cols };
-    }
-    if (raw.seatMap && Array.isArray(raw.seatMap.seats)) {
-      const normalizedSeats = raw.seatMap.seats.map((s) => {
-        const [r, c] = parseRC(s);
-        const isCouple = String(s.label || "").includes("-");
-        const type = s.type || (isCouple ? "COUPLE" : "NORMAL");
-        const span = s.span ?? (type === "COUPLE" ? 2 : 1);
-        const status = typeof s.status === "boolean" ? s.status : true;
-        return { ...s, row: r, col: c, type, span, status };
-      });
-      const rows =
-        raw.seatMap.rows ??
-        Math.max(0, ...normalizedSeats.map((s) => s.row || 0));
-      const cols =
-        raw.seatMap.cols ??
-        Math.max(0, ...normalizedSeats.map((s) => s.col || 0));
-      return { seats: normalizedSeats, rows, cols };
-    }
-    return null;
-  };
-
-  const mergeRoomWithStatus = (room, status) => {
-    if (!room) return status || null;
-    const statusByKey = new Map(
-      (status?.seats || []).map((s) => [s._id || s.label, s]),
-    );
-    const mergedSeats = (room.seats || []).map((rs) => {
-      const key = rs._id || rs.label;
-      const st = statusByKey.get(key);
-      return st
-        ? {
-            ...rs,
-            bookingStatus: st.bookingStatus,
-            userId: st.userId,
-            price: st.price ?? rs.price,
-          }
-        : rs;
-    });
-    return { ...room, seats: mergedSeats };
-  };
-
-  const seatPayload = useMemo(() => mergeRoomWithStatus(
-    normalizeSeatMap(roomSeatData),
-    normalizeSeatMap(data),
-  ), [roomSeatData, data]);
+  const total = myHoldSeats?.reduce((sum, seat) => {
+    return sum + getSeatPrice(seat);
+  }, 0);
 
   const { mutate } = useMutation({
-    mutationFn: (seatId) =>
+    mutationFn: (payload) =>
       toggleSeat({
-        showtimeId,
-        seatId: seatId._id,
-        roomId: roomIdParam,
-        row: seatId.row,
-        col: seatId.col,
+        showtimeId: showtimeId,
+        seatId: payload._id,
+        row: payload.row,
+        col: payload.col,
+        roomId: payload.roomId,
+        type: payload.type,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -172,390 +80,382 @@ const SeatPicker = ({
     onError: (err) => HandleError(err),
   });
 
-  const myHoldSeats = useMemo(() => seatPayload?.seats.filter(
-    (seat) => seat.bookingStatus === SEAT_STATUS.HOLD && seat.userId === userId,
-  ) || [], [seatPayload, userId]);
-
-  const total = myHoldSeats.reduce((sum, seat) => sum + getSeatPrice(seat), 0);
-
-  const canSelectSeatAdjacent = (target) => {
-    const isReleasing =
-      target.bookingStatus === SEAT_STATUS.HOLD && target.userId === userId;
-    if (isReleasing) return true;
-    const current = myHoldSeats || [];
-    if (current.length === 0) return true;
-
-    const range = (s) => ({
-      start: s.col,
-      end: s.col + (s.span || 1) - 1,
-      row: s.row,
-    });
-    const isAdjacent = (a, b) => {
-      const ra = range(a);
-      const rb = range(b);
-
-      const sameRow = ra.row === rb.row;
-      const rowsDiff = Math.abs(ra.row - rb.row);
-      const overlapCols = !(ra.end < rb.start || rb.end < ra.start);
-
-      if (sameRow) {
-        return ra.end + 1 === rb.start || rb.end + 1 === ra.start;
-      }
-      if (rowsDiff === 1) {
-        return overlapCols;
-      }
-      return false;
-    };
-
-    return current.some((s) => isAdjacent(target, s));
-  };
-
-  useEffect(() => {
-    if (!socket) return;
-
-    const updateSeats = () => {
-      queryClient.invalidateQueries({
-        predicate: ({ queryKey }) => queryKey.includes(QUERYKEY.SEAT),
-      });
-    };
-
-    socket.emit("joinShowtime", showtimeId);
-    socket.on("seatUpdated", updateSeats);
-
-    return () => {
-      socket.off("seatUpdated", updateSeats);
-    };
-  }, [showtimeId, socket, queryClient]);
-
   const getSeatColorClass = (seat) => {
     const isMyHold = seat.userId === userId;
-    if (seat.bookingStatus === SEAT_STATUS.BOOKED || (seat.bookingStatus === SEAT_STATUS.HOLD && !isMyHold)) {
-        return "bg-gray-200 text-gray-400 cursor-not-allowed"; // Sold
+    if (
+      seat.bookingStatus === SEAT_STATUS.BOOKED ||
+      (seat.bookingStatus === SEAT_STATUS.HOLD && !isMyHold)
+    ) {
+      return "bg-gray-200 text-gray-400 cursor-not-allowed";
     }
-    if (isMyHold) return "bg-blue-600 text-white border-blue-700 shadow-md shadow-blue-200"; // Selected
+    if (isMyHold)
+      return "bg-blue-600 text-white border-blue-700 shadow-md shadow-blue-200"; // Selected
     if (seat.type === "VIP") return "bg-amber-400 text-white border-amber-500";
     if (seat.type === "COUPLE") return "bg-rose-400 text-white border-rose-500";
     return "bg-white border border-gray-200 text-gray-700 hover:border-red-500"; // Normal
   };
-
-  // Remove forced dark mode
   useEffect(() => {
-     // Optional: Force light mode if needed or just let it be natural
-     // document.body.style.backgroundColor = "#f8fafc";
-     // return () => { document.body.style.backgroundColor = ""; }
-  }, []);
-
-  const handleSeatClick = (seat) => {
-    if (!userId) {
-        showMessage({
-        type: "error",
-        title: "Đăng nhập",
-        description: "Vui lòng đăng nhập để chọn ghế",
-        });
-        nav("/auth/login");
-        return;
-    }
-    const isMyHold = seat.userId === userId;
-    if (seat.bookingStatus === SEAT_STATUS.HOLD && !isMyHold) return;
-    if (seat.bookingStatus === SEAT_STATUS.BOOKED) return;
-    
-    if (!canSelectSeatAdjacent(seat)) {
-        showMessage({
-        type: "warning",
-        title: "Chọn ghế",
-        description: "Vui lòng chọn các ghế liền kề nhau",
-        });
-        return;
-    }
-    mutate(seat);
-  };
-
-  const getSeatLabel = (seat) => {
-     // If seat has a label like "A-1", "A1", etc.
-     // If we want to show just "1", "2" on the seat button and "A", "B" on the side row.
-     // However, user asked for "full functionality... regarding seat name".
-     // If the previous version showed "A1", we should show "A1".
-     // But based on grid layout, usually only number is shown to save space.
-     // Let's check if the label is just a number or full string.
-     
-     // Current implementation:
-     // seat.label.split('-')[1] || seat.label.replace(/^[A-Z]/, '')
-     
-     // If user wants full name (e.g. A01), we can try to show it if it fits.
-     // But typically, standard cinema view is Row Letter on side + Number on seat.
-     
-     // Let's stick to the current logic but ensure it's robust.
-     const label = seat.label || "";
-     if (label.includes("-")) return label.split("-")[1]; // A-1 -> 1
-     return label.replace(/^[A-Z]+/, ""); // A1 -> 1, AA12 -> 12
-  };
+    const handleSeatUpdate = () => {
+      queryClient.invalidateQueries({
+        predicate: ({ queryKey }) => queryKey.includes(QUERYKEY.SEAT),
+      });
+    };
+    socket.emit("joinShowtime", showtimeId);
+    socket.on("seatUpdated", handleSeatUpdate);
+    return () => {
+      socket.off("seatUpdated", handleSeatUpdate);
+    };
+  }, [queryClient, showtimeId, socket]);
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 px-4 font-sans text-slate-900">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
-            
-            {/* LEFT COLUMN: SCREEN & SEATS */}
-                <div className="flex-1 w-full bg-white rounded-3xl shadow-sm p-8">
-                  {/* Back Button */}
-                  <div className="mb-6">
-                      <button 
-                        onClick={() => {
-                            if (movieIdParam) {
-                                nav(`/showtime/${movieIdParam}`);
-                            } else {
-                                nav(-1);
-                            }
-                        }}
-                        className="flex items-center gap-2 text-slate-500 hover:text-red-600 font-medium transition-colors"
-                      >
-                         <LeftOutlined /> 
-                         <span>Chọn suất chiếu khác</span>
-                      </button>
+    <div className="min-h-screen bg-slate-50 py-8  font-sans text-slate-900">
+      <div className="flex flex-col lg:flex-row gap-8 items-start">
+        {/* LEFT COLUMN: SCREEN & SEATS */}
+        <div className="flex-1 w-full bg-white rounded-3xl shadow-sm p-8">
+          {/* Back Button */}
+          <div className="mb-6">
+            <button
+              onClick={() => {
+                if (movieIdParam) {
+                  nav(`/showtime/${movieIdParam}`);
+                } else {
+                  nav(-1);
+                }
+              }}
+              className="flex items-center gap-2 text-slate-500 hover:text-red-600 font-medium transition-colors"
+            >
+              <LeftOutlined />
+              <span>Chọn suất chiếu khác</span>
+            </button>
+          </div>
+
+          {/* Screen Indicator */}
+          <div className="mb-12 relative flex flex-col items-center justify-center">
+            <div className="w-full max-w-2xl h-2 bg-slate-200 rounded-full mb-2"></div>
+            <div
+              className="w-full max-w-2xl h-12 bg-linear-to-b from-slate-100 to-white transform -perspective-x"
+              style={{
+                clipPath: "polygon(0 0, 100% 0, 95% 100%, 5% 100%)",
+                opacity: 0.5,
+              }}
+            ></div>
+            <span className="absolute top-4 text-sm font-semibold tracking-widest text-slate-400 uppercase">
+              Màn hình
+            </span>
+          </div>
+
+          {isLoading ? (
+            <div className="flex justify-center py-20">
+              <Spin size="large" />
+            </div>
+          ) : (
+            <div className="flex justify-center gap-4 overflow-x-auto pb-4">
+              {/* Row Labels Left */}
+              <div className="flex flex-col gap-2 pt-1">
+                {Array.from({ length: data?.rows || 0 }, (_, i) => (
+                  <div
+                    key={`l-${i}`}
+                    className="h-9 w-6 flex items-center justify-center text-sm font-semibold text-slate-400"
+                  >
+                    {String.fromCharCode(65 + i)}
                   </div>
+                ))}
+              </div>
 
-                  {/* Screen Indicator */}
-                <div className="mb-12 relative flex flex-col items-center justify-center">
-                    <div className="w-full max-w-2xl h-2 bg-slate-200 rounded-full mb-2"></div>
-                    <div 
-                        className="w-full max-w-2xl h-12 bg-gradient-to-b from-slate-100 to-white transform -perspective-x"
-                        style={{ clipPath: "polygon(0 0, 100% 0, 95% 100%, 5% 100%)", opacity: 0.5 }}
-                    ></div>
-                    <span className="absolute top-4 text-sm font-semibold tracking-widest text-slate-400 uppercase">Màn hình</span>
-                </div>
+              {/* Seat Grid */}
+              <div
+                className="grid gap-2"
+                style={{
+                  gridTemplateColumns: `repeat(${data?.cols || 0}, 36px)`,
+                  gridTemplateRows: `repeat(${data?.rows || 0}, 36px)`,
+                }}
+              >
+                {data?.seats?.map((seat) => {
+                  if (seat.combinedWith || seat.status === false)
+                    return <div key={seat._id} />;
 
-                {isLoading ? (
-                    <div className="flex justify-center py-20"><Spin size="large" /></div>
-                ) : (
-                    <div className="flex justify-center gap-4 overflow-x-auto pb-4">
-                        {/* Row Labels Left */}
-                        <div className="flex flex-col gap-2 pt-1">
-                             {Array.from({ length: seatPayload?.rows || 0 }, (_, i) => (
-                                <div key={`l-${i}`} className="h-9 w-6 flex items-center justify-center text-sm font-semibold text-slate-400">
-                                    {String.fromCharCode(65 + i)}
-                                </div>
-                             ))}
-                        </div>
+                  const isSold =
+                    seat.bookingStatus === SEAT_STATUS.BOOKED ||
+                    (seat.bookingStatus === SEAT_STATUS.HOLD &&
+                      seat.userId !== userId);
 
-                        {/* Seat Grid */}
-                        <div 
-                            className="grid gap-2"
-                            style={{
-                                gridTemplateColumns: `repeat(${seatPayload?.cols || 0}, 36px)`,
-                                gridTemplateRows: `repeat(${seatPayload?.rows || 0}, 36px)`
-                            }}
-                        >
-                            {seatPayload?.seats?.map((seat) => {
-                                if (seat.combinedWith || seat.status === false) return <div key={seat._id} />;
-                                
-                                const isSold = seat.bookingStatus === SEAT_STATUS.BOOKED || (seat.bookingStatus === SEAT_STATUS.HOLD && seat.userId !== userId);
-                                
-                                return (
-                                    <button
-                                        key={seat._id}
-                                        onClick={() => handleSeatClick(seat)}
-                                        disabled={isSold}
-                                        className={`
-                                            relative h-9 rounded-md flex items-center justify-center text-xs font-bold transition-all duration-200
-                                            ${getSeatColorClass(seat)}
-                                            ${seat.span > 1 ? `col-span-${seat.span}` : 'col-span-1'}
-                                        `}
-                                        style={{ gridColumn: `span ${seat.span || 1}` }}
-                                    >
-                                        {isSold ? (
-                                            <span className="text-[10px] font-bold text-red-600">MPV</span>
-                                        ) : seat.span > 1 ? (
-                                            seat.label.split("-")[0]
-                                        ) : (
-                                            seat.label.replace("-", "")
-                                        )}
-                                    </button>
-                                );
-                            })}
-                        </div>
+                  return (
+                    <button
+                      key={seat._id}
+                      disabled={isSold}
+                      className={`relative h-9 rounded-md flex items-center justify-center text-xs font-bold transition-all duration-200 ${getSeatColorClass(
+                        seat,
+                      )}`}
+                      style={{
+                        gridRowStart: seat.row,
+                        gridColumnStart: seat.col,
+                        gridColumnEnd: `span ${seat.span || 1}`,
+                      }}
+                      onClick={() => {
+                        if (
+                          seat.bookingStatus === "HOLD" &&
+                          seat.userId !== userId
+                        )
+                          return;
+                        if (seat.bookingStatus === "BOOKED") return;
+                        mutate(seat);
+                      }}
+                    >
+                      {isSold ? (
+                        <span className="text-[10px] font-bold text-red-600">
+                          MPV
+                        </span>
+                      ) : (
+                        seat.label
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
 
-                        {/* Row Labels Right */}
-                        <div className="flex flex-col gap-2 pt-1">
-                             {Array.from({ length: seatPayload?.rows || 0 }, (_, i) => (
-                                <div key={`r-${i}`} className="h-9 w-6 flex items-center justify-center text-sm font-semibold text-slate-400">
-                                    {String.fromCharCode(65 + i)}
-                                </div>
-                             ))}
-                        </div>
-                    </div>
-                )}
+              {/* Row Labels Right */}
+              <div className="flex flex-col gap-2 pt-1">
+                {Array.from({ length: data?.rows || 0 }, (_, i) => (
+                  <div
+                    key={`r-${i}`}
+                    className="h-9 w-6 flex items-center justify-center text-sm font-semibold text-slate-400"
+                  >
+                    {String.fromCharCode(65 + i)}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-                {/* Legend */}
-                <div className="mt-12 flex flex-wrap justify-center gap-6 border-t pt-8 border-slate-100">
-                     <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded bg-gray-200 flex items-center justify-center text-red-600 font-bold text-[8px]">MPV</div>
-                        <span className="text-sm text-slate-500">Đã đặt</span>
-                     </div>
-                     <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded bg-white border border-gray-200"></div>
-                        <span className="text-sm text-slate-500">Ghế thường</span>
-                     </div>
-                     <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded bg-amber-400"></div>
-                        <span className="text-sm text-slate-500">Ghế VIP</span>
-                     </div>
-                     <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded bg-rose-400"></div>
-                        <span className="text-sm text-slate-500">Ghế đôi</span>
-                     </div>
-                     <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded bg-red-500"></div>
-                        <span className="text-sm text-slate-500">Ghế bạn chọn</span>
-                     </div>
-                </div>
+          {/* Legend */}
+          <div className="mt-12 flex flex-wrap justify-center gap-6 border-t pt-8 border-slate-100">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-gray-200 flex items-center justify-center text-red-600 font-bold text-[8px]">
+                MPV
+              </div>
+              <span className="text-sm text-slate-500">Đã đặt</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-white border border-gray-200"></div>
+              <span className="text-sm text-slate-500">Ghế thường</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-amber-400"></div>
+              <span className="text-sm text-slate-500">Ghế VIP</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-rose-400"></div>
+              <span className="text-sm text-slate-500">Ghế đôi</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-red-500"></div>
+              <span className="text-sm text-slate-500">Ghế bạn chọn</span>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN: BOOKING INFO */}
+        <div className=" space-y-6">
+          {/* Movie Info Card */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+            <h3 className="font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">
+              Thông tin suất chiếu
+            </h3>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-500">Ngày chiếu</span>
+                <span className="font-bold text-slate-700">
+                  {showtimeInfo
+                    ? dayjs(showtimeInfo.startTime).format("DD/MM/YYYY")
+                    : "..."}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Giờ chiếu</span>
+                <span className="font-bold text-slate-700">
+                  {showtimeInfo
+                    ? dayjs(showtimeInfo.startTime).format("HH:mm")
+                    : hour}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Rạp chiếu</span>
+                {/* <span className="font-bold text-slate-700">
+                    {showtimeInfo?.roomId?.name || roomSeatData?.name || "..."}
+                  </span> */}
+              </div>
+            </div>
+          </div>
+
+          {/* Timer Card */}
+          <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between border border-red-50">
+            <span className="text-slate-500 font-medium">
+              Thời gian giữ ghế
+            </span>
+            <span className="text-xl font-bold text-red-600">
+              <CountTime
+                onTimeout={async () => {
+                  await unHoldSeat();
+                  showMessage({
+                    type: "warning",
+                    title: "Hết thời gian",
+                    description: "Đã hủy giữ ghế của bạn",
+                  });
+                  queryClient.invalidateQueries({
+                    predicate: ({ queryKey }) =>
+                      queryKey.includes(QUERYKEY.SEAT),
+                  });
+                  setTimeout(() => window.location.reload(), 800);
+                }}
+              />
+            </span>
+          </div>
+
+          {/* Booking Info Card */}
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-slate-100">
+              <h3 className="text-xl font-bold text-slate-800">
+                Thông Tin Đặt Vé
+              </h3>
             </div>
 
-            {/* RIGHT COLUMN: BOOKING INFO */}
-            <div className="w-full lg:w-96 shrink-0 space-y-6">
-                
-                {/* Movie Info Card */}
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-                    <h3 className="font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Thông tin suất chiếu</h3>
-                    <div className="space-y-3 text-sm">
-                         <div className="flex justify-between">
-                            <span className="text-slate-500">Ngày chiếu</span>
-                            <span className="font-bold text-slate-700">
-                                {showtimeInfo ? dayjs(showtimeInfo.startTime).format("DD/MM/YYYY") : "..."}
-                            </span>
-                         </div>
-                         <div className="flex justify-between">
-                            <span className="text-slate-500">Giờ chiếu</span>
-                            <span className="font-bold text-slate-700">
-                                {showtimeInfo ? dayjs(showtimeInfo.startTime).format("HH:mm") : hour}
-                            </span>
-                         </div>
-                         <div className="flex justify-between">
-                            <span className="text-slate-500">Rạp chiếu</span>
-                            <span className="font-bold text-slate-700">
-                                {showtimeInfo?.roomId?.name || roomSeatData?.name || "..."}
-                            </span>
-                         </div>
-                    </div>
-                </div>
-
-                {/* Timer Card */}
-                <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between border border-red-50">
-                    <span className="text-slate-500 font-medium">Thời gian giữ ghế</span>
-                    <span className="text-xl font-bold text-red-600">
-                         <CountTime
-                            onTimeout={async () => {
-                                try { await unHoldSeat(); } catch (e) {}
-                                showMessage({ type: "warning", title: "Hết thời gian", description: "Đã hủy giữ ghế của bạn" });
-                                queryClient.invalidateQueries({ predicate: ({ queryKey }) => queryKey.includes(QUERYKEY.SEAT) });
-                                setTimeout(() => window.location.reload(), 800);
-                            }}
-                        />
+            <div className="p-6 space-y-6">
+              {/* Selected Seats List */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-semibold text-slate-500 flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full bg-red-500 flex items-center justify-center text-[10px] text-white">
+                      ✓
                     </span>
+                    Ghế Đã Chọn
+                  </span>
                 </div>
-
-                {/* Booking Info Card */}
-                <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-slate-100">
-                        <h3 className="text-xl font-bold text-slate-800">Thông Tin Đặt Vé</h3>
-                    </div>
-                    
-                    <div className="p-6 space-y-6">
-                        {/* Selected Seats List */}
-                        <div>
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="text-sm font-semibold text-slate-500 flex items-center gap-2">
-                                    <span className="w-4 h-4 rounded-full bg-red-500 flex items-center justify-center text-[10px] text-white">✓</span> 
-                                    Ghế Đã Chọn
-                                </span>
-                            </div>
-                            {myHoldSeats.length > 0 ? (
-                                <div className="flex flex-wrap gap-2">
-                                    {myHoldSeats.map(seat => (
-                                        <div key={seat._id} className="flex items-center gap-1 bg-red-500 text-white pl-3 pr-1 py-1 rounded-lg shadow-sm shadow-red-200">
-                                            <span className="font-bold text-sm">{seat.label}</span>
-                                            <button 
-                                                onClick={() => mutate(seat)}
-                                                className="hover:bg-red-600 p-1 rounded-md transition-colors"
-                                            >
-                                                <CloseOutlined className="text-xs" />
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-sm text-slate-400 italic">Chưa chọn ghế nào</p>
-                            )}
-                        </div>
-
-                        {/* Price Breakdown */}
-                        <div className="space-y-3 pt-4 border-t border-slate-100">
-                            {['NORMAL', 'VIP', 'COUPLE'].map(type => {
-                                const seatsOfType = myHoldSeats.filter(s => s.type === type);
-                                if (seatsOfType.length === 0) return null;
-                                const price = getSeatPrice(seatsOfType[0]);
-                                return (
-                                    <div key={type} className="flex justify-between text-slate-600">
-                                        <span>
-                                            {type === 'NORMAL' ? 'Ghế Thường' : type === 'VIP' ? 'Ghế VIP' : 'Ghế Đôi'} 
-                                            <span className="text-slate-400 mx-2">x {seatsOfType.length}</span>
-                                        </span>
-                                        <span className="font-semibold">{formatCurrency(price * seatsOfType.length)}</span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-                        {/* Total */}
-                        <div className="pt-4 border-t border-slate-100 space-y-2">
-                            <div className="flex justify-between items-center text-slate-500">
-                                <span>Tạm Tính</span>
-                                <span>{formatCurrency(total)}</span>
-                            </div>
-                            <div className="flex justify-between items-center bg-red-50 p-3 rounded-xl">
-                                <span className="font-bold text-slate-800">Tổng Cộng</span>
-                                <span className="font-bold text-red-600 text-xl">{formatCurrency(total)}</span>
-                            </div>
-                        </div>
-
-                        {/* Note */}
-                        <div className="bg-blue-50 p-3 rounded-xl flex gap-3 items-start">
-                             <div className="mt-0.5 text-blue-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                                </svg>
-                             </div>
-                             <p className="text-xs text-blue-600 leading-relaxed">
-                                Vui lòng hoàn tất thanh toán trong thời gian giữ ghế để đảm bảo đặt chỗ thành công
-                             </p>
-                        </div>
-
-                        {/* Action Button */}
-                        <Button
-                            type="primary"
-                            size="large"
-                            block
-                            onClick={() => {
-                                if (myHoldSeats.length === 0) {
-                                    showMessage({
-                                        type: "warning",
-                                        title: "Thông báo",
-                                        description: "Vui lòng chọn ghế trước khi thanh toán",
-                                    });
-                                    return;
-                                }
-                                
-                                const finalMovieId = movieIdParam || (showtimeInfo?.movieId?._id || showtimeInfo?.movieId);
-                                const finalHour = hour || (showtimeInfo ? dayjs(showtimeInfo.startTime).format("HH:mm") : "");
-                                
-                                nav(`/checkout/${showtimeId}/${roomId}?movieId=${finalMovieId}&hour=${finalHour}`);
-                            }}
-                            className="bg-red-600 hover:bg-red-700 border-none h-12 rounded-xl text-base font-bold shadow-lg shadow-red-200"
+                {myHoldSeats?.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {myHoldSeats.map((seat) => (
+                      <div
+                        key={seat._id}
+                        className="flex items-center gap-1 bg-red-500 text-white pl-3 pr-1 py-1 rounded-lg shadow-sm shadow-red-200"
+                      >
+                        <span className="font-bold text-sm">{seat.label}</span>
+                        <button
+                          onClick={() => mutate(seat)}
+                          className="hover:bg-red-600 p-1 rounded-md transition-colors"
                         >
-                            Tiếp Tục Thanh Toán
-                        </Button>
+                          <CloseOutlined className="text-xs" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-400 italic">
+                    Chưa chọn ghế nào
+                  </p>
+                )}
+              </div>
+
+              {/* Price Breakdown */}
+              <div className="space-y-3 pt-4 border-t border-slate-100">
+                {["NORMAL", "VIP", "COUPLE"].map((type) => {
+                  const seatsOfType = myHoldSeats.filter(
+                    (s) => s.type === type,
+                  );
+                  if (seatsOfType.length === 0) return null;
+                  const price = getSeatPrice(seatsOfType[0]);
+                  return (
+                    <div
+                      key={type}
+                      className="flex justify-between text-slate-600"
+                    >
+                      <span>
+                        {type === "NORMAL"
+                          ? "Ghế Thường"
+                          : type === "VIP"
+                          ? "Ghế VIP"
+                          : "Ghế Đôi"}
+                        <span className="text-slate-400 mx-2">
+                          x {seatsOfType.length}
+                        </span>
+                      </span>
+                      <span className="font-semibold">
+                        {formatCurrency(price * seatsOfType.length)}
+                      </span>
                     </div>
+                  );
+                })}
+              </div>
+
+              {/* Total */}
+              <div className="pt-4 border-t border-slate-100 space-y-2">
+                <div className="flex justify-between items-center text-slate-500">
+                  <span>Tạm Tính</span>
+                  <span>{formatCurrency(total)}</span>
                 </div>
+                <div className="flex justify-between items-center bg-red-50 p-3 rounded-xl">
+                  <span className="font-bold text-slate-800">Tổng Cộng</span>
+                  <span className="font-bold text-red-600 text-xl">
+                    {formatCurrency(total)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Note */}
+              <div className="bg-blue-50 p-3 rounded-xl flex gap-3 items-start">
+                <div className="mt-0.5 text-blue-500">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <p className="text-xs text-blue-600 leading-relaxed">
+                  Vui lòng hoàn tất thanh toán trong thời gian giữ ghế để đảm
+                  bảo đặt chỗ thành công
+                </p>
+              </div>
+
+              {/* Action Button */}
+              <Button
+                type="primary"
+                size="large"
+                block
+                onClick={() => {
+                  if (myHoldSeats.length === 0) {
+                    showMessage({
+                      type: "warning",
+                      title: "Thông báo",
+                      description: "Vui lòng chọn ghế trước khi thanh toán",
+                    });
+                    return;
+                  }
+
+                  const finalMovieId =
+                    movieIdParam ||
+                    showtimeInfo?.movieId?._id ||
+                    showtimeInfo?.movieId;
+                  const finalHour =
+                    hour ||
+                    (showtimeInfo
+                      ? dayjs(showtimeInfo.startTime).format("HH:mm")
+                      : "");
+
+                  nav(
+                    `/checkout/${showtimeId}/${roomId}?movieId=${finalMovieId}&hour=${finalHour}`,
+                  );
+                }}
+                className="bg-red-600 hover:bg-red-700 border-none h-12 rounded-xl text-base font-bold shadow-lg shadow-red-200"
+              >
+                Tiếp Tục Thanh Toán
+              </Button>
             </div>
+          </div>
         </div>
       </div>
     </div>

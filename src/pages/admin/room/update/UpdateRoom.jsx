@@ -18,7 +18,7 @@ import {
 import TextArea from "antd/es/input/TextArea";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { seatTypeColor } from "../../../../common/constants";
+import { seatTypeColor, seatTypeText } from "../../../../common/constants";
 import { QUERY } from "../../../../common/constants/queryKey";
 import { useMessage } from "../../../../common/hooks/useMessage";
 import {
@@ -156,7 +156,12 @@ const UpdateRoom = () => {
     setSeatState((prevSeats) =>
       prevSeats.map((seat) =>
         seat.id === seatId
-          ? { ...seat, locked: !seat.locked, selected: false }
+          ? {
+              ...seat,
+              locked: !seat.locked,
+              status: seat.locked,
+              selected: false,
+            }
           : seat,
       ),
     );
@@ -264,11 +269,10 @@ const UpdateRoom = () => {
         col: seat.col,
         label: seat.label,
         type: seat.type,
-        status: seat.status,
         span: seat.span || 1,
         ...seat,
+        status: !seat.locked,
       }));
-    console.log(seatsToSubmit);
     mutate({
       ...values,
       cols,
@@ -544,12 +548,11 @@ const UpdateRoom = () => {
                                               )
                                             : "#d1d5db"
                                         }`,
-                                        color: seat.status ? "#fff" : "#9ca3af",
+                                        color: seatTypeText[seat.type],
                                         minWidth: isCombined ? "80px" : "40px",
                                         gridColumn: isCombined
                                           ? `span 2`
                                           : "auto",
-                                        display: seat.status ? "flex" : "none",
                                         opacity: seat.locked ? 0.9 : 1,
                                         cursor: seat.locked
                                           ? "not-allowed"
