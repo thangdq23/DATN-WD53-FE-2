@@ -171,11 +171,10 @@ export const getStyleSeatCard = (seat, color) => {
   };
 
   if (seat.locked) {
-    // Locked seat style
     return {
       ...baseStyle,
       backgroundColor: seatTypeColor.LOCKED || "#374151",
-      color: "#fff",
+      color: seatTypeColor.LOCKED_TEXT,
       border: `1px solid ${darkenColor(seatTypeColor.LOCKED || "#374151", 10)}`,
       borderRadius: "4px",
       boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
@@ -187,11 +186,10 @@ export const getStyleSeatCard = (seat, color) => {
   }
 
   if (!seat.status) {
-    // Inactive seat style
     return {
       ...baseStyle,
-      backgroundColor: "#f3f4f6",
-      color: "#9ca3af",
+      backgroundColor: seatTypeColor.LOCKED,
+      color: seatTypeColor.LOCKED_TEXT,
       border: "1px dashed #d1d5db",
       borderRadius: "10px",
       boxShadow: "none",
@@ -209,7 +207,7 @@ export const getStyleSeatCard = (seat, color) => {
     backgroundColor: bgColor,
     color: "#fff",
     border: `1px solid ${darkenColor(bgColor, 10)}`,
-    borderRadius: "10px",
+    borderRadius: "5px",
     boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
     "&:hover": {
       transform: "translateY(-2px)",
