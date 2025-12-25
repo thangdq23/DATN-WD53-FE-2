@@ -107,6 +107,13 @@ const ShowtimePicker = () => {
     enabled: !!selectedDate || (!selectedDate && days.length === 0) // Allow fetching if no days (to show empty state) or if selected
   });
 
+  // Find current showtime object if showtimeId is present
+  const currentShowtime = useMemo(() => {
+    if (!showtimeId || !allShowtimesData) return null;
+    const raw = allShowtimesData?.data?.docs || allShowtimesData?.data || [];
+    return raw.find(s => s._id === showtimeId);
+  }, [showtimeId, allShowtimesData]);
+
   // Group showtimes by Room
   const showtimesByRoom = useMemo(() => {
     const raw = data?.data || [];
@@ -270,7 +277,11 @@ const ShowtimePicker = () => {
           )}
         </div>
       ) : (
-        <SeatPicker days={days} selectedDate={selectedDate} />
+        <SeatPicker 
+          days={days} 
+          selectedDate={selectedDate} 
+          showtimeInfo={currentShowtime}
+        />
       )}
     </section>
   );
