@@ -44,8 +44,8 @@ const ShowtimesPage = () => {
     <div className="min-h-screen bg-white text-slate-900">
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-6">
-          <h2 className="text-3xl font-extrabold flex items-center gap-3 uppercase text-red-600">
-            <span className="w-3 h-3 rounded-full bg-red-600 shadow-lg shadow-red-500/50"></span>
+          <h2 className="text-3xl font-extrabold flex items-center gap-3 uppercase text-blue-600">
+            <span className="w-3 h-3 rounded-full bg-blue-600 shadow-lg shadow-blue-500/50"></span>
             Phim đang chiếu
           </h2>
         </div>
@@ -71,7 +71,7 @@ const ShowtimesPage = () => {
                 style={
                   isActive
                     ? {
-                        background: "linear-gradient(90deg, #ff4d4f, #ff2d2d)",
+                        background: "linear-gradient(90deg, #003366, #003366)",
                         border: "none",
                         color: "#fff",
                       }
@@ -187,7 +187,7 @@ const MovieTimes = ({ movieId, selected, roomId }) => {
         const isPast = isToday && start.isBefore(dayjs());
         const baseClass = isPast
           ? "border-white/10 text-gray-500 pointer-events-none"
-          : "border-red-500 text-red-500 hover:bg-gradient-to-r hover:from-[#ff4d4f] hover:to-[#ff2d2d] hover:text-white hover:border-[#ff4d4f] shadow-red-500/20 shadow-sm";
+          : "border-blue-500 text-blue-500 hover:bg-gradient-to-r hover:from-[#3b82f6] hover:to-[#1d4ed8] hover:text-white hover:border-[#3b82f6] shadow-blue-500/20 shadow-sm";
         const roomId = s.roomId?._id || s.roomId;
         return (
           <Link
@@ -202,7 +202,7 @@ const MovieTimes = ({ movieId, selected, roomId }) => {
               e.stopPropagation();
             }}
           >
-            <span className={`font-semibold ${isPast ? "" : "text-red-500 group-hover:text-white"}`}>{start.format("HH:mm")}</span>
+            <span className={`font-semibold ${isPast ? "" : "text-blue-500 group-hover:text-white"}`}>{start.format("HH:mm")}</span>
           </Link>
         );
       })}

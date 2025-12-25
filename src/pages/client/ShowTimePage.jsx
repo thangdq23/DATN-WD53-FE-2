@@ -94,7 +94,7 @@ const ShowtimePage = () => {
                 className={`px-3 py-1 rounded text-xs font-bold uppercase tracking-wide ${
                   movie.statusRelease === "nowShowing"
                     ? "bg-red-600"
-                    : "bg-blue-600"
+                    : "bg-red-600"
                 }`}
               >
                 {movie.statusRelease === "nowShowing"
@@ -144,7 +144,7 @@ const ShowtimePage = () => {
                     .getElementById("showtime-section")
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
-                className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg shadow-red-600/30 transition transform hover:-translate-y-0.5"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg shadow-blue-600/30 transition transform hover:-translate-y-0.5"
               >
                 Mua Vé
               </button>
@@ -190,7 +190,7 @@ const ShowtimePage = () => {
         {!isSeatSelection && (
           <div className="lg:col-span-4 space-y-8">
             <div>
-              <h3 className="text-xl font-bold text-slate-800 uppercase mb-4 border-l-4 border-red-600 pl-3">
+              <h3 className="text-xl font-bold text-slate-800 uppercase mb-4 border-l-4 border-blue-600 pl-3">
                 Phim đang chiếu
               </h3>
               <div className="space-y-4">
@@ -206,7 +206,7 @@ const ShowtimePage = () => {
                       className="w-20 h-28 object-cover rounded bg-gray-200"
                     />
                     <div className="flex-1">
-                      <h4 className="font-semibold text-slate-800 group-hover:text-red-600 transition line-clamp-2">
+                      <h4 className="font-semibold text-slate-800 group-hover:text-blue-600 transition line-clamp-2">
                         {m.name}
                       </h4>
                       <p className="text-xs text-slate-500 mt-1">

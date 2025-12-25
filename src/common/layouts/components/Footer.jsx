@@ -57,7 +57,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 justify-items-center md:justify-items-start">
           <div className="space-y-4 max-w-xs mx-auto md:mx-0">
             <h2 className="text-2xl font-bold text-white flex items-center justify-center md:justify-start">
-              <span className="bg-red-600 text-white px-2 py-1 rounded mr-2">MPV</span>
+              <span className="bg-blue-600 text-white px-2 py-1 rounded mr-2">MPV</span>
               <span>CINEMA</span>
             </h2>
             <p className="text-sm leading-relaxed">
@@ -87,7 +87,7 @@ const Footer = () => {
                 <li key={index}>
                   <Link 
                     to={link.path} 
-                    className="hover:text-red-500 transition-colors duration-300"
+                    className="hover:text-blue-500 transition-colors duration-300"
                   >
                     {link.title}
                   </Link>
@@ -103,7 +103,7 @@ const Footer = () => {
             <ul className="space-y-3">
               {contactInfo.map((item, index) => (
                 <li key={index} className="flex items-center justify-center md:justify-start">
-                  <span className="text-red-500 mr-3">{item.icon}</span>
+                  <span className="text-blue-500 mr-3">{item.icon}</span>
                   <span className="text-sm">{item.text}</span>
                 </li>
               ))}
