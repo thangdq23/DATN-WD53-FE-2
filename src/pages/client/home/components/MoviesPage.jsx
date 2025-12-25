@@ -42,7 +42,7 @@ const MoviesPage = () => {
           viewport={{ once: true, amount: 0.2 }}
         >
           <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-2">
-            Phim Đang Chiếu
+            Danh sách phim
           </h1>
           <p className="text-lg md:text-xl text-white/90">
             Khám phá những bộ phim đỉnh cao đang được chiếu tại rạp
@@ -86,7 +86,7 @@ const Chip = ({ label, active, onClick }) => (
     onClick={onClick}
     className={`px-4 py-2 rounded-full border transition shadow-sm ${
       active
-        ? "bg-red-600 text-white border-red-600 shadow-red-900/30"
+        ? "bg-blue-600 text-white border-blue-600 shadow-blue-900/30"
         : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
     }`}
   >

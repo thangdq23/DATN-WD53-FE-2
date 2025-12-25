@@ -37,8 +37,8 @@ const HomeShowtimeSection = () => {
       viewport={{ once: true, amount: 0.2 }}
     >
       <div className="mb-6">
-        <h2 className="text-3xl font-extrabold flex items-center gap-3 uppercase text-red-600">
-          <span className="w-3 h-3 rounded-full bg-red-600 shadow-lg shadow-red-500/50"></span>
+        <h2 className="text-3xl font-extrabold flex items-center gap-3 uppercase text-blue-600">
+          <span className="w-3 h-3 rounded-full bg-blue-600 shadow-lg shadow-blue-500/50"></span>
           Lịch chiếu hôm nay
         </h2>
         <p className="text-slate-500 mt-2 ml-6">

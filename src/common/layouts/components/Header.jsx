@@ -38,8 +38,8 @@ const Header = () => {
         {/* LOGO + MENU */}
         <div className="flex items-center gap-8">
           <Link to="/" className={`flex items-center gap-2 ${navColorBase}`}>
-            <FaFilm size={24} className="text-red-500" />
-            <span className="text-2xl font-bold text-red-500">MPV</span>
+            <FaFilm size={24} className="text-blue-500" />
+            <span className="text-2xl font-bold text-blue-500">MPV</span>
           </Link>
 
           <ul className="flex items-center gap-6 m-0">
@@ -48,7 +48,7 @@ const Header = () => {
                 <NavLink
                   to={item.path}
                   className={({ isActive }) =>
-                    `${navColorBase} relative ${isActive ? "text-white after:content-[''] after:absolute after:left-0 after:-bottom-2 after:h-[2px] after:w-full after:bg-red-500" : ""} text-[15px]`
+                    `${navColorBase} relative ${isActive ? "text-white after:content-[''] after:absolute after:left-0 after:-bottom-2 after:h-[2px] after:w-full after:bg-blue-500" : ""} text-[15px]`
                   }
                   style={{ color: "#fff" }}
                 >
@@ -99,7 +99,7 @@ const Header = () => {
               <Link
                 to={"/auth/login"}
                 className="inline-flex items-center justify-center px-5 py-2 rounded-full text-white font-semibold shadow-sm hover:opacity-90"
-                style={{ background: "linear-gradient(90deg, #ff4d4f, #ff2d2d)", border: "none", color: "#fff" }}
+                style={{ background: "linear-gradient(90deg, #2f0fe4ff, #4c57eeff)", border: "none", color: "#fff" }}
               >
                 Đăng nhập
               </Link>
