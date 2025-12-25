@@ -75,7 +75,7 @@ const ShowtimePage = () => {
           className="absolute inset-0 bg-cover bg-center blur-xl opacity-40 scale-110"
           style={{ backgroundImage: `url(${movie.poster})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/80 to-transparent" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 h-full flex items-center gap-10">
           {/* Poster - Hidden on mobile, visible on desktop */}
