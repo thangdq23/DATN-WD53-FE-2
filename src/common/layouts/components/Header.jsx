@@ -33,7 +33,9 @@ const Header = () => {
   const headerBg = scrolled ? "bg-black/70 backdrop-blur-md" : "bg-black";
 
   return (
-    <header className={`sticky top-0 z-50 ${headerBg} transition-colors duration-300`}>
+    <header
+      className={`sticky top-0 z-50 ${headerBg} transition-colors duration-300`}
+    >
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         {/* LOGO + MENU */}
         <div className="flex items-center gap-8">
@@ -48,7 +50,11 @@ const Header = () => {
                 <NavLink
                   to={item.path}
                   className={({ isActive }) =>
-                    `${navColorBase} relative ${isActive ? "text-white after:content-[''] after:absolute after:left-0 after:-bottom-2 after:h-[2px] after:w-full after:bg-blue-500" : ""} text-[15px]`
+                    `${navColorBase} relative ${
+                      isActive
+                        ? "text-white after:content-[''] after:absolute after:left-0 after:-bottom-2 after:h-[2px] after:w-full after:bg-blue-500"
+                        : ""
+                    } text-[15px]`
                   }
                   style={{ color: "#fff" }}
                 >
@@ -78,7 +84,11 @@ const Header = () => {
                   }
                 }}
                 className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-full text-white font-semibold shadow-sm hover:opacity-90"
-                style={{ background: "linear-gradient(90deg, #ff4d4f, #ff2d2d)", border: "none", color: "#fff" }}
+                style={{
+                  background: "linear-gradient(90deg, #2f0fe4ff, #4c57eeff)",
+                  border: "none",
+                  color: "#fff",
+                }}
                 title="Đăng xuất"
               >
                 <FaSignOutAlt />
@@ -87,19 +97,23 @@ const Header = () => {
             </>
           ) : (
             <>
-            <Link
-              to={"/auth/register"}
-              className="inline-flex items-center justify-center px-5 py-2 rounded-full border border-white bg-transparent text-white font-semibold transition-opacity duration-200 shadow-sm hover:opacity-90"
-              style={{ color: "#fff" }}
-            >
-              Đăng ký
-              <FaUser className="text-white" />
-            </Link>
+              <Link
+                to={"/auth/register"}
+                className="inline-flex items-center justify-center px-5 py-2 rounded-full border border-white bg-transparent text-white font-semibold transition-opacity duration-200 shadow-sm hover:opacity-90"
+                style={{ color: "#fff" }}
+              >
+                Đăng ký
+                <FaUser className="text-white" />
+              </Link>
 
               <Link
                 to={"/auth/login"}
                 className="inline-flex items-center justify-center px-5 py-2 rounded-full text-white font-semibold shadow-sm hover:opacity-90"
-                style={{ background: "linear-gradient(90deg, #2f0fe4ff, #4c57eeff)", border: "none", color: "#fff" }}
+                style={{
+                  background: "linear-gradient(90deg, #2f0fe4ff, #4c57eeff)",
+                  border: "none",
+                  color: "#fff",
+                }}
               >
                 Đăng nhập
               </Link>

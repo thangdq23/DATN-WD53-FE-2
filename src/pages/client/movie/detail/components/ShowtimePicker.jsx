@@ -283,7 +283,7 @@ const ShowtimePicker = () => {
                             className={`font-semibold ${
                               dayjs(s.startTime).isBefore(dayjs())
                                 ? ""
-                                : "text-red-500 group-hover:text-white"
+                                : "text-blue-700 group-hover:text-white"
                             }`}
                           >
                             {dayjs(s.startTime).format("HH:mm")}
