@@ -15,6 +15,7 @@ import dayjs from "dayjs";
 
 import { getDetailMovie } from "../../../common/services/movie.service";
 import { statusRelease } from "../../../common/constants";
+import { getAgeBadge } from "../../../common/utils/age";
 
 const { Title } = Typography;
 
