@@ -101,9 +101,9 @@ const ShowtimePage = () => {
                   ? "Đang chiếu"
                   : "Sắp chiếu"}
               </span>
-              {movie.ageRequire && (
+              {(movie.ageRequire || movie.ageRestriction) && (
                 <span className="bg-yellow-500 text-black px-3 py-1 rounded text-xs font-bold">
-                  {getAgeBadge(movie.ageRequire).label}
+                  {getAgeBadge(movie.ageRequire || movie.ageRestriction).label}
                 </span>
               )}
             </div>
