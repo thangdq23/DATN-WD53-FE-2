@@ -16,6 +16,7 @@ import {
   Tag,
   Space,
   Image,
+  Tooltip,
 } from "antd";
 import dayjs from "dayjs";
 import { Link, useNavigate } from "react-router-dom";
@@ -29,6 +30,7 @@ import FilterMovie from "./components/FilterMovie";
 import { QUERY } from "../../../common/constants/queryKey";
 import { statusRelease } from "../../../common/constants";
 import { useMessage } from "../../../common/hooks/useMessage";
+import { getAgeBadge } from "../../../common/utils/age";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -166,7 +168,11 @@ const ListMovie = () => {
                     </Paragraph>
                     <Paragraph style={{ marginBottom: 4 }}>
                       <Text strong>Độ tuổi: </Text>
-                      {movie.ageRestriction}
+                      <Tooltip title={getAgeBadge(movie.ageRestriction).description}>
+                        <Tag color={getAgeBadge(movie.ageRestriction).color}>
+                          {getAgeBadge(movie.ageRestriction).label}
+                        </Tag>
+                      </Tooltip>
                     </Paragraph>
                     <Paragraph style={{ marginBottom: 0 }}>
                       <Text strong>Chiếu: </Text>
