@@ -58,7 +58,7 @@ const HomeShowtimeSection = () => {
         ) : (
           <div className="space-y-6">
             {movies.map((m) => {
-              const age = getAgeBadge(m.ageRequire);
+              const age = getAgeBadge(m.ageRequire || m.age || m.ageRestriction);
               return (
                 <FM.div
                   key={m._id}
@@ -96,7 +96,7 @@ const HomeShowtimeSection = () => {
                         </p>
                         <p>Khởi chiếu: {formatReleaseDate(m)}</p>
                         <p className="text-red-400">
-                          {ageText(age, m.ageRequire)}
+                          {ageText(age, m.ageRequire || m.age)}
                         </p>
                       </div>
                       <MovieTimes movieId={m._id} selected={selected} />
@@ -189,7 +189,7 @@ const formatReleaseDate = (m) => {
 };
 
 const ageText = (ageBadge, raw) => {
-  const label = (raw || ageBadge?.label || "P").toString().toUpperCase();
+  const label = (ageBadge?.label || raw || "P").toString().toUpperCase();
   if (label.startsWith("K")) return "K - Phim dành cho mọi độ tuổi";
   if (label.includes("13"))
     return "T13 - Phim được phổ biến đến người xem từ đủ 13 tuổi trở lên (13+)";

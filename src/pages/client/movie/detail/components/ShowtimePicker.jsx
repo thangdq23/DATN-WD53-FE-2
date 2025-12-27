@@ -30,31 +30,15 @@ const ShowtimePicker = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // 2. Extract unique dates from showtimes
+  // 2. Generate next 5 days from today
   const days = useMemo(() => {
-    const raw = allShowtimesData?.data?.docs || allShowtimesData?.data || [];
-
-    const uniqueDates = new Set();
-    const sortedDays = [];
-
-    if (Array.isArray(raw)) {
-      raw.forEach((s) => {
-        const d = dayjs(s.startTime).startOf("day");
-        if (d.isBefore(dayjs().startOf("day"))) return; // Skip past days
-
-        const key = d.format("YYYY-MM-DD");
-        if (!uniqueDates.has(key)) {
-          uniqueDates.add(key);
-          sortedDays.push(d);
-        }
-      });
+    const dates = [];
+    const today = dayjs().startOf("day");
+    for (let i = 0; i < 5; i++) {
+      dates.push(today.add(i, "day"));
     }
-
-    // Sort by date
-    sortedDays.sort((a, b) => a.valueOf() - b.valueOf());
-
-    return sortedDays;
-  }, [allShowtimesData]);
+    return dates;
+  }, []);
 
   const [selectedDate, setSelectedDate] = useState(null);
 
@@ -171,7 +155,7 @@ const ShowtimePicker = () => {
                       <LeftOutlined />
                     </button>
 
-                    <div className="flex-1 overflow-x-auto flex scrollbar-hide">
+                    <div className="flex-1 overflow-x-auto flex justify-center scrollbar-hide">
                       {days.map((d) => {
                         const isSelected = d.isSame(selectedDate, "day");
                         const dayName = d.format("dddd"); // Thứ Năm...
@@ -222,20 +206,6 @@ const ShowtimePicker = () => {
                     </button>
                   </>
                 )}
-              </div>
-
-              {/* Filters */}
-              <div className="flex items-center gap-3 p-4 bg-slate-50">
-                <Select
-                  defaultValue="Toàn quốc"
-                  style={{ width: 140 }}
-                  options={[{ value: "Toàn quốc", label: "Toàn quốc" }]}
-                />
-                <Select
-                  defaultValue="Tất cả rạp"
-                  style={{ width: 140 }}
-                  options={[{ value: "Tất cả rạp", label: "Tất cả rạp" }]}
-                />
               </div>
             </div>
           </div>

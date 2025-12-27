@@ -7,7 +7,7 @@ import {
   getDetailMovie,
   getAllMovie,
 } from "../../common/services/movie.service";
-import { Modal } from "antd";
+import { Modal, Tooltip } from "antd";
 import { PlayCircleOutlined } from "@ant-design/icons";
 import { getAgeBadge } from "../../common/utils/age";
 
@@ -101,10 +101,20 @@ const ShowtimePage = () => {
                   ? "Đang chiếu"
                   : "Sắp chiếu"}
               </span>
-              {movie.ageRequire && (
-                <span className="bg-yellow-500 text-black px-3 py-1 rounded text-xs font-bold">
-                  {getAgeBadge(movie.ageRequire).label}
-                </span>
+              {(movie.ageRequire || movie.ageRestriction) && (
+                <Tooltip
+                  title={
+                    getAgeBadge(movie.ageRequire || movie.ageRestriction)
+                      .description
+                  }
+                >
+                  <span className="bg-yellow-500 text-black px-3 py-1 rounded text-xs font-bold cursor-help">
+                    {
+                      getAgeBadge(movie.ageRequire || movie.ageRestriction)
+                        .label
+                    }
+                  </span>
+                </Tooltip>
               )}
             </div>
 

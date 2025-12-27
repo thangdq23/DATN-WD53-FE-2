@@ -222,6 +222,8 @@ const SeatPicker = ({
                         <span className="text-[10px] font-bold text-red-600">
                           MPV
                         </span>
+                      ) : seat.span > 1 ? (
+                        seat.label.replace("-", ",")
                       ) : (
                         seat.label
                       )}
