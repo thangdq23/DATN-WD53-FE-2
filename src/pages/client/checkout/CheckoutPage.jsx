@@ -26,6 +26,7 @@ import { getSeatByRoom } from "../../../common/services/room.service";
 import { getSeatShowtime } from "../../../common/services/seat.showtime.service";
 import { getDetailShowtime } from "../../../common/services/showtime.service";
 import { formatCurrency, getSeatPrice } from "../../../common/utils";
+import CountTime from "../../../components/CountTime";
 import { useAuthSelector } from "../../../store/useAuthStore";
 
 const CheckoutPage = () => {
@@ -148,9 +149,14 @@ const CheckoutPage = () => {
   return (
     <div className="min-h-[110vh] mt-12 bg-white text-slate-900">
       <div className="max-w-7xl xl:mx-auto mx-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-extrabold">Thanh toán</h1>
-          <p className="text-slate-600">Xác nhận thông tin và chọn phương thức thanh toán</p>
+       <div className="flex items-end justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-extrabold">Thanh toán</h1>
+            <p className="text-slate-600" style={{ marginBottom: 0 }}>
+              Xác nhận thông tin và chọn phương thức thanh toán
+            </p>
+          </div>
+          <CountTime />
         </div>
         {isLoading ? (
           <div className="flex items-center justify-center min-h-[40vh]">
