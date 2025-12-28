@@ -18,3 +18,7 @@ export const unHoldSeat = async () => {
   const { data } = await api.patch(`${prefix}/un-hold`);
   return data;
 };
+export const extendHoldSeat = async (showtimeId) => {
+  const { data } = await api.patch(`${prefix}/extend-hold/${showtimeId}`);
+  return data;
+};

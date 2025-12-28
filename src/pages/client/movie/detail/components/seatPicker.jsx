@@ -1,5 +1,7 @@
+import { CloseOutlined, LeftOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Spin } from "antd";
+import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import { useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router";
@@ -8,6 +10,7 @@ import { SEAT_STATUS } from "../../../../../common/constants/seat";
 import { useMessage } from "../../../../../common/hooks/useMessage";
 import { useUnHoldOnBack } from "../../../../../common/hooks/useUnHoldOnBack";
 import {
+  extendHoldSeat,
   getSeatShowtime,
   toggleSeat,
   unHoldSeat,
@@ -15,10 +18,9 @@ import {
 import { formatCurrency, getSeatPrice } from "../../../../../common/utils";
 import CountTime from "../../../../../components/CountTime";
 import { getSocket } from "../../../../../socket/socket-client";
-import { getAllShowtime } from "../../../../../common/services/showtime.service";
 import { useAuthSelector } from "../../../../../store/useAuthStore";
-import { CloseOutlined, LeftOutlined } from "@ant-design/icons";
-import dayjs from "dayjs";
+
+
 
 const SeatPicker = ({
   showtimeId: showtimeIdProp,
@@ -53,21 +55,19 @@ const SeatPicker = ({
     enabled: !!showtimeId && !!roomId,
   });
 
-  const { data: showtimeDetailData } = useQuery({
-    queryKey: [QUERYKEY.SHOWTIME, "detail", showtimeId],
-    queryFn: async () => {
-      const res = await getAllShowtime({ _id: showtimeId });
-      return res;
+  const { mutate: mutateExtendHold, isPending } = useMutation({
+    mutationFn: (showtimeId) => extendHoldSeat(showtimeId),
+    onSuccess: () => {
+      const finalMovieId =
+        movieIdParam || showtimeInfo?.movieId?._id || showtimeInfo?.movieId;
+      const finalHour =
+        hour ||
+        (showtimeInfo ? dayjs(showtimeInfo.startTime).format("HH:mm") : "");
+      nav(
+        `/checkout/${showtimeId}/${roomId}?movieId=${finalMovieId}&hour=${finalHour}`,
+      );
     },
-    enabled: !!showtimeId && !showtimeInfo,
-    staleTime: 5 * 60 * 1000,
   });
-
-  const resolvedShowtime =
-    showtimeInfo ||
-    (showtimeDetailData?.data?.docs && showtimeDetailData.data.docs[0]) ||
-    (Array.isArray(showtimeDetailData?.data) && showtimeDetailData.data[0]) ||
-    null;
 
   const myHoldSeats =
     data?.seats?.filter(
@@ -222,8 +222,6 @@ const SeatPicker = ({
                         <span className="text-[10px] font-bold text-red-600">
                           MPV
                         </span>
-                      ) : seat.span > 1 ? (
-                        seat.label.replace("-", ",")
                       ) : (
                         seat.label
                       )}
@@ -267,7 +265,7 @@ const SeatPicker = ({
               <span className="text-sm text-slate-500">Ghế đôi</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded bg-blue-500"></div>
+              <div className="w-6 h-6 rounded bg-red-500"></div>
               <span className="text-sm text-slate-500">Ghế bạn chọn</span>
             </div>
           </div>
@@ -284,24 +282,24 @@ const SeatPicker = ({
               <div className="flex justify-between">
                 <span className="text-slate-500">Ngày chiếu</span>
                 <span className="font-bold text-slate-700">
-                  {resolvedShowtime
-                    ? dayjs(resolvedShowtime.startTime).format("DD/MM/YYYY")
+                  {showtimeInfo
+                    ? dayjs(showtimeInfo.startTime).format("DD/MM/YYYY")
                     : "..."}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Giờ chiếu</span>
                 <span className="font-bold text-slate-700">
-                  {resolvedShowtime
-                    ? dayjs(resolvedShowtime.startTime).format("HH:mm")
+                  {showtimeInfo
+                    ? dayjs(showtimeInfo.startTime).format("HH:mm")
                     : hour}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Phòng chiếu</span>
-                <span className="font-bold text-slate-700">
-                  {resolvedShowtime?.roomId?.name || roomId || "..."}
-                </span>
+                <span className="text-slate-500">Rạp chiếu</span>
+                {/* <span className="font-bold text-slate-700">
+                    {showtimeInfo?.roomId?.name || roomSeatData?.name || "..."}
+                  </span> */}
               </div>
             </div>
           </div>
@@ -343,7 +341,7 @@ const SeatPicker = ({
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-semibold text-slate-500 flex items-center gap-2">
-                    <span className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-[10px] text-white">
+                    <span className="w-4 h-4 rounded-full bg-red-500 flex items-center justify-center text-[10px] text-white">
                       ✓
                     </span>
                     Ghế Đã Chọn
@@ -354,12 +352,12 @@ const SeatPicker = ({
                     {myHoldSeats.map((seat) => (
                       <div
                         key={seat._id}
-                        className="flex items-center gap-1 bg-blue-500 text-white pl-3 pr-1 py-1 rounded-lg shadow-sm shadow-blue-200"
+                        className="flex items-center gap-1 bg-red-500 text-white pl-3 pr-1 py-1 rounded-lg shadow-sm shadow-red-200"
                       >
                         <span className="font-bold text-sm">{seat.label}</span>
                         <button
                           onClick={() => mutate(seat)}
-                          className="hover:bg-blue-600 p-1 rounded-md transition-colors"
+                          className="hover:bg-red-600 p-1 rounded-md transition-colors"
                         >
                           <CloseOutlined className="text-xs" />
                         </button>
@@ -412,7 +410,7 @@ const SeatPicker = ({
                 </div>
                 <div className="flex justify-between items-center bg-red-50 p-3 rounded-xl">
                   <span className="font-bold text-slate-800">Tổng Cộng</span>
-                  <span className="font-bold text-blue-600 text-xl">
+                  <span className="font-bold text-red-600 text-xl">
                     {formatCurrency(total)}
                   </span>
                 </div>
@@ -445,6 +443,7 @@ const SeatPicker = ({
                 type="primary"
                 size="large"
                 block
+                loading={isPending}
                 onClick={() => {
                   if (myHoldSeats.length === 0) {
                     showMessage({
@@ -454,20 +453,7 @@ const SeatPicker = ({
                     });
                     return;
                   }
-
-                  const finalMovieId =
-                    movieIdParam ||
-                    showtimeInfo?.movieId?._id ||
-                    showtimeInfo?.movieId;
-                  const finalHour =
-                    hour ||
-                    (showtimeInfo
-                      ? dayjs(showtimeInfo.startTime).format("HH:mm")
-                      : "");
-
-                  nav(
-                    `/checkout/${showtimeId}/${roomId}?movieId=${finalMovieId}&hour=${finalHour}`,
-                  );
+                  mutateExtendHold(showtimeId);
                 }}
                 className="bg-red-600 hover:bg-red-700 border-none h-12 rounded-xl text-base font-bold shadow-lg shadow-red-200"
               >
