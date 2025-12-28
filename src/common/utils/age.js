@@ -6,7 +6,7 @@ export const getAgeBadge = (ageRequire) => {
       text: "Phổ biến",
       description: "Phim được phổ biến rộng rãi cho mọi đối tượng khán giả.",
     };
-  const age = ageRequire.toUpperCase().trim();
+  const age = String(ageRequire).toUpperCase().trim();
   if (age === "K")
     return {
       label: "K",
@@ -24,7 +24,7 @@ export const getAgeBadge = (ageRequire) => {
     };
   if (age.includes("13"))
     return {
-      label: "13+",
+      label: "T13",
       color: "#FFD700",
       text: "Trên 13 tuổi",
       description:
@@ -32,7 +32,7 @@ export const getAgeBadge = (ageRequire) => {
     };
   if (age.includes("16"))
     return {
-      label: "16+",
+      label: "T16",
       color: "#FFA500",
       text: "Trên 16 tuổi",
       description:
@@ -40,7 +40,7 @@ export const getAgeBadge = (ageRequire) => {
     };
   if (age.includes("18"))
     return {
-      label: "18+",
+      label: "T18",
       color: "#FF4500",
       text: "Trên 18 tuổi",
       description:

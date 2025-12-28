@@ -58,9 +58,14 @@ const ListShowtime = () => {
       title: "Độ tuổi",
       dataIndex: "ageRequire",
       width: 120,
-      render: (age) => {
-        const { color, label } = getAgeBadge(age);
-        return <Tag color={color}>{label}</Tag>;
+      render: (_, record) => {
+        const age = record.ageRequire || record.age || record.ageRestriction;
+        const { color, label, description } = getAgeBadge(age);
+        return (
+          <Tooltip title={description}>
+            <Tag color={color}>{label}</Tag>
+          </Tooltip>
+        );
       },
     },
     {

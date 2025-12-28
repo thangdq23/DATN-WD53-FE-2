@@ -13,6 +13,7 @@ import { updateStatusMovie } from "../../../../common/services/movie.service";
 import { QUERY } from "../../../../common/constants/queryKey";
 import TextWrap from "../../../../components/WrapText";
 import { statusRelease } from "../../../../common/constants";
+import { getAgeBadge } from "../../../../common/utils/age";
 
 export const columnMovie = (getSorterProps) => {
   const queryClient = useQueryClient();

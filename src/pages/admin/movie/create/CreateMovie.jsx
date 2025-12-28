@@ -159,9 +159,9 @@ const CreateMovie = () => {
                   options={[
                     { value: "P", label: "P - Phù hợp với mọi lứa tuổi" },
                     { value: "K", label: "K - Dành cho trẻ em" },
-                    { value: "C13", label: "C13 - Cấm khán giả dưới 13 tuổi" },
-                    { value: "C16", label: "C16 - Cấm khán giả dưới 16 tuổi" },
-                    { value: "C18", label: "C18 - Cấm khán giả dưới 18 tuổi" },
+                    { value: "C13", label: "T13 - Trên 13 tuổi" },
+                    { value: "C16", label: "T16 - Trên 16 tuổi" },
+                    { value: "C18", label: "T18 - Trên 18 tuổi" },
                   ]}
                 />
               </Form.Item>
