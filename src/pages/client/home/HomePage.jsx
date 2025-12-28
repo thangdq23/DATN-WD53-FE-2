@@ -82,14 +82,21 @@ const HomePage = () => {
   const filteredMovies = useMemo(() => {
     return moviesToShow?.filter((movie) => {
       const matchSearch = query.search
-        ? movie.name?.toLowerCase().includes(query.search.toLowerCase())
+        ? (movie.name || "")
+            .toLowerCase()
+            .includes(String(query.search).toLowerCase())
         : true;
 
       const matchGenre = query.genre
-        ? movie?.genreIds?.some((g) => g._id === query.genre)
+        ? Array.isArray(movie?.genreIds) &&
+          movie.genreIds.some((g) => String(g?._id) === String(query.genre))
         : true;
 
-      const matchAge = query.age ? movie.age === query.age : true;
+      // ✅ FIX: backend field là ageRestriction
+      const matchAge = query.age
+        ? String(movie?.ageRestriction) === String(query.age)
+        : true;
+
       const matchHot =
         query.hot !== null && query.hot !== undefined
           ? movie.isHot === query.hot
@@ -129,11 +136,6 @@ const HomePage = () => {
     window.addEventListener("banners:update", onCustomUpdate);
     return () => window.removeEventListener("storage", onStorage);
   }, []);
-
-  // --- Lịch chiếu hôm nay (preview) ---
-  // Removed custom TodayTimes logic as we replaced it with HomeShowtimeSection
-  // const today = dayjs();
-  // ... (removed)
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
@@ -201,8 +203,11 @@ const HomePage = () => {
               Danh sách phim
             </h2>
           </div>
+
           <MovieTabs tabKey={tabKey} onChange={handleChangeTab} />
-          <MovieFilterBar status={tabKey} />
+
+          {/* ✅ FIX: truyền moviesToShow để filter bar derive genres */}
+          <MovieFilterBar status={tabKey} movies={moviesToShow} />
 
           {isLoading ? (
             <div className="flex items-center justify-center min-h-[30vh]">
