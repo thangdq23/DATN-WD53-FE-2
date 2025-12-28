@@ -109,7 +109,7 @@ const SeatPicker = ({
       return "bg-gray-200 text-gray-400 cursor-not-allowed";
     }
     if (isMyHold)
-      return "bg-blue-600 text-white border-blue-700 shadow-md shadow-blue-200"; // Selected
+      return "bg-red-500 text-white border-red-700 shadow-md shadow-red-200"; // Selected
     if (seat.type === "VIP") return "bg-amber-400 text-white border-amber-500";
     if (seat.type === "COUPLE") return "bg-rose-400 text-white border-rose-500";
     return "bg-white border border-gray-200 text-gray-700 hover:border-red-500"; // Normal
