@@ -28,18 +28,19 @@ import { getDetailShowtime } from "../../../common/services/showtime.service";
 import { formatCurrency, getSeatPrice } from "../../../common/utils";
 import CountTime from "../../../components/CountTime";
 import { useAuthSelector } from "../../../store/useAuthStore";
+import dayjs from "dayjs";
 
 const CheckoutPage = () => {
-  const[acpPolicy, setAcpPolicy] = useState(false);
+  const [acpPolicy, setAcpPolicy] = useState(false);
   const nav = useNavigate();
   const [form] = Form.useForm();
   const { showtimeId, roomId } = useParams();
   const [searchParams] = useSearchParams();
-  const hour = searchParams.get("hour");
+
   const movieId = searchParams.get("movieId");
   const userId = useAuthSelector((s) => s.user?._id);
-  const user= useAuthSelector((s)=>s.user);
-  const {HandleError} = useMessage();
+  const user = useAuthSelector((s) => s.user);
+  const { HandleError } = useMessage();
 
   const { data: roomSeatData } = useQuery({
     queryKey: [QUERYKEY.ROOM, roomId, "seat-map"],
@@ -94,62 +95,67 @@ const CheckoutPage = () => {
     const seats = (room.seats || []).map((rs) => {
       const st = m.get(rs._id || rs.label);
       return st
-        ? { 
-          ...rs, 
-          bookingStatus: st.bookingStatus, 
-          userId: st.userId, 
-          price: st.price ?? rs.price 
-        }
+        ? {
+            ...rs,
+            bookingStatus: st.bookingStatus,
+            userId: st.userId,
+            price: st.price ?? rs.price,
+          }
         : rs;
     });
-    return { ...room, name: room?.name || roomSeatData?.data?.name || roomSeatData?.name, seats };
+    return {
+      ...room,
+      name: room?.name || roomSeatData?.data?.name || roomSeatData?.name,
+      seats,
+    };
   }, [roomSeatData, seatStatusRes]);
 
   const myHoldSeats = useMemo(
     () =>
-    seatPayload?.seats?.filter(
-      (s) => s.bookingStatus === SEAT_STATUS.HOLD && s.userId === userId,
+      seatPayload?.seats?.filter(
+        (s) => s.bookingStatus === SEAT_STATUS.HOLD && s.userId === userId,
       ) || [],
-  [seatPayload, userId]
+    [seatPayload, userId],
   );
 
   const total = useMemo(
-    () => myHoldSeats.reduce((sum, s) => sum + getSeatPrice(s), 0), 
+    () => myHoldSeats.reduce((sum, s) => sum + getSeatPrice(s), 0),
     [myHoldSeats],
-    );
+  );
 
-    const {mutate, isPending} = useMutation({
-      mutationFn: (payload)=> checkoutPayos(payload),
-      onSuccess:({data})=>{
-        window.location.href= data;
-      },
-      onError:(err) =>HandleError(err),
-    })
-    const handleCheckout = async()=>{
-      const values = await form.validateFields();
-      const payload ={
-        showtimeId,
-        movieId,
-        movieName: movieName,
-        roomId,
-        roomName: roomSeatData.data.name,
-        startTime: showtimeRes.data.startTime,
-        totalAmount: total,
-        seats: myHoldSeats.map((item)=>{
-          return{
-            ...item,
-            seatId: item._id,
-            price: item.price.find((price)=> price.seatType === item.type).value,
-          };
-        }),
-        ...values,
-      };
-      mutate(payload);
-    }
+  const { mutate, isPending } = useMutation({
+    mutationFn: (payload) => checkoutPayos(payload),
+    onSuccess: ({ data }) => {
+      window.location.href = data;
+    },
+    onError: (err) => HandleError(err),
+  });
+
+  const handleCheckout = async () => {
+    const values = await form.validateFields();
+    const payload = {
+      showtimeId,
+      movieId,
+      movieName: movieName,
+      roomId,
+      roomName: roomSeatData.data.name,
+      startTime: showtimeRes.data.startTime,
+      totalAmount: total,
+      seats: myHoldSeats.map((item) => {
+        return {
+          ...item,
+          seatId: item._id,
+          price: item.price.find((price) => price.seatType === item.type).value,
+        };
+      }),
+      ...values,
+    };
+    mutate(payload);
+  };
   return (
     <div className="min-h-[110vh] mt-12 bg-white text-slate-900">
       <div className="max-w-7xl xl:mx-auto mx-6">
-       <div className="flex items-end justify-between mb-6">
+        <div className="flex items-end justify-between mb-6">
           <div>
             <h1 className="text-3xl font-extrabold">Thanh toán</h1>
             <p className="text-slate-600" style={{ marginBottom: 0 }}>
@@ -167,70 +173,71 @@ const CheckoutPage = () => {
             <div className="lg:col-span-2 space-y-6">
               <div>
                 <Card
-                className="rounded-2x1 bg-white"
-                style={{borderColor: "#e5e7eb"}}
+                  className="rounded-2xl bg-white"
+                  style={{ borderColor: "#e5e7eb" }}
                 >
                   <p className="text-sm text-slate-600">Thông tin khách hàng</p>
-                  <Form 
-                   initialValues={{ customerInfo: { ...user } }}
-                   form={form}
-                   layout="vertical"
+                  <Form
+                    initialValues={{ customerInfo: { ...user } }}
+                    form={form}
+                    layout="vertical"
                   >
                     <Form.Item
-                    label="Email"
-                    name={["customerInfo","email"]}
-                    rules={[
-                      {
-                        type: "email",
-                        message: "Vui lòng nhập đúng định dạng email",
-                      },
-                      {
-                        required: true,
-                        message:"Email không được để trống",
-                      }
-                    ]}
+                      label="Email"
+                      name={["customerInfo", "email"]}
+                      rules={[
+                        {
+                          type: "email",
+                          message: "Vui lòng nhập đúng định dạng email",
+                        },
+                        {
+                          required: true,
+                          message: "Email không được để trống",
+                        },
+                      ]}
                     >
                       <Input placeholder="Nhập email của bạn" />
                     </Form.Item>
                     <Form.Item
-                    label="Họ và tên"
-                    name={["customerInfo","userName"]}
-                    rules={[
-                      {
-                        required: true,
-                        message:"Họ và tên không được để trống",
-                      }
-                    ]}
+                      label="Họ và tên"
+                      name={["customerInfo", "userName"]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "Họ và tên không được để trống",
+                        },
+                      ]}
                     >
-                      <Input placeholder="Nhập họ và tên của bạn" />
+                      <Input placeholder="Nhập họ tên của bạn" />
                     </Form.Item>
                     <Form.Item
-                    label="Số điện thoại"
-                    name={["customerInfo","phone"]}
-                    rules={[
-                      {
-                        required: true,
-                        message:"Số điện thoại không được để trống",
-                      },
-                      {
-                        min: 6,
-                        message:"Số điện thoại phải có ít nhất 6 ký tự",
-                      },
-                      {
-                        max: 16,
-                        message:"Số điện thoại chỉ được phép nhập tối đa 16 ký tự",
-                      }
-                    ]}
+                      label="Số điện thoại"
+                      name={["customerInfo", "phone"]}
+                      rules={[
+                        {
+                          required: true,
+                          message: "Số điện thoại không được để trống",
+                        },
+                        {
+                          min: 6,
+                          message: "Số điện thoại phải có ít nhất 6 ký tự",
+                        },
+                        {
+                          max: 16,
+                          message:
+                            "Số điện thoại chỉ được phép nhập tối đa 16 ký tự",
+                        },
+                      ]}
                     >
-                      <Input placeholder="Nhập số điện thoại của bạn" />
+                      <Input placeholder="Nhập họ tên của bạn" />
                     </Form.Item>
                   </Form>
                 </Card>
                 <Card
-                className="rounded-2xl bg-white"
-                style={{ borderColor: "#e5e7eb", marginTop: 20 }}
+                  className="rounded-2xl bg-white"
+                  style={{ borderColor: "#e5e7eb", marginTop: 20 }}
                 >
-                    <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between">
                     <p className="text-sm text-slate-600">Thông tin phim</p>
                     <Tag color="red">Đang giữ {myHoldSeats.length} ghế</Tag>
                   </div>
@@ -255,9 +262,18 @@ const CheckoutPage = () => {
                         <div className="flex items-center gap-3">
                           <ScheduleOutlined className="text-red-500" />
                           <div>
-                            <p className="text-slate-600 m-0">Ngày giờ chiếu</p>
-                            <p className="font-bold text-slate-900 m-0">
-                              {hour}
+                            <p className="text-slate-600 m-0!">
+                              Ngày giờ chiếu
+                            </p>
+                            <p className="font-bold text-slate-900 m-0!">
+                              {dayjs(showtimeRes?.data?.startTime).format(
+                                `HH:mm `,
+                              )}
+                            </p>
+                            <p className="font-bold text-slate-900 m-0!">
+                              {dayjs(showtimeRes?.data?.startTime).format(
+                                `DD/MM/YYYY `,
+                              )}
                             </p>
                           </div>
                         </div>
@@ -283,19 +299,26 @@ const CheckoutPage = () => {
                       </p>
                     </div>
                   </div>
-                  </Card>
-                </div>
+                </Card>
+              </div>
             </div>
 
             <div className="lg:col-span-1">
-              <Card className="rounded-2xl bg-white" style={{ borderColor: "#e5e7eb", position: "sticky", top: 24 }}>
+              <Card
+                className="rounded-2xl bg-white"
+                style={{ borderColor: "#e5e7eb", position: "sticky", top: 24 }}
+              >
                 <div className="flex items-center gap-8">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600">
                     <CreditCardOutlined />
                   </div>
                   <div>
-                    <p className="text-sm text-slate-600 m-0">Phương thức thanh toán</p>
-                    <p className="text-xs text-slate-500 m-0">Chọn một phương thức để tiếp tục</p>
+                    <p className="text-sm text-slate-600 m-0">
+                      Phương thức thanh toán
+                    </p>
+                    <p className="text-xs text-slate-500 m-0">
+                      Chọn một phương thức để tiếp tục
+                    </p>
                   </div>
                 </div>
 
@@ -303,16 +326,24 @@ const CheckoutPage = () => {
                   <Radio.Group defaultValue="vietqr" className="w-full">
                     <div className="space-y-3">
                       <div className="rounded-xl border border-slate-200 p-3 hover:border-red-400">
-                        <Radio value="vietqr" className="text-slate-900">VietQR</Radio>
+                        <Radio value="vietqr" className="text-slate-900">
+                          VietQR
+                        </Radio>
                       </div>
                       <div className="rounded-xl border border-slate-200 p-3 hover:border-red-400">
-                        <Radio value="vnpay" className="text-slate-900">VNPAY</Radio>
+                        <Radio value="vnpay" className="text-slate-900">
+                          VNPAY
+                        </Radio>
                       </div>
                       <div className="rounded-xl border border-slate-200 p-3 hover:border-red-400">
-                        <Radio value="viettel" className="text-slate-900">Viettel Money</Radio>
+                        <Radio value="viettel" className="text-slate-900">
+                          Viettel Money
+                        </Radio>
                       </div>
                       <div className="rounded-xl border border-slate-200 p-3 hover:border-red-400">
-                        <Radio value="momo" className="text-slate-900">MoMo</Radio>
+                        <Radio value="momo" className="text-slate-900">
+                          MoMo
+                        </Radio>
                       </div>
                     </div>
                   </Radio.Group>
@@ -322,7 +353,9 @@ const CheckoutPage = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span>Thanh toán</span>
-                    <span className="font-bold">{formatCurrency(total || 0)}</span>
+                    <span className="font-bold">
+                      {formatCurrency(total || 0)}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span>Phí</span>
@@ -330,29 +363,34 @@ const CheckoutPage = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span>Tổng cộng</span>
-                    <span className="font-bold">{formatCurrency(total || 0)}</span>
+                    <span className="font-bold">
+                      {formatCurrency(total || 0)}
+                    </span>
                   </div>
                 </div>
 
                 <div className="mt-4">
                   <Checkbox
-                  onChange={(e)=>{
-                    setAcpPolicy(e.target.checked);
-                  }}
-                  className="text-slate-800"
+                    onChange={(e) => {
+                      setAcpPolicy(e.target.checked);
+                    }}
+                    className="text-slate-800"
                   >
-                    Tôi xác nhận các thông tin đã chính xác và đồng ý với các điều khoản &chính sách
+                    Tôi xác nhận các thông tin đã chính xác và đồng ý với các
+                    điều khoản & chính sách
                   </Checkbox>
                 </div>
 
                 <div className="mt-4 flex items-center gap-3">
                   <Button
+                    loading={isPending}
                     type="primary"
-                    className="flex-1"
-                    style={{ 
-                      height: 44, 
-                      borderRadius: 9999, 
-                      border: "none" }}
+                    className="flex-1 "
+                    style={{
+                      height: 44,
+                      borderRadius: 9999,
+                      border: "none",
+                    }}
                     disabled={!myHoldSeats.length || !acpPolicy}
                     onClick={() => {
                       handleCheckout();
@@ -360,16 +398,18 @@ const CheckoutPage = () => {
                   >
                     Thanh toán
                   </Button>
-                  <Button onClick={() => nav(-1)} style={{ height: 44 }}>Quay lại</Button>
+                  <Button onClick={() => nav(-1)} style={{ height: 44 }}>
+                    Quay lại
+                  </Button>
                 </div>
               </Card>
             </div>
           </div>
         )}
 
-        <Card 
+        <Card
           className="rounded-2xl bg-white"
-          style={{ borderColor: "#e5e7eb", marginTop: 20 }}        
+          style={{ borderColor: "#e5e7eb", marginTop: 20 }}
         >
           <p className="text-sm text-slate-600">Thông tin thanh toán</p>
           <div className="mt-3">
@@ -379,7 +419,9 @@ const CheckoutPage = () => {
               <div className="col-span-3">Tổng tiền</div>
             </div>
             <div className="mt-2 grid grid-cols-12 items-center text-slate-900">
-              <div className="col-span-6">Ghế ({myHoldSeats.map((s) => s.label).join(", ") || "—"})</div>
+              <div className="col-span-6">
+                Ghế ({myHoldSeats.map((s) => s.label).join(", ") || "—"})
+              </div>
               <div className="col-span-3">{myHoldSeats.length}</div>
               <div className="col-span-3">{formatCurrency(total || 0)}</div>
             </div>

@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import { useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router";
-import { QUERYKEY } from "../../../../../common/constants/queryKey";
+import { QUERY, QUERYKEY } from "../../../../../common/constants/queryKey";
 import { SEAT_STATUS } from "../../../../../common/constants/seat";
 import { useMessage } from "../../../../../common/hooks/useMessage";
 import { useUnHoldOnBack } from "../../../../../common/hooks/useUnHoldOnBack";
@@ -19,8 +19,7 @@ import { formatCurrency, getSeatPrice } from "../../../../../common/utils";
 import CountTime from "../../../../../components/CountTime";
 import { getSocket } from "../../../../../socket/socket-client";
 import { useAuthSelector } from "../../../../../store/useAuthStore";
-
-
+import { getDetailShowtime } from "../../../../../common/services/showtime.service";
 
 const SeatPicker = ({
   showtimeId: showtimeIdProp,
@@ -68,6 +67,10 @@ const SeatPicker = ({
       );
     },
   });
+  const { data: showtimeResponse } = useQuery({
+    queryKey: [QUERY.SHOWTIME, showtimeId],
+    queryFn: () => getDetailShowtime(showtimeId),
+  });
 
   const myHoldSeats =
     data?.seats?.filter(
@@ -106,7 +109,7 @@ const SeatPicker = ({
       return "bg-gray-200 text-gray-400 cursor-not-allowed";
     }
     if (isMyHold)
-      return "bg-blue-600 text-white border-blue-700 shadow-md shadow-blue-200"; // Selected
+      return "bg-red-500 text-white border-red-700 shadow-md shadow-red-200"; // Selected
     if (seat.type === "VIP") return "bg-amber-400 text-white border-amber-500";
     if (seat.type === "COUPLE") return "bg-rose-400 text-white border-rose-500";
     return "bg-white border border-gray-200 text-gray-700 hover:border-red-500"; // Normal
@@ -282,8 +285,10 @@ const SeatPicker = ({
               <div className="flex justify-between">
                 <span className="text-slate-500">Ngày chiếu</span>
                 <span className="font-bold text-slate-700">
-                  {showtimeInfo
-                    ? dayjs(showtimeInfo.startTime).format("DD/MM/YYYY")
+                  {showtimeResponse
+                    ? dayjs(showtimeResponse.data.startTime).format(
+                        "DD/MM/YYYY",
+                      )
                     : "..."}
                 </span>
               </div>
@@ -297,9 +302,9 @@ const SeatPicker = ({
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Rạp chiếu</span>
-                {/* <span className="font-bold text-slate-700">
-                    {showtimeInfo?.roomId?.name || roomSeatData?.name || "..."}
-                  </span> */}
+                <span className="font-bold text-slate-700">
+                  {showtimeResponse?.data?.roomId?.name || "..."}
+                </span>
               </div>
             </div>
           </div>
