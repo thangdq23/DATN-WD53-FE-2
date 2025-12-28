@@ -11,7 +11,7 @@ const MovieFilterBar = ({ status, movies = [] }) => {
 
   const { query, onFilter } = useTable();
 
-  // ✅ Derive thể loại từ movies.genreIds (client-side, không gọi API genre)
+  
   const genreOptions = useMemo(() => {
     const map = new Map();
 
@@ -30,12 +30,12 @@ const MovieFilterBar = ({ status, movies = [] }) => {
       .sort((a, b) => a.label.localeCompare(b.label));
   }, [movies]);
 
-  // Sync input Reidirect theo query
+  
   useEffect(() => {
     setSearchValue(query.search || "");
   }, [query.search]);
 
-  // Reset filter khi đổi tab status
+ 
   useEffect(() => {
     onFilter({ search: null, genre: null, age: null });
     setSearchValue("");
@@ -60,7 +60,7 @@ const MovieFilterBar = ({ status, movies = [] }) => {
 
   return (
     <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
-      {/* Search */}
+      
       <Col xs={24} sm={12} md={8}>
         <Search
           placeholder="Tìm tên phim..."
@@ -71,7 +71,7 @@ const MovieFilterBar = ({ status, movies = [] }) => {
         />
       </Col>
 
-      {/* Thể loại (derive từ movies) */}
+      
       <Col xs={12} sm={6} md={4}>
         <Select
           placeholder="Thể loại"
@@ -83,7 +83,7 @@ const MovieFilterBar = ({ status, movies = [] }) => {
         />
       </Col>
 
-      {/* Độ tuổi (value theo backend: P/C13/C16/C18) */}
+      
       <Col xs={12} sm={6} md={4}>
         <Select
           placeholder="Độ tuổi"

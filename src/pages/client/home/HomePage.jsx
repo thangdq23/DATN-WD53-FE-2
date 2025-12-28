@@ -23,20 +23,20 @@ const HomePage = () => {
   const [tabKey, setTabKey] = useState("nowShowing");
   const { query } = useTable();
 
-  // --- Gọi API phim ---
+  
   const { data, isLoading } = useQuery({
     queryKey: ["movies-homepage"],
     queryFn: () => getAllMovie({ status: true }),
   });
 
-  // --- Gọi API phim nổi bật ---
+  
   const { data: featuredData, isLoading: loadingFeatured } = useQuery({
     queryKey: ["movies-featured"],
     queryFn: () => getAllMovie({ isHot: true, status: true, limit: 4 }),
   });
   const featuredMovies = featuredData?.data || [];
 
-  // --- Tách phim theo ngày ---
+  
   const { nowShowingMovies, upcomingMovies } = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -74,11 +74,11 @@ const HomePage = () => {
     return { nowShowingMovies: now, upcomingMovies: upcoming };
   }, [data]);
 
-  // chọn list theo tab
+  
   const moviesToShow =
     tabKey === "nowShowing" ? nowShowingMovies : upcomingMovies;
 
-  // --- Bộ lọc frontend ---
+  
   const filteredMovies = useMemo(() => {
     return moviesToShow?.filter((movie) => {
       const matchSearch = query.search
@@ -92,7 +92,7 @@ const HomePage = () => {
           movie.genreIds.some((g) => String(g?._id) === String(query.genre))
         : true;
 
-      // ✅ FIX: backend field là ageRestriction
+      
       const matchAge = query.age
         ? String(movie?.ageRestriction) === String(query.age)
         : true;
@@ -112,7 +112,7 @@ const HomePage = () => {
 
   const [bannerList, setBannerList] = useState([bannerImgA, bannerImgB]);
 
-  // Đọc cấu hình banner từ localStorage và cập nhật khi thay đổi
+  
   useEffect(() => {
     const readLS = () => {
       try {

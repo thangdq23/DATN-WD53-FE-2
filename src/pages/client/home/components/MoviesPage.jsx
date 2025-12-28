@@ -9,10 +9,7 @@ import posterFallback from "../../../../assets/images/poster/trai-tim-que-quat.j
 
 const { Search } = Input;
 
-/**
- * Backend field: ageRestriction = "P" | "C13" | "C16" | "C18"
- * UI field: "P" | "C13+" | "C16+" | "C18+"
- */
+
 const AGE_MAP = {
   P: ["P"],
   "C13+": ["P", "C13"],
@@ -25,20 +22,13 @@ const MoviesPage = () => {
   const [genre, setGenre] = useState(undefined);
   const [age, setAge] = useState(undefined);
 
-  // Fetch movies
+  
   const { data: moviesRaw, isLoading, error } = useQuery({
     queryKey: ["client-movies"],
     queryFn: () => getAllMovie({ status: true }),
   });
 
-  /**
-   * Normalize movies array (để tránh movies = [])
-   * Support:
-   * - [...] (array)
-   * - { data: [...] }
-   * - { success, message, data: [...] }  (đúng JSON bạn gửi)
-   * - { data: { data: [...] } }
-   */
+  
   const movies = useMemo(() => {
     if (!moviesRaw) return [];
 
@@ -51,19 +41,14 @@ const MoviesPage = () => {
     return [];
   }, [moviesRaw]);
 
-  /**
-   * Derive genres from movies.genreIds
-   * - genreIds có thể là:
-   *   A) [{ _id, name }]
-   *   B) ["id1", "id2"]  (nếu backend trả string) -> không có name => không tạo option
-   */
+  
   const genreOptions = useMemo(() => {
     const map = new Map();
 
     movies.forEach((m) => {
       if (Array.isArray(m?.genreIds)) {
         m.genreIds.forEach((g) => {
-          // Case A: object
+         
           if (g && typeof g === "object") {
             const id = g?._id;
             const name = g?.name;
@@ -78,7 +63,7 @@ const MoviesPage = () => {
       .sort((a, b) => a.label.localeCompare(b.label));
   }, [movies]);
 
-  // ===== DEBUG LOGS (tạm thời) =====
+  
   console.log("[MoviesPage] isLoading =", isLoading);
   console.log("[MoviesPage] error =", error);
   console.log("[MoviesPage] moviesRaw =", moviesRaw);
@@ -89,18 +74,18 @@ const MoviesPage = () => {
   console.log("[MoviesPage] genreOptions.length =", genreOptions.length);
   console.log("[MoviesPage] selected genre =", genre);
   console.log("[MoviesPage] selected age =", age);
-  // ===============================
+  
 
   const filteredMovies = useMemo(() => {
     let list = movies;
 
-    // Search
+   
     if (search) {
       const q = search.trim().toLowerCase();
       list = list.filter((m) => (m?.name || "").toLowerCase().includes(q));
     }
 
-    // Genre filter
+    
     if (genre) {
       list = list.filter(
         (m) =>
@@ -109,7 +94,7 @@ const MoviesPage = () => {
       );
     }
 
-    // Age filter (đúng field ageRestriction)
+    
     if (age) {
       const allowed = AGE_MAP[age] || [];
       list = list.filter((m) => allowed.includes(m?.ageRestriction));
@@ -120,7 +105,7 @@ const MoviesPage = () => {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      {/* Hero */}
+      
       <section className="relative h-[420px] flex items-center justify-center text-center overflow-hidden">
         <img
           src={bannerImg}
@@ -144,7 +129,7 @@ const MoviesPage = () => {
         </FM.div>
       </section>
 
-      {/* Filters */}
+      
       <div className="max-w-7xl mx-auto px-6 pt-6">
         <Row gutter={[12, 12]}>
           <Col xs={24} md={8}>
@@ -190,13 +175,13 @@ const MoviesPage = () => {
           </Col>
         </Row>
 
-        {/* Debug nhỏ ngay UI để khỏi phải mở console */}
+       
         <div style={{ marginTop: 8, color: "#999", fontSize: 12 }}>
           debug: movies={movies.length} | genres={genreOptions.length}
         </div>
       </div>
 
-      {/* Grid */}
+     
       <div className="max-w-7xl mx-auto px-6 py-16">
         {isLoading ? (
           <div className="flex items-center justify-center min-h-[30vh]">
