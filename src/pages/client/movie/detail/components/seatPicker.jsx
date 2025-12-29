@@ -39,9 +39,19 @@ const SeatPicker = ({
   useUnHoldOnBack();
 
   const userId = useAuthSelector((state) => state.user?._id);
-  const { HandleError, showMessage } = useMessage();
+  const token = useAuthSelector((state) => state.token);
+  const { HandleError, showMessage, antdMessage } = useMessage();
   const queryClient = useQueryClient();
   const socket = getSocket();
+
+  useEffect(() => {
+    if (!token) {
+      antdMessage.warning("Vui lòng đăng nhập để tiếp tục!");
+      nav("/auth/login");
+    }
+  }, [token, nav, antdMessage]);
+
+  if (!token) return null;
 
   const { data, isLoading } = useQuery({
     queryKey: [QUERYKEY.SEAT, showtimeId, roomId],
@@ -120,10 +130,10 @@ const SeatPicker = ({
         predicate: ({ queryKey }) => queryKey.includes(QUERYKEY.SEAT),
       });
     };
-    socket.emit("joinShowtime", showtimeId);
-    socket.on("seatUpdated", handleSeatUpdate);
+    socket?.emit("joinShowtime", showtimeId);
+    socket?.on("seatUpdated", handleSeatUpdate);
     return () => {
-      socket.off("seatUpdated", handleSeatUpdate);
+      socket?.off("seatUpdated", handleSeatUpdate);
     };
   }, [queryClient, showtimeId, socket]);
 

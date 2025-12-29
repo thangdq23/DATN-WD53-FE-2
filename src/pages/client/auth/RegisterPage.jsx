@@ -1,5 +1,5 @@
 import { Button, Form, Input } from "antd";
-import { UserOutlined, MailOutlined, PhoneOutlined, LockOutlined } from "@ant-design/icons";
+import { UserOutlined, MailOutlined, PhoneOutlined, LockOutlined, HomeOutlined } from "@ant-design/icons";
 import { formRules } from "../../../common/utils/formRule";
 import { useMutation } from "@tanstack/react-query";
 import { registerService } from "../../../common/services/auth.service";
@@ -28,6 +28,14 @@ const RegisterPage = () => {
   };
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gray-100">
+      <Link 
+        to="/" 
+        className="absolute top-6 left-6 z-50 flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-slate-600 font-bold shadow-lg hover:bg-[#D66D75] hover:text-white transition-all duration-300 hover:scale-105 group"
+      >
+        <HomeOutlined className="text-lg group-hover:animate-pulse" />
+        <span className="text-sm">Trang chủ</span>
+      </Link>
+
       {/* Background Image with Blur */}
       <div 
           className="absolute inset-0 z-0"

@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Button, Checkbox, Form, Input } from "antd";
 import { Link, useNavigate } from "react-router";
-import { GoogleOutlined, FacebookOutlined } from "@ant-design/icons";
+import { GoogleOutlined, FacebookOutlined, HomeOutlined } from "@ant-design/icons";
 import bannerImg3 from "../../../assets/images/banner/backgourlogin-register.jpg";
 import sideImg from "../../../assets/images/banner/background-loginupdate.jpg";
 import { useMessage } from "../../../common/hooks/useMessage";
@@ -31,6 +31,14 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gray-100">
+      <Link 
+        to="/" 
+        className="absolute top-6 left-6 z-50 flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-slate-600 font-bold shadow-lg hover:bg-[#D66D75] hover:text-white transition-all duration-300 hover:scale-105 group"
+      >
+        <HomeOutlined className="text-lg group-hover:animate-pulse" />
+        <span className="text-sm">Trang chủ</span>
+      </Link>
+      
       {/* Background Image with Blur */}
       <div 
           className="absolute inset-0 z-0"
