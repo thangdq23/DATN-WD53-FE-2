@@ -1,32 +1,109 @@
 import React, { useMemo, useState } from "react";
+import { Row, Col, Input, Select } from "antd";
 import { motion as FM } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import bannerImg from "../../../../assets/images/banner/banner2.jpg";
 import { getAllMovie } from "../../../../common/services/movie.service";
-import { getAllGenre } from "../../../../common/services/genre.service";
 import MovieCard from "./MovieCard";
 import posterFallback from "../../../../assets/images/poster/trai-tim-que-quat.jpg";
 
-const MoviesPage = () => {
-  const [selectedGenre, setSelectedGenre] = useState(null);
+const { Search } = Input;
 
-  const { data: moviesData, isLoading } = useQuery({
-    queryKey: ["client-movies", selectedGenre],
+const AGE_MAP = {
+  P: ["P"],
+  "C13+": ["P", "C13"],
+  "C16+": ["P", "C13", "C16"],
+  "C18+": ["P", "C13", "C16", "C18"],
+};
+
+const MoviesPage = () => {
+  const [search, setSearch] = useState("");
+  const [genre, setGenre] = useState(undefined);
+  const [age, setAge] = useState(undefined);
+
+  
+  const { data: moviesRaw, isLoading, error } = useQuery({
+    queryKey: ["client-movies"],
     queryFn: () => getAllMovie({ status: true }),
   });
 
-  const movies = moviesData?.data || [];
+  
+  const movies = useMemo(() => {
+    if (!moviesRaw) return [];
 
-  const filtered = useMemo(() => {
-    if (!selectedGenre) return movies;
-    return movies.filter((m) =>
-      m?.genreIds?.some((g) => g._id === selectedGenre),
-    );
-  }, [movies, selectedGenre]);
+    if (Array.isArray(moviesRaw)) return moviesRaw;
+
+    if (Array.isArray(moviesRaw.data)) return moviesRaw.data;
+
+    if (Array.isArray(moviesRaw.data?.data)) return moviesRaw.data.data;
+
+    return [];
+  }, [moviesRaw]);
+
+  
+  const genreOptions = useMemo(() => {
+    const map = new Map();
+
+    movies.forEach((m) => {
+      if (Array.isArray(m?.genreIds)) {
+        m.genreIds.forEach((g) => {
+         
+          if (g && typeof g === "object") {
+            const id = g?._id;
+            const name = g?.name;
+            if (id && name) map.set(String(id), name);
+          }
+        });
+      }
+    });
+
+    return Array.from(map.entries())
+      .map(([id, name]) => ({ value: id, label: name }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [movies]);
+
+ 
+  console.log("[MoviesPage] isLoading =", isLoading);
+  console.log("[MoviesPage] error =", error);
+  console.log("[MoviesPage] moviesRaw =", moviesRaw);
+  console.log("[MoviesPage] movies.length =", movies.length);
+  console.log("[MoviesPage] firstMovie =", movies[0]);
+  console.log("[MoviesPage] firstMovie.genreIds =", movies?.[0]?.genreIds);
+  console.log("[MoviesPage] genreOptions =", genreOptions);
+  console.log("[MoviesPage] genreOptions.length =", genreOptions.length);
+  console.log("[MoviesPage] selected genre =", genre);
+  console.log("[MoviesPage] selected age =", age);
+
+  const filteredMovies = useMemo(() => {
+    let list = movies;
+
+    
+    if (search) {
+      const q = search.trim().toLowerCase();
+      list = list.filter((m) => (m?.name || "").toLowerCase().includes(q));
+    }
+
+   
+    if (genre) {
+      list = list.filter(
+        (m) =>
+          Array.isArray(m?.genreIds) &&
+          m.genreIds.some((g) => String(g?._id) === String(genre))
+      );
+    }
+
+    
+    if (age) {
+      const allowed = AGE_MAP[age] || [];
+      list = list.filter((m) => allowed.includes(m?.ageRestriction));
+    }
+
+    return list;
+  }, [movies, search, genre, age]);
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      {/* Hero */}
+     
       <section className="relative h-[420px] flex items-center justify-center text-center overflow-hidden">
         <img
           src={bannerImg}
@@ -50,20 +127,71 @@ const MoviesPage = () => {
         </FM.div>
       </section>
 
-      <div className="" style={{ padding: 20 }}></div>
-      {/* Movies grid */}
-      <div className="max-w-7xl mx-auto px-6 pb-16">
+      
+      <div className="max-w-7xl mx-auto px-6 pt-6">
+        <Row gutter={[12, 12]}>
+          <Col xs={24} md={8}>
+            <Search
+              placeholder="Tìm tên phim..."
+              allowClear
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onSearch={(v) => setSearch(v || "")}
+            />
+          </Col>
+
+          <Col xs={12} md={5}>
+            <Select
+              placeholder="Thể loại"
+              allowClear
+              value={genre}
+              onChange={setGenre}
+              style={{ width: "100%" }}
+              options={genreOptions}
+              notFoundContent={
+                <span style={{ color: "#999" }}>
+                  No data (genreOptions.length = {genreOptions.length})
+                </span>
+              }
+            />
+          </Col>
+
+          <Col xs={12} md={5}>
+            <Select
+              placeholder="Độ tuổi"
+              allowClear
+              value={age}
+              onChange={setAge}
+              style={{ width: "100%" }}
+              options={[
+                { value: "P", label: "P" },
+                { value: "C13+", label: "C13+" },
+                { value: "C16+", label: "C16+" },
+                { value: "C18+", label: "C18+" },
+              ]}
+            />
+          </Col>
+        </Row>
+
+        
+        <div style={{ marginTop: 8, color: "#999", fontSize: 12 }}>
+          debug: movies={movies.length} | genres={genreOptions.length}
+        </div>
+      </div>
+
+     
+      <div className="max-w-7xl mx-auto px-6 py-16">
         {isLoading ? (
           <div className="flex items-center justify-center min-h-[30vh]">
             Đang tải danh sách phim...
           </div>
-        ) : filtered.length === 0 ? (
+        ) : filteredMovies.length === 0 ? (
           <div className="rounded-2xl bg-white border border-slate-200 p-6">
             <p className="text-slate-600">Không có phim phù hợp với bộ lọc</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filtered.map((m) => (
+            {filteredMovies.map((m) => (
               <FM.div
                 key={m._id}
                 initial={{ opacity: 0, y: 24 }}
@@ -80,18 +208,5 @@ const MoviesPage = () => {
     </div>
   );
 };
-
-const Chip = ({ label, active, onClick }) => (
-  <button
-    onClick={onClick}
-    className={`px-4 py-2 rounded-full border transition shadow-sm ${
-      active
-        ? "bg-blue-600 text-white border-blue-600 shadow-blue-900/30"
-        : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
-    }`}
-  >
-    {label}
-  </button>
-);
 
 export default MoviesPage;
