@@ -11,9 +11,10 @@ const { Search } = Input;
 
 const AGE_MAP = {
   P: ["P"],
-  "C13+": ["P", "C13"],
-  "C16+": ["P", "C13", "C16"],
-  "C18+": ["P", "C13", "C16", "C18"],
+  K: ["P", "K"],
+  T13: ["P", "K", "T13", "C13", "C13+"],
+  T16: ["P", "K", "T13", "C13", "C13+", "T16", "C16", "C16+"],
+  T18: ["P", "K", "T13", "C13", "C13+", "T16", "C16", "C16+", "T18", "C18", "C18+"],
 };
 
 const MoviesPage = () => {
@@ -165,9 +166,10 @@ const MoviesPage = () => {
               style={{ width: "100%" }}
               options={[
                 { value: "P", label: "P" },
-                { value: "C13+", label: "C13+" },
-                { value: "C16+", label: "C16+" },
-                { value: "C18+", label: "C18+" },
+                { value: "K", label: "K" },
+                { value: "T13", label: "T13" },
+                { value: "T16", label: "T16" },
+                { value: "T18", label: "T18" },
               ]}
             />
           </Col>

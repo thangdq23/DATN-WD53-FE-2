@@ -93,9 +93,10 @@ const MovieFilterBar = ({ status, movies = [] }) => {
           style={{ width: "100%" }}
           options={[
             { value: "P", label: "P" },
-            { value: "C13", label: "C13+" },
-            { value: "C16", label: "C16+" },
-            { value: "C18", label: "C18+" },
+            { value: "K", label: "K" },
+            { value: "C13", label: "T13" },
+            { value: "C16", label: "T16" },
+            { value: "C18", label: "T18" },
           ]}
         />
       </Col>
