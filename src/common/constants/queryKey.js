@@ -4,6 +4,7 @@ export const QUERYKEY = {
   ROOM: "ROOM",
   SHOWTIME: "SHOWTIME",
   USER: "USER",
+  ORDER: "ORDER",
 };
 
 export const QUERY = QUERYKEY;

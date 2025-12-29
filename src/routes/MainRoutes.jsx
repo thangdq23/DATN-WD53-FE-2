@@ -13,6 +13,8 @@ import MoviesPage from "../pages/client/home/components/MoviesPage";
 import NewsPage from "../pages/client/home/components/NewsPage";
 import NewsDetailPage from "../pages/client/home/components/NewsDetailPage";
 import CheckoutPage from "../pages/client/checkout/CheckoutPage";
+import PaymentSuccess from "../pages/client/checkout/PaymentSuccess";
+import PaymentFailed from "../pages/client/checkout/PaymentFailed";
 
 export const MainRoutes = [
   {
@@ -71,7 +73,19 @@ export const MainRoutes = [
         path: "checkout/:showtimeId/:roomId",
         element: <CheckoutPage />,
       },
-      
+      {
+        path: "payment",
+        children:[
+          {
+            path:"success/:id",
+            element:<PaymentSuccess/>
+          },
+          {
+            path:"failed",
+            element:<PaymentFailed/>
+          }
+        ]
+      }
     ],
   },
   {
