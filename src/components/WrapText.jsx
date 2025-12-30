@@ -29,7 +29,7 @@ const TextWrap = ({ text, style, className }) => {
       {textElement}
     </Tooltip>
   ) : (
-    textElement
+     <p style={{ ...style }}>{textElement}</p>
   );
 };
 
