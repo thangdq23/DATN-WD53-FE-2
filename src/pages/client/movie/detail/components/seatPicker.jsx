@@ -311,7 +311,7 @@ const SeatPicker = ({
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Rạp chiếu</span>
+                <span className="text-slate-500">Phòng chiếu</span>
                 <span className="font-bold text-slate-700">
                   {showtimeResponse?.data?.roomId?.name || "..."}
                 </span>

@@ -327,22 +327,7 @@ const CheckoutPage = () => {
                     <div className="space-y-3">
                       <div className="rounded-xl border border-slate-200 p-3 hover:border-red-400">
                         <Radio value="vietqr" className="text-slate-900">
-                          VietQR
-                        </Radio>
-                      </div>
-                      <div className="rounded-xl border border-slate-200 p-3 hover:border-red-400">
-                        <Radio value="vnpay" className="text-slate-900">
-                          VNPAY
-                        </Radio>
-                      </div>
-                      <div className="rounded-xl border border-slate-200 p-3 hover:border-red-400">
-                        <Radio value="viettel" className="text-slate-900">
-                          Viettel Money
-                        </Radio>
-                      </div>
-                      <div className="rounded-xl border border-slate-200 p-3 hover:border-red-400">
-                        <Radio value="momo" className="text-slate-900">
-                          MoMo
+                          PAYOS
                         </Radio>
                       </div>
                     </div>
