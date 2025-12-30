@@ -1,8 +1,8 @@
 import { DatePicker, Input, Select } from "antd";
 import dayjs from "dayjs";
-import { useTableHook } from "../../../../common/hooks/useTableHook";
+import { useTable } from "../../../../common/hooks/useTable";
 import { useEffect, useState } from "react";
-import { TICKET_STATUS } from "../../../../common/constants/ticket";
+import { ORDER_STATUS } from "../../../../common/constants/order";
 import { useQuery } from "@tanstack/react-query";
 import { QUERYKEY } from "../../../../common/constants/queryKey";
 import { getAllMovie } from "../../../../common/services/movie.service";
@@ -11,8 +11,7 @@ import { getAllRoom } from "../../../../common/services/room.service";
 const { RangePicker } = DatePicker;
 
 const FilterTicket = () => {
-  const { query, onFilter } = useTableHook();
-
+  const { query, onFilter } = useTable();
 
   const [timeSelect, setTimeSelect] = useState(null);
   const [searchValue, setSearchValue] = useState("");
@@ -38,7 +37,7 @@ const FilterTicket = () => {
 
   return (
     <div className="mt-4 flex items-center gap-4 flex-wrap">
-      
+      {/* SEARCH */}
       <div>
         <p className="mb-2">Tìm kiếm</p>
         <Input.Search
@@ -54,7 +53,7 @@ const FilterTicket = () => {
         />
       </div>
 
-      
+      {/* TIME */}
       <div>
         <p className="mb-2">Thời gian</p>
         <Select
@@ -88,7 +87,7 @@ const FilterTicket = () => {
         />
       </div>
 
-      {/* RANGE PICKER */}
+      {/* RANGE */}
       {timeSelect === "range" && (
         <div>
           <p className="mb-2">Khoảng thời gian</p>
@@ -118,8 +117,8 @@ const FilterTicket = () => {
           style={{ width: 150 }}
           options={[
             { value: "", label: "Tất cả trạng thái" },
-            ...Object.entries(TICKET_STATUS).map(([key, value]) => ({
-              label: value,
+            ...Object.entries(ORDER_STATUS).map(([key, value]) => ({
+              label: value.label,
               value: key,
             })),
           ]}
@@ -216,7 +215,7 @@ const FilterTicket = () => {
         </div>
       )}
 
-      
+      {/* ROOM */}
       {rooms.length > 0 && (
         <div>
           <p className="mb-2">Phòng chiếu</p>

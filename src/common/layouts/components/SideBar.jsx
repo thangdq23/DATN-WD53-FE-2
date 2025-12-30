@@ -7,6 +7,7 @@ import {
   ScheduleOutlined,
   TagsOutlined,
   DesktopOutlined,
+  ContainerOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -25,6 +26,11 @@ const SideBar = () => {
       icon: <UserOutlined />,
       label: "Quản lý người dùng",
     },
+     {
+    icon: <ContainerOutlined />,
+    label: "Quản lý vé",
+    route: "/admin/ticket",
+  },
     {
       key: "/admin/genres",
       icon: <TagsOutlined />,

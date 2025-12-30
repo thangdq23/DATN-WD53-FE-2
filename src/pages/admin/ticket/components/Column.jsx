@@ -1,13 +1,8 @@
 import { EyeOutlined } from "@ant-design/icons";
 import { Space, Tag, Tooltip } from "antd";
 import dayjs from "dayjs";
-import {
-  TICKET_STATUS,
-  TICKET_STATUS_COLOR,
-} from "../../../../common/constants/ticket";
+import { ORDER_STATUS } from "../../../../common/constants/order";
 import { formatCurrency } from "../../../../common/utils";
-import TextNowWrap from "../../../../components/TextNowWrap";
-import ModalDetailTicket from "./ModalDetailTicket";
 
 export const columnTicket = () => [
   {
@@ -15,11 +10,7 @@ export const columnTicket = () => [
     dataIndex: "ticketId",
     key: "ticketId",
     width: 120,
-    render: (id) => (
-      <Tag className="font-mono">
-        <TextNowWrap text={id} />
-      </Tag>
-    ),
+    render: (id) => <Tag className="font-mono">{id}</Tag>,
   },
   {
     title: "Khách hàng",
@@ -28,9 +19,9 @@ export const columnTicket = () => [
     width: 160,
     render: (name, record) => (
       <div>
-        <TextNowWrap text={name} />
+        <div>{name}</div>
         <div className="text-xs text-gray-500">
-          <TextNowWrap text={record?.customerInfo?.phone} />
+          {record.customerInfo?.phone}
         </div>
       </div>
     ),
@@ -40,21 +31,19 @@ export const columnTicket = () => [
     dataIndex: "movieName",
     key: "movieName",
     width: 160,
-    render: (name) => <TextNowWrap text={name} />,
+    render: (name) => name,
   },
   {
     title: "Ghế",
     dataIndex: "items",
     key: "items",
-    width: 110,
-    render: (items = [], record) => (
+    width: 120,
+    render: (items, record) => (
       <div>
         <Tag color="blue">
-          <TextNowWrap
-            text={items.map((i) => i.seatLabel).join(", ")}
-          />
+          {items?.map((i) => i.seatLabel).join(", ")}
         </Tag>
-        <TextNowWrap text={record?.roomName} />
+        <div className="text-xs text-gray-500">{record.roomName}</div>
       </div>
     ),
   },
@@ -65,11 +54,10 @@ export const columnTicket = () => [
     width: 140,
     render: (time) => (
       <div>
-        <TextNowWrap
-          text={dayjs(time).format("HH:mm")}
-          style={{ color: "orange" }}
-        />
-        <TextNowWrap text={dayjs(time).format("YYYY/MM/DD")} />
+        <div style={{ color: "orange" }}>
+          {dayjs(time).format("HH:mm")}
+        </div>
+        <div>{dayjs(time).format("YYYY/MM/DD")}</div>
       </div>
     ),
   },
@@ -80,8 +68,8 @@ export const columnTicket = () => [
     width: 140,
     render: (time) => (
       <div>
-        <TextNowWrap text={dayjs(time).format("HH:mm")} />
-        <TextNowWrap text={dayjs(time).format("YYYY/MM/DD")} />
+        <div>{dayjs(time).format("HH:mm")}</div>
+        <div>{dayjs(time).format("YYYY/MM/DD")}</div>
       </div>
     ),
   },
@@ -89,12 +77,12 @@ export const columnTicket = () => [
     title: "Thanh toán",
     dataIndex: "isPaid",
     key: "isPaid",
-    width: 100,
+    width: 120,
     render: (paid, record) => (
       <div>
-        <p>{formatCurrency(record?.totalPrice)}</p>
+        <div>{formatCurrency(record.totalAmount || 0)}</div>
         <Tag color={paid ? "green" : "red"}>
-          <TextNowWrap text={paid ? "Đã TT" : "Chưa TT"} />
+          {paid ? "Đã TT" : "Chưa TT"}
         </Tag>
       </div>
     ),
@@ -103,24 +91,22 @@ export const columnTicket = () => [
     title: "Trạng thái",
     dataIndex: "status",
     key: "status",
-    width: 110,
-    render: (status) => (
-      <Tag color={TICKET_STATUS_COLOR[status]}>
-        <TextNowWrap text={TICKET_STATUS[status]} />
-      </Tag>
-    ),
+    width: 120,
+    render: (status) => {
+      const st = ORDER_STATUS[status];
+      if (!st) return "-";
+      return <Tag color={st.color}>{st.label}</Tag>;
+    },
   },
   {
     title: "",
     key: "action",
     width: 60,
-    render: (_, record) => (
+    render: () => (
       <Space>
-        <ModalDetailTicket ticket={record}>
-          <Tooltip title="Xem chi tiết">
-            <EyeOutlined />
-          </Tooltip>
-        </ModalDetailTicket>
+        <Tooltip title="Xem chi tiết (sắp làm)">
+          <EyeOutlined style={{ color: "#999" }} />
+        </Tooltip>
       </Space>
     ),
   },

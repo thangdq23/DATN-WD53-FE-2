@@ -14,6 +14,10 @@ import CreateMovieShowtime from "../pages/admin/showtime/create/CreateMovieShowt
 import ListUser from "../pages/admin/user/ListUser";
 import BannerManager from "../pages/admin/banner/BannerManager";
 import ListOrder from "../pages/admin/order/ListOrder";
+import ListTicket from "../pages/admin/ticket/ListTicket";
+import ScanQR from "../pages/admin/ticket/scanQR/ScanQR";
+import PaymentSuccess from "../pages/client/payment/PaymentSuccess";
+
 
 export const AdminRoutes = [
   {
@@ -89,6 +93,24 @@ export const AdminRoutes = [
       {
         path: "ticket",
         element: <ListOrder />,
+      },
+      {
+        path: "ticket",
+        children: [
+          {
+            index: true,
+            element: <ListTicket />,
+          },
+          {
+            path: "qr",
+            element: <ScanQR />,
+          },
+{
+  path: "payment/success/:id",
+  element: <PaymentSuccess />,
+}
+
+        ],
       },
     ],
   },
