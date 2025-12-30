@@ -30,15 +30,26 @@ const ShowtimePicker = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // 2. Generate next 5 days from today
+  // 2. Generate days from actual showtimes
   const days = useMemo(() => {
-    const dates = [];
-    const today = dayjs().startOf("day");
-    for (let i = 0; i < 5; i++) {
-      dates.push(today.add(i, "day"));
+    const raw = allShowtimesData?.data?.docs || allShowtimesData?.data || [];
+    const uniqueDates = new Set();
+    const sortedDays = [];
+    if (Array.isArray(raw)) {
+      raw.forEach((s) => {
+        const d = dayjs(s.startTime).startOf("day");
+        // Only show future dates (including today)
+        if (d.isBefore(dayjs().startOf("day"))) return;
+        const key = d.format("YYYY-MM-DD");
+        if (!uniqueDates.has(key)) {
+          uniqueDates.add(key);
+          sortedDays.push(d);
+        }
+      });
     }
-    return dates;
-  }, []);
+    sortedDays.sort((a, b) => a.valueOf() - b.valueOf());
+    return sortedDays;
+  }, [allShowtimesData]);
 
   const [selectedDate, setSelectedDate] = useState(null);
 
