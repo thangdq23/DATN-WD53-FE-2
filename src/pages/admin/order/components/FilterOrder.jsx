@@ -27,7 +27,7 @@ const FilterOrder = () => {
 
   useEffect(() => {
     if (query.search) setSearchValue(query.search);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, []);
 
   const movies = data?.data;

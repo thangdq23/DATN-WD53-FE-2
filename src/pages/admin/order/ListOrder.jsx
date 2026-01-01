@@ -106,7 +106,7 @@ const ListOrder = () => {
       align: "center",
       render: (_, record) => (
         <Space>
-          {/* 👁 Xem chi tiết */}
+          
           <Link to={`/admin/ticket/${record._id}`}>
             <Button icon={<EyeOutlined />} />
           </Link>
@@ -117,13 +117,13 @@ const ListOrder = () => {
 
   return (
     <div>
-      {/* HEADER */}
+      
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">
           Danh sách vé
         </h2>
 
-        {/* 📷 QUÉT QR RIÊNG */}
+        
         <Link to="/admin/ticket/qr">
           <Button
             type="primary"
@@ -134,10 +134,10 @@ const ListOrder = () => {
         </Link>
       </div>
 
-      {/* FILTER */}
+      
       <FilterOrder />
 
-      {/* TABLE */}
+    
       <div className="mt-4">
         <Table
           bordered

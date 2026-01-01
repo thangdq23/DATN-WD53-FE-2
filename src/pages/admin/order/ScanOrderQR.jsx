@@ -42,7 +42,7 @@ const ScanOrderQR = () => {
     try {
       const res = await verifyOrderByCode(code);
 
-      // verifyOrderByCode đã normalize về { data: order }
+      
       if (!res?.data) {
         antdMessage.error("Không tìm thấy vé / đơn hàng với mã này");
         return;
@@ -60,12 +60,12 @@ const ScanOrderQR = () => {
     }
   };
 
-  // Nếu từ ListOrder click qua có ?code=MPV-xxxx thì auto verify
+  
   useEffect(() => {
     const sp = new URLSearchParams(location.search);
     const code = sp.get("code");
     if (code) handleScan(code);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [location.search]);
 
   const { mutate, isLoading } = useMutation({
@@ -97,7 +97,7 @@ const ScanOrderQR = () => {
       </div>
 
       <div className="flex gap-10 flex-wrap">
-        {/* SCAN */}
+        
         <div>
           <div className="w-[320px] h-[320px] bg-black rounded-lg overflow-hidden flex items-center justify-center">
             {data?.data ? (
@@ -133,7 +133,7 @@ const ScanOrderQR = () => {
           />
         </div>
 
-        {/* INFO */}
+        
         {data?.data && (
           <div className="flex-1 bg-[#1a1d23] p-6 rounded-xl min-w-[320px]">
             <h2 className="text-green-500 text-lg font-semibold mb-2">

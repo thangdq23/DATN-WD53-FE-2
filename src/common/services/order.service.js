@@ -2,16 +2,9 @@ import api from "../utils/api";
 
 const prefix = "/order";
 
-/**
- * Backend ORDER API EXPECT:
- * pagination.page (BẮT BUỘC)
- * pagination.limit (optional)
- *
- * Nếu không có → backend crash (500)
- */
 const buildParams = (params = {}) => {
   const result = {
-    // 🔥 BẮT BUỘC – tránh backend read undefined.page
+    
     pagination: {
       page: 1,
       limit: 10,
@@ -21,7 +14,7 @@ const buildParams = (params = {}) => {
   Object.entries(params).forEach(([key, value]) => {
     if (value === undefined || value === null || value === "") return;
 
-    // FE filters (scalar)
+    
     if (
       [
         "search",
@@ -39,9 +32,6 @@ const buildParams = (params = {}) => {
   return result;
 };
 
-// =======================
-// LIST + SEARCH + FILTER
-// =======================
 export const getAllOrder = async (params) => {
   const finalParams = buildParams(params);
 
@@ -52,17 +42,13 @@ export const getAllOrder = async (params) => {
   return data;
 };
 
-// =======================
-// DETAIL
-// =======================
+
 export const getDetailOrder = async (id) => {
   const { data } = await api.get(`${prefix}/detail/${id}`);
   return data;
 };
 
-// =======================
-// VERIFY QR / CODE
-// =======================
+
 export const verifyOrderByCode = async (code) => {
   const { data } = await api.get(prefix, {
     params: {
@@ -81,9 +67,7 @@ export const verifyOrderByCode = async (code) => {
   return data;
 };
 
-// =======================
-// CONFIRM
-// =======================
+
 export const confirmOrder = async (id) => {
   const { data } = await api.patch(`${prefix}/${id}`, {
     status: "used",
