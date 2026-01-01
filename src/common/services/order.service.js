@@ -1,11 +1,92 @@
 import api from "../utils/api";
 
-const prefix = `/order`;
+const prefix = "/order";
+
+/**
+ * Backend ORDER API EXPECT:
+ * pagination.page (BẮT BUỘC)
+ * pagination.limit (optional)
+ *
+ * Nếu không có → backend crash (500)
+ */
+const buildParams = (params = {}) => {
+  const result = {
+    // 🔥 BẮT BUỘC – tránh backend read undefined.page
+    pagination: {
+      page: 1,
+      limit: 10,
+    },
+  };
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === "") return;
+
+    // FE filters (scalar)
+    if (
+      [
+        "search",
+        "status",
+        "movieId",
+        "roomName",
+        "createdAtFrom",
+        "createdAtTo",
+      ].includes(key)
+    ) {
+      result[key] = Array.isArray(value) ? value[0] : value;
+    }
+  });
+
+  return result;
+};
+
+// =======================
+// LIST + SEARCH + FILTER
+// =======================
+export const getAllOrder = async (params) => {
+  const finalParams = buildParams(params);
+
+  const { data } = await api.get(prefix, {
+    params: finalParams,
+  });
+
+  return data;
+};
+
+// =======================
+// DETAIL
+// =======================
 export const getDetailOrder = async (id) => {
   const { data } = await api.get(`${prefix}/detail/${id}`);
   return data;
 };
-export const getAllOrder = async(params)=>{
-  const {data} = await api.get(prefix, {params});
+
+// =======================
+// VERIFY QR / CODE
+// =======================
+export const verifyOrderByCode = async (code) => {
+  const { data } = await api.get(prefix, {
+    params: {
+      search: code,
+      pagination: {
+        page: 1,
+        limit: 1,
+      },
+    },
+  });
+
+  if (Array.isArray(data?.data)) {
+    return { data: data.data[0] || null };
+  }
+
   return data;
-}
+};
+
+// =======================
+// CONFIRM
+// =======================
+export const confirmOrder = async (id) => {
+  const { data } = await api.patch(`${prefix}/${id}`, {
+    status: "used",
+  });
+  return data;
+};

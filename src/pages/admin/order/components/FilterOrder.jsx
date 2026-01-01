@@ -7,110 +7,112 @@ import { getAllRoom } from "../../../../common/services/room.service";
 import { useQuery } from "@tanstack/react-query";
 import { getAllMovie } from "../../../../common/services/movie.service";
 import { QUERYKEY } from "../../../../common/constants/queryKey";
+
 const { RangePicker } = DatePicker;
 
 const FilterOrder = () => {
   const { query, onFilter } = useTable();
   const [timeSelect, setTimeSelect] = useState(null);
   const [searchValue, setSearchValue] = useState("");
+
   const { data } = useQuery({
     queryKey: [QUERYKEY.MOVIE],
     queryFn: () => getAllMovie({ status: true }),
   });
+
   const { data: roomData } = useQuery({
     queryKey: [QUERYKEY.ROOM],
     queryFn: () => getAllRoom({ status: true }),
   });
+
   useEffect(() => {
-    if (query.search) {
-      setSearchValue(query.search);
-    }
+    if (query.search) setSearchValue(query.search);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   const movies = data?.data;
   const rooms = roomData?.data;
+
   return (
-    <div className="mt-4 flex items-center gap-4">
+    <div className="mt-4 flex items-center gap-4 flex-wrap">
       <div>
         <p className="mb-2">Tìm kiếm</p>
         <Input.Search
           value={searchValue}
           allowClear
-          onSearch={(e) => onFilter({ search: [e] })}
+          onSearch={(v) => onFilter({ search: v || null })}
           onChange={(e) => {
-            setSearchValue(e.target.value);
-            if (!e.target.value) onFilter({ search: null });
+            const v = e.target.value;
+            setSearchValue(v);
+            if (!v) onFilter({ search: null });
           }}
           placeholder="Tìm kiếm theo mã vé, thông tin người dùng"
         />
       </div>
+
       <div>
         <p className="mb-2">Thời gian</p>
         <Select
-          defaultValue={query.createdAt || ""}
+          value={timeSelect ?? ""}
           allowClear
           placeholder="Chọn thời gian hiển thị"
-          onChange={(e) => {
-            if (e !== "range") {
+          onChange={(v) => {
+            if (v && v !== "range") {
               onFilter({
-                createdAtFrom: e
-                  ? [dayjs(e).startOf("day").toISOString()]
-                  : null,
-                createdAtTo: e ? [dayjs(e).endOf("day").toISOString()] : null,
+                createdAtFrom: dayjs(v).startOf("day").toISOString(),
+                createdAtTo: dayjs(v).endOf("day").toISOString(),
               });
             } else {
               onFilter({ createdAtFrom: null, createdAtTo: null });
             }
-            setTimeSelect(e);
+            setTimeSelect(v || "");
           }}
           options={[
             { value: "", label: "Tất cả thời gian" },
             { value: "range", label: "Khoảng thời gian" },
-            {
-              value: dayjs().format("YYYY-MM-DD"),
-              label: "Hôm nay",
-            },
+            { value: dayjs().format("YYYY-MM-DD"), label: "Hôm nay" },
           ]}
           style={{ width: 150 }}
         />
       </div>
+
       {timeSelect === "range" && (
         <div>
           <p className="mb-2">Khoảng thời gian</p>
           <RangePicker
             placeholder={["Bắt đầu", "Kết thúc"]}
-            onChange={(e) => {
+            onChange={(dates) => {
               onFilter({
-                createdAtFrom: e
-                  ? [dayjs(e[0]).startOf("day").toISOString()]
+                createdAtFrom: dates
+                  ? dayjs(dates[0]).startOf("day").toISOString()
                   : null,
-                createdAtTo: e
-                  ? [dayjs(e[1]).endOf("day").toISOString()]
+                createdAtTo: dates
+                  ? dayjs(dates[1]).endOf("day").toISOString()
                   : null,
               });
             }}
           />
         </div>
       )}
+
       <div>
         <p className="mb-2">Trạng thái vé</p>
         <Select
           defaultValue={query.status || ""}
           placeholder="Chọn trạng thái vé"
           options={[
-            {
-              value: "",
-              label: "Tất cả trạng thái",
-            },
+            { value: "", label: "Tất cả trạng thái" },
             ...Object.entries(ORDER_OPTIONS_STATUS).map(([key, value]) => ({
               label: value,
               value: key,
             })),
           ]}
           allowClear
-          onChange={(e) => onFilter({ status: [e] })}
+          onChange={(v) => onFilter({ status: v || null })}
           style={{ width: 150 }}
         />
       </div>
+
       {movies && (
         <div>
           <p className="mb-2">Lọc theo phim</p>
@@ -119,8 +121,8 @@ const FilterOrder = () => {
             placeholder="Chọn phim"
             defaultValue={query.movieId || ""}
             allowClear
-            style={{ width: 200 }}
-            onChange={(e) => onFilter({ movieId: [e] })}
+            style={{ width: 240 }}
+            onChange={(v) => onFilter({ movieId: v || null })}
             optionFilterProp="label"
             optionLabelProp="label"
             filterOption={(input, option) =>
@@ -130,6 +132,7 @@ const FilterOrder = () => {
             <Select.Option value="" label="Tất cả phim">
               Tất cả phim
             </Select.Option>
+
             <Select.OptGroup label="Đang chiếu">
               {movies
                 ?.filter((m) => m.statusRelease === "nowShowing")
@@ -150,6 +153,7 @@ const FilterOrder = () => {
                   </Select.Option>
                 ))}
             </Select.OptGroup>
+
             <Select.OptGroup label="Sắp chiếu">
               {movies
                 ?.filter((m) => m.statusRelease === "upcoming")
@@ -170,6 +174,7 @@ const FilterOrder = () => {
                   </Select.Option>
                 ))}
             </Select.OptGroup>
+
             <Select.OptGroup label="Đã chiếu">
               {movies
                 ?.filter((m) => m.statusRelease === "released")
@@ -193,28 +198,21 @@ const FilterOrder = () => {
           </Select>
         </div>
       )}
+
       {rooms && (
         <div>
           <p className="mb-2">Phòng chiếu</p>
-          {rooms && (
-            <Select
-              defaultValue={query.createdAt || ""}
-              allowClear
-              onChange={(e) => onFilter({ roomName: [e] })}
-              placeholder="Chọn phòng chiếu"
-              options={[
-                {
-                  label: "Tất cả phòng chiếu",
-                  value: "",
-                },
-                ...rooms.map((item) => ({
-                  label: item.name,
-                  value: item.name,
-                })),
-              ]}
-              style={{ width: 150 }}
-            />
-          )}
+          <Select
+            defaultValue={query.roomName || ""}
+            allowClear
+            onChange={(v) => onFilter({ roomName: v || null })}
+            placeholder="Chọn phòng chiếu"
+            options={[
+              { label: "Tất cả phòng chiếu", value: "" },
+              ...rooms.map((item) => ({ label: item.name, value: item.name })),
+            ]}
+            style={{ width: 180 }}
+          />
         </div>
       )}
     </div>
