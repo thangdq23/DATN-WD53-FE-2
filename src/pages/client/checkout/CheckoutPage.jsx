@@ -133,23 +133,37 @@ const CheckoutPage = () => {
 
   const handleCheckout = async () => {
     const values = await form.validateFields();
+    console.log("Checkout form values:", values);
+    
+    // Ensure robust fallback for roomName and movieName
+    const finalRoomName = roomSeatData?.data?.name || roomSeatData?.name || roomId;
+    const finalMovieName = movieName || showtimeRes?.data?.movie?.name || "Unknown Movie";
+
     const payload = {
+      userId,
       showtimeId,
       movieId,
-      movieName: movieName,
+      movieName: finalMovieName,
       roomId,
-      roomName: roomSeatData.data.name,
-      startTime: showtimeRes.data.startTime,
+      roomName: finalRoomName,
+      startTime: showtimeRes?.data?.startTime,
       totalAmount: total,
-      seats: myHoldSeats.map((item) => {
-        return {
-          ...item,
-          seatId: item._id,
-          price: item.price.find((price) => price.seatType === item.type).value,
-        };
-      }),
-      ...values,
+      seats: myHoldSeats.map((item) => ({
+        _id: item._id,
+        seatId: item._id,
+        label: item.label,
+        type: item.type,
+        price: item.price?.find((p) => p.seatType === item.type)?.value || 0,
+      })),
+      returnUrl: `${window.location.origin}/payment/success`,
+      cancelUrl: `${window.location.origin}/`,
+      customerInfo: values.customerInfo,
+      email: values.customerInfo?.email,
+      phone: values.customerInfo?.phone,
+      userName: values.customerInfo?.userName,
     };
+    
+    console.log("Checkout Payload:", payload);
     mutate(payload);
   };
   return (
