@@ -1,7 +1,10 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { FaFilm, FaUser, FaSignOutAlt } from "react-icons/fa";
+import { FaFilm } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useAuthSelector } from "../../../store/useAuthStore";
+import { Avatar, Button, Dropdown, List, Popover } from "antd";
+import { useUserSelector } from "../../../store/useUserStore";
+import dayjs from "dayjs";
 
 const Header = () => {
   const nav = useNavigate();
@@ -9,6 +12,8 @@ const Header = () => {
     user: state.user,
     logout: state.doLogout,
   }));
+
+  const tickets = useUserSelector((s) => s.tickets || []);
 
   const navItems = [
     { path: "/", label: "Trang Chủ" },
@@ -69,31 +74,79 @@ const Header = () => {
         <div className="flex items-center gap-4 font-sans text-[15px]">
           {user ? (
             <>
-              <p className={`${navColorBase} m-0`}>Xin chào, {user.userName}</p>
-
-              <button
-                type="button"
-                onClick={() => {
-                  try {
-                    logout();
-                    nav("/");
-                    nav(0);
-                  } catch {
-                    logout();
-                    window.location.href = "/";
-                  }
-                }}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-full text-white font-semibold shadow-sm hover:opacity-90"
-                style={{
-                  background: "linear-gradient(90deg, #2f0fe4ff, #4c57eeff)",
-                  border: "none",
-                  color: "#fff",
-                }}
-                title="Đăng xuất"
+              <Popover
+                placement="bottomRight"
+                trigger="click"
+                content={() => (
+                  <div style={{ minWidth: 260 }}>
+                    <div className="p-3 border-b">
+                      <div className="font-semibold">{user.userName}</div>
+                      <div className="text-sm text-gray-500">{user.email}</div>
+                    </div>
+                    <div className="p-2 border-b">
+                      <div className="font-semibold mb-2">Vé gần đây</div>
+                      <div>
+                        {tickets.length === 0 ? (
+                          <div className="text-sm text-gray-500">
+                            Chưa có vé
+                          </div>
+                        ) : (
+                          <List
+                            size="small"
+                            dataSource={tickets.slice(0, 5)}
+                            renderItem={(it) => (
+                              <List.Item>
+                                <div className="w-full">
+                                  <div className="text-sm font-medium">
+                                    {it.movieName}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    {dayjs(it.startTime).format("DD/MM HH:mm")}{" "}
+                                    • {it.ticketId}
+                                  </div>
+                                </div>
+                              </List.Item>
+                            )}
+                          />
+                        )}
+                      </div>
+                    </div>
+                    <div className="p-2 flex gap-2">
+                      <Link to="/user/profile">
+                        <Button size="small">Trang cá nhân</Button>
+                      </Link>
+                      <Link to="/user/tickets">
+                        <Button size="small">Lịch sử</Button>
+                      </Link>
+                      <Button
+                        size="small"
+                        danger
+                        onClick={() => {
+                          try {
+                            logout();
+                            nav("/");
+                            nav(0);
+                          } catch {
+                            logout();
+                            window.location.href = "/";
+                          }
+                        }}
+                      >
+                        Đăng xuất
+                      </Button>
+                    </div>
+                  </div>
+                )}
               >
-                <FaSignOutAlt />
-                <span>Đăng xuất</span>
-              </button>
+                <div className="flex items-center gap-3 cursor-pointer">
+                  <Avatar size={36} style={{ backgroundColor: "#2f0fe4" }}>
+                    {(user.userName || "").charAt(0).toUpperCase()}
+                  </Avatar>
+                  <span className={`${navColorBase} hidden md:inline-block`}>
+                    {user.userName}
+                  </span>
+                </div>
+              </Popover>
             </>
           ) : (
             <>
@@ -103,7 +156,6 @@ const Header = () => {
                 style={{ color: "#fff" }}
               >
                 Đăng ký
-                <FaUser className="text-white" />
               </Link>
 
               <Link
