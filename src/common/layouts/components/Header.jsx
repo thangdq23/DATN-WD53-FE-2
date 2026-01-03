@@ -3,8 +3,6 @@ import { FaFilm } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useAuthSelector } from "../../../store/useAuthStore";
 import { Avatar, Button, Dropdown, List, Popover } from "antd";
-import { useUserSelector } from "../../../store/useUserStore";
-import dayjs from "dayjs";
 
 const Header = () => {
   const nav = useNavigate();
@@ -13,7 +11,7 @@ const Header = () => {
     logout: state.doLogout,
   }));
 
-  const tickets = useUserSelector((s) => s.tickets || []);
+  // intentionally not reading tickets here; kept selector import for future use
 
   const navItems = [
     { path: "/", label: "Trang Chủ" },
@@ -77,48 +75,40 @@ const Header = () => {
               <Popover
                 placement="bottomRight"
                 trigger="click"
-                content={() => (
-                  <div style={{ minWidth: 260 }}>
-                    <div className="p-3 border-b">
-                      <div className="font-semibold">{user.userName}</div>
-                      <div className="text-sm text-gray-500">{user.email}</div>
-                    </div>
-                    <div className="p-2 border-b">
-                      <div className="font-semibold mb-2">Vé gần đây</div>
+                content={
+                  <div
+                    style={{ minWidth: 260 }}
+                    className="rounded-md overflow-hidden shadow-md bg-white"
+                  >
+                    <div className="p-4 flex items-center gap-3">
+                      <Avatar size={48} style={{ backgroundColor: "#2f0fe4" }}>
+                        {(user.userName || "").charAt(0).toUpperCase()}
+                      </Avatar>
                       <div>
-                        {tickets.length === 0 ? (
-                          <div className="text-sm text-gray-500">
-                            Chưa có vé
-                          </div>
-                        ) : (
-                          <List
-                            size="small"
-                            dataSource={tickets.slice(0, 5)}
-                            renderItem={(it) => (
-                              <List.Item>
-                                <div className="w-full">
-                                  <div className="text-sm font-medium">
-                                    {it.movieName}
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    {dayjs(it.startTime).format("DD/MM HH:mm")}{" "}
-                                    • {it.ticketId}
-                                  </div>
-                                </div>
-                              </List.Item>
-                            )}
-                          />
-                        )}
+                        <div className="font-semibold text-gray-800">
+                          {user.userName}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {user.email}
+                        </div>
                       </div>
                     </div>
-                    <div className="p-2 flex gap-2">
-                      <Link to="/user/profile">
-                        <Button size="small">Trang cá nhân</Button>
+                    <div className="border-t" />
+                    <div className="p-3 flex items-center gap-2">
+                      <Link to="/user/profile" className="w-full">
+                        <Button block size="small">
+                          Trang cá nhân
+                        </Button>
                       </Link>
-                      <Link to="/user/tickets">
-                        <Button size="small">Lịch sử</Button>
+                      <Link to="/user/tickets" className="w-full">
+                        <Button block size="small">
+                          Lịch sử
+                        </Button>
                       </Link>
+                    </div>
+                    <div className="p-3">
                       <Button
+                        block
                         size="small"
                         danger
                         onClick={() => {
@@ -136,7 +126,7 @@ const Header = () => {
                       </Button>
                     </div>
                   </div>
-                )}
+                }
               >
                 <div className="flex items-center gap-3 cursor-pointer">
                   <Avatar size={36} style={{ backgroundColor: "#2f0fe4" }}>
