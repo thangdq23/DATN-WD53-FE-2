@@ -14,6 +14,7 @@ import CreateMovieShowtime from "../pages/admin/showtime/create/CreateMovieShowt
 import ListUser from "../pages/admin/user/ListUser";
 import BannerManager from "../pages/admin/banner/BannerManager";
 import ListOrder from "../pages/admin/order/ListOrder";
+import ScanOrderQR from "../pages/admin/order/ScanOrderQR";
 
 export const AdminRoutes = [
   {
@@ -24,10 +25,12 @@ export const AdminRoutes = [
         index: true,
         element: <DashboardPage />,
       },
+
       {
         path: "genres",
         element: <GenrePage />,
       },
+
       {
         path: "movies",
         children: [
@@ -49,6 +52,7 @@ export const AdminRoutes = [
           },
         ],
       },
+
       {
         path: "rooms",
         children: [
@@ -66,6 +70,7 @@ export const AdminRoutes = [
           },
         ],
       },
+
       {
         path: "showtimes",
         element: <ListShowtime />,
@@ -78,17 +83,29 @@ export const AdminRoutes = [
         path: "showtimes/movie/:id",
         element: <ListShowtimeInMovie />,
       },
+
       {
         path: "users",
         element: <ListUser />,
       },
+
       {
         path: "banners",
         element: <BannerManager />,
       },
+
       {
         path: "ticket",
-        element: <ListOrder />,
+        children: [
+          {
+            index: true,
+            element: <ListOrder />,
+          },
+          {
+            path: "qr",
+            element: <ScanOrderQR />,
+          },
+        ],
       },
     ],
   },
