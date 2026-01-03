@@ -15,6 +15,8 @@ import NewsDetailPage from "../pages/client/home/components/NewsDetailPage";
 import CheckoutPage from "../pages/client/checkout/CheckoutPage";
 import PaymentSuccess from "../pages/client/checkout/PaymentSuccess";
 import PaymentFailed from "../pages/client/checkout/PaymentFailed";
+import ProfilePage from "../pages/client/user/ProfilePage";
+import MyTicketsPage from "../pages/client/user/MyTicketsPage";
 
 export const MainRoutes = [
   {
@@ -34,7 +36,7 @@ export const MainRoutes = [
         ],
       },
       {
-        path: "about",
+        path: "about", // thêm route cho AboutPage
         element: <AboutPage />,
       },
       {
@@ -73,10 +75,29 @@ export const MainRoutes = [
         path: "checkout/:showtimeId/:roomId",
         element: <CheckoutPage />,
       },
+      {
+        path: "user",
+        children: [
+          { path: "profile", element: <ProfilePage /> },
+          { path: "tickets", element: <MyTicketsPage /> },
+        ],
+      },
+      {
+        path: "payment",
+        children: [
+          {
+            path: "success/:id",
+            element: <PaymentSuccess />,
+          },
+          {
+            path: "failed",
+            element: <PaymentFailed />,
+          },
+        ],
+      },
     ],
   },
 
- 
   {
     path: "auth",
     element: <AuthLayout />,
