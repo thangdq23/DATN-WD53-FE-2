@@ -36,7 +36,7 @@ export const MainRoutes = [
         ],
       },
       {
-        path: "about",       // thêm route cho AboutPage
+        path: "about", // thêm route cho AboutPage
         element: <AboutPage />,
       },
       {
@@ -76,22 +76,28 @@ export const MainRoutes = [
         element: <CheckoutPage />,
       },
       {
+        path: "user",
+        children: [
+          { path: "profile", element: <ProfilePage /> },
+          { path: "tickets", element: <MyTicketsPage /> },
+        ],
+      },
+      {
         path: "payment",
-        children:[
+        children: [
           {
-            path:"success/:id",
-            element:<PaymentSuccess/>
+            path: "success/:id",
+            element: <PaymentSuccess />,
           },
           {
-            path:"failed",
-            element:<PaymentFailed/>
-          }
-        ]
-      }
+            path: "failed",
+            element: <PaymentFailed />,
+          },
+        ],
+      },
     ],
   },
 
- 
   {
     path: "auth",
     element: <AuthLayout />,
