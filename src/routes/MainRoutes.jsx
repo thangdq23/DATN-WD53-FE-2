@@ -34,15 +34,15 @@ export const MainRoutes = [
         ],
       },
       {
-        path: "about",       // thêm route cho AboutPage
+        path: "about",
         element: <AboutPage />,
       },
       {
-        path: "contact",       
+        path: "contact",
         element: <ContactPage />,
       },
       {
-        path: "lien-he",       
+        path: "lien-he",
         element: <ContactPage />,
       },
       {
@@ -73,21 +73,10 @@ export const MainRoutes = [
         path: "checkout/:showtimeId/:roomId",
         element: <CheckoutPage />,
       },
-      {
-        path: "payment",
-        children:[
-          {
-            path:"success/:id",
-            element:<PaymentSuccess/>
-          },
-          {
-            path:"failed",
-            element:<PaymentFailed/>
-          }
-        ]
-      }
     ],
   },
+
+ 
   {
     path: "auth",
     element: <AuthLayout />,
@@ -99,6 +88,20 @@ export const MainRoutes = [
       {
         path: "login",
         element: <LoginPage />,
+      },
+    ],
+  },
+
+  {
+    path: "payment",
+    children: [
+      {
+        path: "success/:id",
+        element: <PaymentSuccess />,
+      },
+      {
+        path: "failed",
+        element: <PaymentFailed />,
       },
     ],
   },
