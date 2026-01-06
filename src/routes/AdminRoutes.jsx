@@ -15,6 +15,7 @@ import ListUser from "../pages/admin/user/ListUser";
 import BannerManager from "../pages/admin/banner/BannerManager";
 import ListOrder from "../pages/admin/order/ListOrder";
 import ScanOrderQR from "../pages/admin/order/ScanOrderQR";
+import OrderDetail from "../pages/admin/order/OrderDetail";
 
 export const AdminRoutes = [
   {
@@ -100,6 +101,10 @@ export const AdminRoutes = [
           {
             index: true,
             element: <ListOrder />,
+          },
+          {
+            path: "detail/:id",
+            element: <OrderDetail/>
           },
           {
             path: "qr",
