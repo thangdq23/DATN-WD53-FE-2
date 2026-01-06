@@ -19,10 +19,10 @@ const AdminLayout = () => {
     { key: "/admin/movies", label: "Quản lý phim" },
     { key: "/admin/rooms", label: "Quản lý phòng chiếu" },
     { key: "/admin/showtimes", label: "Quản lý lịch chiếu" },
-    { key: "/admin/ticket", label: "Quản lý vé"},
+    { key: "/admin/ticket", label: "Quản lý vé" },
+    { key: "/admin/ticket", label: "Quản lý vé" },
     { key: "/admin/banners", label: "Quản lý banner" },
     { key: "/admin/users", label: "Quản lý người dùng" },
-
   ];
 
   return (
@@ -87,7 +87,9 @@ const AdminLayout = () => {
               Modal.confirm({
                 centered: true,
                 title: "Đăng xuất",
-                icon: <ExclamationCircleOutlined style={{ color: "#ef4444" }} />,
+                icon: (
+                  <ExclamationCircleOutlined style={{ color: "#ef4444" }} />
+                ),
                 content: "Bạn có chắc chắn muốn đăng xuất không?",
                 okText: "Đăng xuất",
                 cancelText: "Hủy",
