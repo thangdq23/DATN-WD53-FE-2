@@ -8,18 +8,38 @@ import {
   VideoCameraOutlined,
   ShoppingCartOutlined,
 } from "@ant-design/icons";
-import { Card, Empty, Collapse, QRCode } from "antd";
-import { useUserSelector } from "../../../store/useUserStore";
+import { Card, Empty, Collapse, QRCode, Button } from "antd";
+import { useEffect, useRef, useState } from "react";
+import useUserStore, { useUserSelector } from "../../../store/useUserStore";
+import * as htmlToImage from "html-to-image";
 import dayjs from "dayjs";
 import { ORDER_STATUS } from "../../../common/constants/order";
 import { formatCurrency } from "../../../common/utils";
 
 const MyTicketsPage = () => {
   const tickets = useUserSelector((s) => s.tickets || []);
+  const [loading, setLoading] = useState(false);
+  const panelRefs = useRef({});
+
+  useEffect(() => {
+    const fetch = async () => {
+      setLoading(true);
+      try {
+        await useUserStore.getState().fetchMyTickets();
+      } catch (e) {
+        // ignore
+      }
+      setLoading(false);
+    };
+
+    fetch();
+  }, []);
 
   return (
     <div className="mt-8 py-8">
-      {tickets.length === 0 ? (
+      {loading ? (
+        <Card title="Lịch sử vé" loading />
+      ) : tickets.length === 0 ? (
         <Card title="Lịch sử vé">
           <Empty description="Bạn chưa có vé nào" />
         </Card>
@@ -65,6 +85,11 @@ const MyTicketsPage = () => {
                 }
               >
                 <div
+                  ref={(el) => {
+                    if (!item?.ticketId) return;
+                    if (!panelRefs.current) panelRefs.current = {};
+                    panelRefs.current[item.ticketId] = el;
+                  }}
                   className="min-h-screen max-w-7xl xl:mx-auto mx-0 grid gap-4"
                   style={{ gridTemplateColumns: "2fr 1fr" }}
                 >
@@ -85,6 +110,7 @@ const MyTicketsPage = () => {
                               <div className="bg-blue-400/30 text-blue-500 px-3 py-3 rounded-lg justify-center flex items-center">
                                 <EnvironmentOutlined />
                               </div>
+                              {/* button moved to below ticket grid to avoid overlap */}
                               <div>
                                 <p className="text-gray-500 mb-0!">
                                   Phòng chiếu
@@ -221,6 +247,32 @@ const MyTicketsPage = () => {
                             {dayjs(item?.createdAt).format("HH:mm DD/MM/YYYY")}
                           </p>
                         </div>
+                      </div>
+                    </Card>
+                    <Card>
+                      <div className=" flex justify-start items-start">
+                        <Button
+                          onClick={async () => {
+                            try {
+                              const node = panelRefs.current?.[item?.ticketId];
+                              if (!node) return;
+                              const dataUrl = await htmlToImage.toPng(node, {
+                                backgroundColor: "#1435a1ff",
+                                cacheBust: true,
+                              });
+                              const a = document.createElement("a");
+                              a.href = dataUrl;
+                              a.download = `${item?.ticketId || "ticket"}.png`;
+                              document.body.appendChild(a);
+                              a.click();
+                              a.remove();
+                            } catch (e) {
+                              console.error(e);
+                            }
+                          }}
+                        >
+                          Lưu vé
+                        </Button>
                       </div>
                     </Card>
                   </div>

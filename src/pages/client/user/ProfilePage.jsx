@@ -13,7 +13,7 @@ import {
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useEffect } from "react";
-import { useUserSelector, useUserStore } from "../../../store/useUserStore";
+import useUserStore, { useUserSelector } from "../../../store/useUserStore";
 import { useAuthSelector } from "../../../store/useAuthStore";
 
 const ProfilePage = () => {
@@ -37,8 +37,10 @@ const ProfilePage = () => {
     try {
       const payload = { ...profile, ...values };
       const res = await updateProfile(payload);
-      if (res?.data) {
-        message.success("Cập nhật thông tin thành công");
+      if (res?.success) {
+        message.success(res?.message || "Cập nhật thông tin thành công");
+      } else {
+        message.error(res?.message || "Cập nhật thất bại");
       }
     } catch {
       message.error("Cập nhật thất bại");
@@ -59,9 +61,6 @@ const ProfilePage = () => {
                   {profile?.userName}
                 </p>
                 <p className="text-gray-500 mb-4">{profile?.email}</p>
-                <Upload showUploadList={false} beforeUpload={() => false}>
-                  <Button icon={<UploadOutlined />}>Tải ảnh đại diện</Button>
-                </Upload>
                 <Divider />
                 <div className="w-full text-left">
                   <p className="text-xs text-gray-500">Số điện thoại</p>
