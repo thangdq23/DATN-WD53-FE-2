@@ -107,7 +107,7 @@ const ListOrder = () => {
       render: (_, record) => (
         <Space>
           
-          <Link to={`/admin/ticket/${record._id}`}>
+          <Link to={`/admin/ticket/detail/${record._id}`}>
             <Button icon={<EyeOutlined />} />
           </Link>
         </Space>
