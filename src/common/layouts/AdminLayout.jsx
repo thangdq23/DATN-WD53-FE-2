@@ -20,7 +20,6 @@ const AdminLayout = () => {
     { key: "/admin/rooms", label: "Quản lý phòng chiếu" },
     { key: "/admin/showtimes", label: "Quản lý lịch chiếu" },
     { key: "/admin/ticket", label: "Quản lý vé" },
-    { key: "/admin/ticket", label: "Quản lý vé" },
     { key: "/admin/banners", label: "Quản lý banner" },
     { key: "/admin/users", label: "Quản lý người dùng" },
   ];
