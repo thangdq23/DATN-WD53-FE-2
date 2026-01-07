@@ -48,7 +48,8 @@ const ShowtimePicker = () => {
       });
     }
     sortedDays.sort((a, b) => a.valueOf() - b.valueOf());
-    return sortedDays;
+    // Only show up to the next 5 available days
+    return sortedDays.slice(0, 5);
   }, [allShowtimesData]);
 
   const [selectedDate, setSelectedDate] = useState(null);

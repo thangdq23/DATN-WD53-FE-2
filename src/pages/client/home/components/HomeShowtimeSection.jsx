@@ -58,7 +58,9 @@ const HomeShowtimeSection = () => {
         ) : (
           <div className="space-y-6">
             {movies.map((m) => {
-              const age = getAgeBadge(m.ageRequire || m.age || m.ageRestriction);
+              const age = getAgeBadge(
+                m.ageRequire || m.age || m.ageRestriction,
+              );
               return (
                 <FM.div
                   key={m._id}
@@ -108,11 +110,11 @@ const HomeShowtimeSection = () => {
           </div>
         )}
       </div>
-      
+
       <div className="mt-4 ml-6">
         <Link
           to="/showtimes"
-          className="inline-block px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg shadow-md font-medium text-white"
+          className="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg shadow-md font-medium text-white"
         >
           Xem tất cả lịch chiếu
         </Link>
@@ -148,12 +150,14 @@ const MovieTimes = ({ movieId, selected }) => {
         const isPast = isToday && start.isBefore(dayjs());
         const baseClass = isPast
           ? "border-white/10 text-gray-500 pointer-events-none"
-          : "border-red-500 text-red-500 hover:bg-gradient-to-r hover:from-[#ff4d4f] hover:to-[#ff2d2d] hover:text-white hover:border-[#ff4d4f] shadow-red-500/20 shadow-sm";
+          : "border-blue-500 text-blue-500 hover:bg-gradient-to-r hover:from-[#155dfc] hover:to-[#155dfc] hover:text-white hover:border-[#155dfc] shadow-blue-500/20 shadow-sm";
         const roomId = s.roomId?._id || s.roomId;
         return (
           <Link
             key={s._id}
-            to={`/showtime/${movieId}/${s._id}/${roomId}?hour=${start.format("HH:mm")}&movieId=${movieId}`}
+            to={`/showtime/${movieId}/${s._id}/${roomId}?hour=${start.format(
+              "HH:mm",
+            )}&movieId=${movieId}`}
             className={`min-w-[84px] px-3 py-2 rounded-lg text-sm flex flex-col items-center border transition-all ${baseClass} group`}
             title={
               minPrice ? `Giá từ ${minPrice.toLocaleString()}đ` : undefined
@@ -165,7 +169,7 @@ const MovieTimes = ({ movieId, selected }) => {
           >
             <span
               className={`font-semibold ${
-                isPast ? "" : "text-red-500 group-hover:text-white"
+                isPast ? "" : "text-blue-500 group-hover:text-white"
               }`}
             >
               {start.format("HH:mm")}

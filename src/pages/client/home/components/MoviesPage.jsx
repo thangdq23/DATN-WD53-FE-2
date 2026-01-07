@@ -14,7 +14,19 @@ const AGE_MAP = {
   K: ["P", "K"],
   T13: ["P", "K", "T13", "C13", "C13+"],
   T16: ["P", "K", "T13", "C13", "C13+", "T16", "C16", "C16+"],
-  T18: ["P", "K", "T13", "C13", "C13+", "T16", "C16", "C16+", "T18", "C18", "C18+"],
+  T18: [
+    "P",
+    "K",
+    "T13",
+    "C13",
+    "C13+",
+    "T16",
+    "C16",
+    "C16+",
+    "T18",
+    "C18",
+    "C18+",
+  ],
 };
 
 const MoviesPage = () => {
@@ -22,13 +34,15 @@ const MoviesPage = () => {
   const [genre, setGenre] = useState(undefined);
   const [age, setAge] = useState(undefined);
 
-  
-  const { data: moviesRaw, isLoading, error } = useQuery({
+  const {
+    data: moviesRaw,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["client-movies"],
     queryFn: () => getAllMovie({ status: true }),
   });
 
-  
   const movies = useMemo(() => {
     if (!moviesRaw) return [];
 
@@ -41,14 +55,12 @@ const MoviesPage = () => {
     return [];
   }, [moviesRaw]);
 
-  
   const genreOptions = useMemo(() => {
     const map = new Map();
 
     movies.forEach((m) => {
       if (Array.isArray(m?.genreIds)) {
         m.genreIds.forEach((g) => {
-         
           if (g && typeof g === "object") {
             const id = g?._id;
             const name = g?.name;
@@ -63,7 +75,6 @@ const MoviesPage = () => {
       .sort((a, b) => a.label.localeCompare(b.label));
   }, [movies]);
 
- 
   console.log("[MoviesPage] isLoading =", isLoading);
   console.log("[MoviesPage] error =", error);
   console.log("[MoviesPage] moviesRaw =", moviesRaw);
@@ -78,22 +89,19 @@ const MoviesPage = () => {
   const filteredMovies = useMemo(() => {
     let list = movies;
 
-    
     if (search) {
       const q = search.trim().toLowerCase();
       list = list.filter((m) => (m?.name || "").toLowerCase().includes(q));
     }
 
-   
     if (genre) {
       list = list.filter(
         (m) =>
           Array.isArray(m?.genreIds) &&
-          m.genreIds.some((g) => String(g?._id) === String(genre))
+          m.genreIds.some((g) => String(g?._id) === String(genre)),
       );
     }
 
-    
     if (age) {
       const allowed = AGE_MAP[age] || [];
       list = list.filter((m) => allowed.includes(m?.ageRestriction));
@@ -104,7 +112,6 @@ const MoviesPage = () => {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-     
       <section className="relative h-[420px] flex items-center justify-center text-center overflow-hidden">
         <img
           src={bannerImg}
@@ -128,7 +135,6 @@ const MoviesPage = () => {
         </FM.div>
       </section>
 
-      
       <div className="max-w-7xl mx-auto px-6 pt-6">
         <Row gutter={[12, 12]}>
           <Col xs={24} md={8}>
@@ -175,13 +181,9 @@ const MoviesPage = () => {
           </Col>
         </Row>
 
-        
-        <div style={{ marginTop: 8, color: "#999", fontSize: 12 }}>
-          debug: movies={movies.length} | genres={genreOptions.length}
-        </div>
+        <div style={{ marginTop: 8, color: "#999", fontSize: 12 }}></div>
       </div>
 
-     
       <div className="max-w-7xl mx-auto px-6 py-16">
         {isLoading ? (
           <div className="flex items-center justify-center min-h-[30vh]">
