@@ -100,11 +100,11 @@ const Header = () => {
                           Trang cá nhân
                         </Button>
                       </Link>
-                      <Link to="/user/tickets" className="w-full">
+                      {/* <Link to="/user/tickets" className="w-full">
                         <Button block size="small">
                           Lịch sử
                         </Button>
-                      </Link>
+                      </Link> */}
                     </div>
                     <div className="p-3">
                       <Button

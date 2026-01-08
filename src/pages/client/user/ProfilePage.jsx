@@ -16,7 +16,10 @@ import {
   Progress,
   Badge,
   Modal,
-  Spin
+  Spin,
+  Empty,
+  Collapse,
+  QRCode
 } from "antd";
 import { 
   UploadOutlined, 
@@ -26,19 +29,31 @@ import {
   UserOutlined, 
   LockOutlined, 
   HistoryOutlined,
-  CheckCircleOutlined,
   ClockCircleOutlined,
+  CreditCardOutlined,
   EnvironmentOutlined,
-  IdcardOutlined
+  QrcodeOutlined,
+  StopFilled,
+  VideoCameraOutlined,
+  ShoppingCartOutlined,
+  CheckCircleOutlined,
+  IdcardOutlined,
+  DownloadOutlined
 } from "@ant-design/icons";
+import * as htmlToImage from 'html-to-image';
+import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import useUserStore, { useUserSelector } from "../../../store/useUserStore";
 import { useAuthSelector } from "../../../store/useAuthStore";
+import { ORDER_STATUS } from "../../../common/constants/order";
+import { formatCurrency } from "../../../common/utils";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const profile = useUserSelector((s) => s.profile);
   const [form] = Form.useForm();
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar || '');
@@ -46,9 +61,39 @@ const ProfilePage = () => {
   const [avatarLoading, setAvatarLoading] = useState(false);
   const [changePasswordVisible, setChangePasswordVisible] = useState(false);
   const [passwordForm] = Form.useForm();
+  const [ticketLoading, setTicketLoading] = useState(false);
+  const tickets = useUserSelector((s) => s.tickets || []);
+  const panelRefs = useRef({});
   const setProfile = useUserStore((s) => s.setProfile);
   const updateProfile = useUserStore((s) => s.updateProfile);
   const authUser = useAuthSelector((s) => s.user);
+  // Fetch tickets when component mounts
+  useEffect(() => {
+    const fetch = async () => {
+      setLoading(true);
+      try {
+        await useUserStore.getState().fetchMyTickets();
+      } catch (e) {
+        // ignore
+      }
+      setLoading(false);
+    };
+
+    fetch();
+  }, []);
+  useEffect(() => {
+    const fetchTickets = async () => {
+      setTicketLoading(true);
+      try {
+        await useUserStore.getState().fetchMyTickets();
+      } catch (e) {
+        console.error('Error fetching tickets:', e);
+      }
+      setTicketLoading(false);
+    };
+
+    fetchTickets();
+  }, []);
 
   useEffect(() => {
     if (!profile && authUser) setProfile(authUser);
@@ -178,6 +223,7 @@ const ProfilePage = () => {
     '&:hover': {
       transform: 'scale(1.1)'
     }
+    
   };
 
   return (
@@ -375,14 +421,7 @@ const ProfilePage = () => {
                     <Progress percent={70} showInfo={false} status="active" style={{ marginTop: '8px' }} />
                   </div>
                   <Divider />
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <Text strong>Xác thực hai yếu tố (2FA)</Text>
-                      <Tag color="orange">Chưa bật</Tag>
-                    </div>
-                    <Text type="secondary">Bảo mật tài khoản của bạn thêm một lớp bảo vệ</Text>
-                    <Button type="primary" ghost style={{ marginTop: '16px' }}>Thiết lập 2FA</Button>
-                  </div>
+               
                 </div>
               </Card>
             </TabPane>
@@ -395,50 +434,315 @@ const ProfilePage = () => {
               }
               key="3"
             >
-              <div style={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                padding: '60px 0',
-                textAlign: 'center'
-              }}>
-                <div style={{ marginBottom: '24px' }}>
-                  <svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M180 40H20C8.9543 40 0 48.9543 0 60V140C0 151.046 8.9543 160 20 160H180C191.046 160 200 151.046 200 140V60C200 48.9543 191.046 40 180 40Z" fill="#F5F5F5"/>
-                    <path d="M160 40H40V20C40 8.9543 48.9543 0 60 0H140C151.046 0 160 8.9543 160 20V40Z" fill="#E6F7FF"/>
-                    <path d="M140 60H60V120H140V60Z" fill="#D9F7BE"/>
-                    <path d="M80 80H60V100H80V80Z" fill="#52C41A"/>
-                    <path d="M120 80H100V100H120V80Z" fill="#52C41A"/>
-                    <path d="M140 100H60V120H140V100Z" fill="#B7EB8F"/>
-                    <path d="M100 60V40H120V60H100Z" fill="#91D5FF"/>
-                  </svg>
-                </div>
-                <Title level={4} style={{ marginBottom: '8px' }}>Chưa có lịch sử đặt vé</Title>
-                <Text type="secondary" style={{ marginBottom: '24px', maxWidth: '400px' }}>
-                  Bạn chưa có lịch sử đặt vé nào. Hãy bắt đầu đặt vé ngay để trải nghiệm dịch vụ của chúng tôi.
-                </Text>
-                <Button 
-                  type="primary" 
-                  size="large"
-                  style={{
-                    background: 'linear-gradient(90deg, #1890ff 0%, #36cfc9 100%)',
-                    border: 'none',
-                    boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)',
-                    padding: '0 32px',
-                    height: '44px',
-                    borderRadius: '22px',
-                    fontWeight: 500,
-                    transition: 'all 0.3s',
-                    ':hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 6px 16px rgba(24, 144, 255, 0.4)'
-                    }
+                <div className="mt-8 py-8">
+      {loading ? (
+        <Card  loading />
+      ) : tickets.length === 0 ? (
+        <Card >
+          <Empty description="Bạn chưa có vé nào" />
+        </Card>
+      ) : (
+        <Card >
+          <Collapse accordion={false}>
+            {tickets.map((item, idx) => (
+              <Collapse.Panel
+                key={item?.ticketId || idx}
+                header={
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-4">
+                      <img
+                        src={item?.moviePoster}
+                        className="h-16 w-12 rounded-md object-cover"
+                        alt=""
+                      />
+                      <div>
+                        <div className="font-semibold">{item?.movieName}</div>
+                        <div className="text-sm text-gray-500">
+                          {item?.roomName} • {item?.ticketId}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm">
+                        {dayjs(item?.startTime).format("HH:mm DD/MM/YYYY")}
+                      </div>
+                      <div className="mt-1">
+                        <span
+                          className="px-2 py-1 rounded text-xs"
+                          style={{
+                            backgroundColor:
+                              ORDER_STATUS[item?.status]?.bgColor,
+                            color: ORDER_STATUS[item?.status]?.color,
+                          }}
+                        >
+                          {ORDER_STATUS[item?.status]?.label}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                }
+              >
+                <div
+                  ref={(el) => {
+                    if (!item?.ticketId) return;
+                    if (!panelRefs.current) panelRefs.current = {};
+                    panelRefs.current[item.ticketId] = el;
                   }}
+                  className="min-h-screen max-w-7xl xl:mx-auto mx-0 grid gap-4"
+                  style={{ gridTemplateColumns: "2fr 1fr" }}
                 >
-                  Đặt vé ngay
-                </Button>
-              </div>
+                  <div>
+                    <Card className="shadow-md!">
+                      <div className="flex items-start gap-8">
+                        <img
+                          src={item?.moviePoster}
+                          className="h-64 w-48 rounded-lg object-cover"
+                          alt=""
+                        />
+                        <div>
+                          <p className="font-semibold text-lg">
+                            {item?.movieName}
+                          </p>
+                          <div className="flex flex-col gap-4">
+                            <div className="flex items-center gap-2">
+                              <div className="bg-blue-400/30 text-blue-500 px-3 py-3 rounded-lg justify-center flex items-center">
+                                <EnvironmentOutlined />
+                              </div>
+                              <div>
+                                <p className="text-gray-500 mb-0!">
+                                  Phòng chiếu
+                                </p>
+                                <p className="font-semibold mb-0!">
+                                  {item?.roomName}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="bg-blue-400/30 text-blue-500 px-3 py-3 rounded-lg justify-center flex items-center">
+                                <ClockCircleOutlined />
+                              </div>
+                              <div>
+                                <p className="text-gray-500 mb-0!">
+                                  Suất chiếu
+                                </p>
+                                <p className="font-semibold mb-0!">
+                                  {dayjs(item?.startTime).format(
+                                    "HH:mm DD/MM/YYYY",
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div
+                                style={{
+                                  backgroundColor:
+                                    ORDER_STATUS[item?.status]?.bgColor,
+                                  color: ORDER_STATUS[item?.status]?.color,
+                                }}
+                                className="px-3 py-3 rounded-lg justify-center flex items-center"
+                              >
+                                <ClockCircleOutlined />
+                              </div>
+                              <div>
+                                <p className="text-gray-500 mb-0!">
+                                  Trạng thái
+                                </p>
+                                <div className="flex items-center gap-2">
+                                  <div className="flex flex-col gap-2">
+                                    <p
+                                      className={`font-semibold mb-0! flex justify-center px-4 rounded-md`}
+                                      style={{
+                                        color: ORDER_STATUS[item?.status]?.color,
+                                        backgroundColor:
+                                          ORDER_STATUS[item?.status]?.bgColor,
+                                      }}
+                                    >
+                                      {ORDER_STATUS[item?.status]?.label}
+                                    </p>
+                                    {item?.status === 'pending' && (() => {
+                                      const ticketCreatedAt = dayjs(item?.createdAt);
+                                      const fiveMinutesAgo = dayjs().subtract(5, 'minute');
+                                      const isExpired = ticketCreatedAt.isBefore(fiveMinutesAgo);
+
+                                      if (isExpired) {
+                                        return (
+                                          <p className="text-red-500 text-sm">
+                                            Đã quá thời gian thanh toán
+                                          </p>
+                                        );
+                                      }
+
+                                      return (
+                                        <Button 
+                                          type="primary" 
+                                          size="small"
+                                          onClick={() => {
+                                            const showtimeId = item?.showtimeId || '';
+                                            const roomId = item?.roomId || '';
+                                            const movieId = item?.movieId || '';
+                                            const hour = item?.startTime ? dayjs(item.startTime).format('HH:mm') : '';
+                                            const selectedSeats = item?.seats?.map(seat => seat.label).join(',') || '';
+                                            
+                                            navigate(`/checkout/${showtimeId}/${roomId}?movieId=${movieId}&hour=${hour}&seats=${encodeURIComponent(selectedSeats)}`);
+                                          }}
+                                          style={{
+                                            background: '#52c41a',
+                                            borderColor: '#52c41a',
+                                          }}
+                                        >
+                                          Thanh toán ngay
+                                        </Button>
+                                      );
+                                    })()}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                    {item?.status !== 'PENDING' && (
+                      <Card className="shadow-md! mt-6!">
+                        <div className="flex items-center gap-4">
+                          {item?.seats?.map((s, i) => (
+                            <div
+                              key={i}
+                              className="bg-blue-500 px-2 py-2 rounded-md text-white"
+                            >
+                              {s.label}
+                            </div>
+                          ))}
+                        </div>
+                      </Card>
+                    )}
+                    {item?.status !== 'PENDING' && (
+                      <Card className="shadow-md! mt-6!">
+                        <div className="flex flex-col items-center gap-2">
+                          <QRCode value={item?.ticketId} />
+                          <p className="text-gray-500 text-xs">
+                            {item?.ticketId}
+                          </p>
+                          <p className="text-gray-500 text-xs">
+                            Quét mã QR tại quầy để nhận vé
+                          </p>
+                        </div>
+                      </Card>
+                    )}
+                  </div>
+                  <div>
+                    <Card className="shadow-md! mt-6!">
+                      <div>
+                        <div className="flex flex-col gap-1">
+                          <div className="text-xs text-gray-500 flex items-center gap-2">
+                            <ShoppingCartOutlined />
+                            Tổng đơn hàng
+                          </div>
+                          <p className="font-semibold text-blue-500">
+                            {formatCurrency(item?.totalAmount || 0)}
+                          </p>
+                        </div>
+                        {item?.status !== 'PENDING' && (
+                          <>
+                            <div className="flex flex-col gap-1 mt-4">
+                              <div className="text-xs text-gray-500 flex items-center gap-2">
+                                <UserOutlined />
+                                Họ và tên
+                              </div>
+                              <p className="font-semibold">
+                                {item?.customerInfo?.userName}
+                              </p>
+                            </div>
+                            <div className="flex flex-col gap-1 mt-2">
+                              <div className="text-xs text-gray-500 flex items-center gap-2">
+                                <UserOutlined />
+                                Số điện thoại
+                              </div>
+                              <p className="font-semibold">
+                                {item?.customerInfo?.phone}
+                              </p>
+                            </div>
+                            <div className="flex flex-col gap-1 mt-2">
+                              <div className="text-xs text-gray-500 flex items-center gap-2">
+                                <UserOutlined />
+                                Email
+                              </div>
+                              <p className="font-semibold">
+                                {item?.customerInfo?.email}
+                              </p>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </Card>
+                    <Card className="shadow-md! mt-6!">
+                      <div className="space-y-4">
+                        <div>
+                          <div className="text-xs text-gray-500 flex items-center gap-2">
+                            Mã giao dịch
+                          </div>
+                          <p className="font-semibold">{item?.codePayment}</p>
+                        </div>
+                        <div>
+                          <div className="text-xs text-gray-500 flex items-center gap-2">
+                            Thời gian đặt vé
+                          </div>
+                          <p className="font-semibold">
+                            {dayjs(item?.createdAt).format("HH:mm DD/MM/YYYY")}
+                          </p>
+                        </div>
+                        
+                        <div className="space-y-2 mt-4">
+                          {item?.status === 'PENDING' && (
+                            <Button 
+                              type="primary" 
+                              block
+                              size="large"
+                              onClick={() => navigate(`/payment/${item?.ticketId}`)}
+                              icon={<CreditCardOutlined />}
+                            >
+                              Thanh toán ngay
+                            </Button>
+                          )}
+                          
+                          <Button
+                            block
+                            size="large"
+                            onClick={async () => {
+                              try {
+                                const node = panelRefs.current?.[item?.ticketId];
+                                if (!node) return;
+                                const dataUrl = await htmlToImage.toPng(node, {
+                                  backgroundColor: "#1435a1ff",
+                                  cacheBust: true,
+                                });
+                                const a = document.createElement("a");
+                                a.href = dataUrl;
+                                a.download = `${item?.ticketId || "ticket"}.png`;
+                                document.body.appendChild(a);
+                                a.click();
+                                a.remove();
+                                message.success('Đã lưu vé thành công');
+                              } catch (e) {
+                                console.error(e);
+                                message.error('Có lỗi khi lưu vé');
+                              }
+                            }}
+                            icon={<DownloadOutlined />}
+                          >
+                            Lưu vé
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
+              </Collapse.Panel>
+            ))}
+          </Collapse>
+        </Card>
+      )}
+    </div>
             </TabPane>
           </Tabs>
         </Card>
