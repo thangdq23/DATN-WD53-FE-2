@@ -28,16 +28,39 @@ export const formRules = {
     },
   }),
   phone: (label, min = 6, max = 18) => ({
-  validator: (_, value) => {
-    if (!value) return Promise.resolve();
-    const regex = new RegExp(`^[0-9]{${min},${max}}$`);
-    if (!regex.test(value)) {
-      return Promise.reject(
-        new Error(`${label} phải từ ${min}–${max} chữ số`)
-      );
-    }
-    return Promise.resolve();
-  },
-}),
+    validator: (_, value) => {
+      if (!value) return Promise.resolve();
+      const regex = new RegExp(`^[0-9]{${min},${max}}$`);
+      if (!regex.test(value)) {
+        return Promise.reject(
+          new Error(`${label} phải từ ${min}–${max} chữ số`),
+        );
+      }
+      return Promise.resolve();
+    },
+  }),
 
+  passwordStrong: (label, options = {}) => {
+    const { min = 8 } = options;
+    return {
+      validator: (_, value) => {
+        if (!value) return Promise.resolve();
+        if (value.length < min) {
+          return Promise.reject(
+            new Error(`${label} phải ít nhất ${min} ký tự`),
+          );
+        }
+        // Require upper, lower, digit, special
+        const re = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/;
+        if (!re.test(value)) {
+          return Promise.reject(
+            new Error(
+              `${label} phải có chữ hoa, chữ thường, số và ký tự đặc biệt`,
+            ),
+          );
+        }
+        return Promise.resolve();
+      },
+    };
+  },
 };
