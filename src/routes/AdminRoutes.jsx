@@ -16,11 +16,16 @@ import BannerManager from "../pages/admin/banner/BannerManager";
 import ListOrder from "../pages/admin/order/ListOrder";
 import ScanOrderQR from "../pages/admin/order/ScanOrderQR";
 import OrderDetail from "../pages/admin/order/OrderDetail";
+import { ProtectedRoute } from "./ProtectedRoute";
 
 export const AdminRoutes = [
   {
     path: "admin",
-    element: <AdminLayout />,
+    element: (
+      <ProtectedRoute requiredRole="admin">
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
@@ -104,7 +109,7 @@ export const AdminRoutes = [
           },
           {
             path: "detail/:id",
-            element: <OrderDetail/>
+            element: <OrderDetail />,
           },
           {
             path: "qr",

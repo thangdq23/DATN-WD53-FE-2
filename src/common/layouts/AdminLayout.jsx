@@ -69,40 +69,7 @@ const AdminLayout = () => {
         />
 
         {/* User + Logout */}
-        <Space size="middle" style={{ marginLeft: "auto" }}>
-          <Button
-            type="default"
-            icon={<UserOutlined />}
-            style={{ borderRadius: 6 }}
-          >
-            Admin
-          </Button>
-          <Button
-            type="primary"
-            icon={<LogoutOutlined />}
-            danger
-            style={{ borderRadius: 6 }}
-            onClick={() => {
-              Modal.confirm({
-                centered: true,
-                title: "Đăng xuất",
-                icon: (
-                  <ExclamationCircleOutlined style={{ color: "#ef4444" }} />
-                ),
-                content: "Bạn có chắc chắn muốn đăng xuất không?",
-                okText: "Đăng xuất",
-                cancelText: "Hủy",
-                okButtonProps: { danger: true },
-                onOk: () => {
-                  logout();
-                  navigate("/");
-                },
-              });
-            }}
-          >
-            Đăng xuất
-          </Button>
-        </Space>
+        <Space size="middle" style={{ marginLeft: "auto" }}></Space>
       </Header>
 
       {/* Nội dung */}
