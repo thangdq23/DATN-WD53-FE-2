@@ -155,21 +155,7 @@ const ContactPage = () => {
         </FM.div>
       </div>
 
-      {/* Map */}
-      <div className="max-w-7xl mx-auto px-6 pb-16">
-        <h2 className="text-3xl font-extrabold mb-5 text-center">Vị Trí Của Chúng Tôi</h2>
-        <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-200">
-          <iframe
-            title="map"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.3799638758637!2d105.7445247750829!3d21.01628608809538!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313455e46cf469cf%3A0xd6f0eef89441f0f9!2sFPT%20Polytechnic!5e0!3m2!1svi!2s!4v1706301499987"
-            width="100%"
-            height="420"
-            allowFullScreen=""
-            loading="lazy"
-            className="w-full"
-          ></iframe>
-        </div>
-      </div>
+      
     </div>
   );
 };
