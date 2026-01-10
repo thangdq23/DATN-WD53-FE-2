@@ -141,6 +141,7 @@ const ProfilePage = () => {
         ...profile,
         ...values,
         avatar: avatarUrl || profile?.avatar,
+        email: profile?.email,
       };
       const res = await updateProfile(payload);
       if (res?.success) {
@@ -428,10 +429,7 @@ const ProfilePage = () => {
                           prefix={<MailOutlined style={{ color: "#faad14" }} />}
                           placeholder="Nhập email"
                           size="large"
-                          rules={[
-                            { required: true, message: "Vui lòng nhập email" },
-                            { type: "email", message: "Email không hợp lệ" },
-                          ]}
+                          disabled
                         />
                       </Form.Item>
                       <div
