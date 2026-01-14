@@ -11,6 +11,7 @@ import {
   Divider,
   Form,
   Input,
+  Modal,
   Radio,
   Spin,
   Tag,
@@ -32,6 +33,7 @@ import dayjs from "dayjs";
 
 const CheckoutPage = () => {
   const [acpPolicy, setAcpPolicy] = useState(false);
+  const [termsVisible, setTermsVisible] = useState(false);
   const nav = useNavigate();
   const [form] = Form.useForm();
   const { showtimeId, roomId } = useParams();
@@ -134,10 +136,12 @@ const CheckoutPage = () => {
   const handleCheckout = async () => {
     const values = await form.validateFields();
     console.log("Checkout form values:", values);
-    
+
     // Ensure robust fallback for roomName and movieName
-    const finalRoomName = roomSeatData?.data?.name || roomSeatData?.name || roomId;
-    const finalMovieName = movieName || showtimeRes?.data?.movie?.name || "Unknown Movie";
+    const finalRoomName =
+      roomSeatData?.data?.name || roomSeatData?.name || roomId;
+    const finalMovieName =
+      movieName || showtimeRes?.data?.movie?.name || "Unknown Movie";
 
     const payload = {
       userId,
@@ -162,7 +166,7 @@ const CheckoutPage = () => {
       phone: values.customerInfo?.phone,
       userName: values.customerInfo?.userName,
     };
-    
+
     console.log("Checkout Payload:", payload);
     mutate(payload);
   };
@@ -291,6 +295,123 @@ const CheckoutPage = () => {
                             </p>
                           </div>
                         </div>
+                        <Modal
+                          title="ĐIỀU KHOẢN THANH TOÁN"
+                          open={termsVisible}
+                          onCancel={() => setTermsVisible(false)}
+                          width={800}
+                          okText="Xác nhận và tiếp tục"
+                          cancelText="Hủy"
+                          onOk={async () => {
+                            try {
+                              setTermsVisible(false);
+                              setAcpPolicy(true);
+                              await handleCheckout();
+                            } catch (e) {
+                              console.error(e);
+                            }
+                          }}
+                        >
+                          <div
+                            style={{
+                              maxHeight: "60vh",
+                              overflowY: "auto",
+                              paddingRight: 8,
+                            }}
+                          >
+                            <p>
+                              Chào mừng Quý khách đến với Hệ thống Đặt Vé Online
+                              của Rạp chiếu phim MPV!
+                            </p>
+                            <p>
+                              Xin cảm ơn Quý khách đã tin tưởng và sử dụng dịch
+                              vụ đặt vé trực tuyến của MPV. Chúc Quý khách có
+                              những giây phút xem phim thật vui vẻ và trọn vẹn
+                              tại rạp.
+                            </p>
+                            <h3>I. Hình thức thanh toán</h3>
+                            <p>
+                              Hiện tại, hệ thống MPV hỗ trợ duy nhất một phương
+                              thức thanh toán trực tuyến là PayOS.
+                            </p>
+                            <p>
+                              Quý khách cần có tài khoản ngân hàng hoặc ví điện
+                              tử hỗ trợ thanh toán qua PayOS.
+                            </p>
+                            <p>
+                              Quý khách vui lòng thực hiện thanh toán đúng theo
+                              hướng dẫn trên cổng PayOS.
+                            </p>
+                            <p>
+                              Giao dịch chỉ được ghi nhận khi hệ thống PayOS xác
+                              nhận thanh toán thành công.
+                            </p>
+
+                            <h3>II. Điều kiện thanh toán</h3>
+                            <p>
+                              Quý khách cần đảm bảo tài khoản thanh toán có đủ
+                              số dư để thực hiện giao dịch.
+                            </p>
+                            <p>
+                              Quý khách vui lòng nhập chính xác các thông tin
+                              theo yêu cầu của PayOS.
+                            </p>
+                            <p>
+                              MPV không chịu trách nhiệm trong trường hợp giao
+                              dịch thất bại do lỗi từ phía ngân hàng, PayOS hoặc
+                              đường truyền mạng.
+                            </p>
+
+                            <h3>III. Chính sách vé và đơn hàng</h3>
+                            <p>
+                              Vé xem phim và các sản phẩm đi kèm sau khi thanh
+                              toán thành công không được hủy, đổi, trả hoặc hoàn
+                              tiền dưới bất kỳ hình thức nào.
+                            </p>
+                            <p>MPV chỉ hỗ trợ hoàn tiền trong trường hợp:</p>
+                            <ul>
+                              <li>Tài khoản của Quý khách đã bị trừ tiền</li>
+                              <li>Nhưng hệ thống không ghi nhận đơn hàng</li>
+                              <li>
+                                Và Quý khách không nhận được mã vé xác nhận từ
+                                hệ thống
+                              </li>
+                            </ul>
+
+                            <h3>IV. Xác nhận đơn hàng</h3>
+                            <p>
+                              Sau khi PayOS xác nhận thanh toán thành công, hệ
+                              thống sẽ gửi mã vé/xác nhận đơn hàng qua email
+                              hoặc số điện thoại Quý khách đã đăng ký.
+                            </p>
+                            <p>
+                              Trong trường hợp không nhận được mã vé, vui lòng
+                              liên hệ bộ phận hỗ trợ trong vòng 60 phút kể từ
+                              thời điểm thanh toán thành công để được xử lý.
+                            </p>
+
+                            <h3>V. Trách nhiệm thông tin khách hàng</h3>
+                            <p>
+                              Quý khách vui lòng kiểm tra kỹ thông tin email và
+                              số điện thoại trước khi thanh toán.
+                            </p>
+                            <p>
+                              MPV không chịu trách nhiệm trong trường hợp Quý
+                              khách nhập sai thông tin dẫn đến không nhận được
+                              mã vé.
+                            </p>
+
+                            <h3>VI. Quy định sử dụng vé</h3>
+                            <p>
+                              Vé chỉ có giá trị cho suất chiếu, thời gian và ghế
+                              đã đặt tại rạp MPV.
+                            </p>
+                            <p>
+                              Quý khách vui lòng đến rạp trước giờ chiếu ít nhất
+                              15 phút để làm thủ tục vào rạp.
+                            </p>
+                          </div>
+                        </Modal>
                       </div>
                       <div className="rounded-xl border border-slate-200 p-4">
                         <div className="flex items-center gap-3">
@@ -384,16 +505,10 @@ const CheckoutPage = () => {
                   <Button
                     loading={isPending}
                     type="primary"
-                    className="flex-1 "
-                    style={{
-                      height: 44,
-                      borderRadius: 9999,
-                      border: "none",
-                    }}
-                    disabled={!myHoldSeats.length || !acpPolicy}
-                    onClick={() => {
-                      handleCheckout();
-                    }}
+                    className="flex-1"
+                    style={{ height: 44, borderRadius: 9999, border: "none" }}
+                    disabled={!myHoldSeats.length}
+                    onClick={() => setTermsVisible(true)}
                   >
                     Thanh toán
                   </Button>

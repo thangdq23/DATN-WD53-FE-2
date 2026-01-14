@@ -3,6 +3,8 @@ import { Scanner } from "@yudiel/react-qr-scanner";
 import { Button, Input, QRCode, Table, Alert } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
+import * as htmlToImage from "html-to-image";
+import { jsPDF } from "jspdf";
 import { Link, useLocation, useNavigate } from "react-router";
 import { DAYOFWEEK_LABEL } from "../../../common/constants/dayOfWeek";
 import { useMessage } from "../../../common/hooks/useMessage";
@@ -24,6 +26,8 @@ const ScanOrderQR = () => {
   const [lastScanError, setLastScanError] = useState(null);
   const scanningRef = useRef(false);
   const { antdMessage, HandleError } = useMessage();
+
+  const printRef = useRef(null);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -177,7 +181,7 @@ const ScanOrderQR = () => {
           <div className="col-span-2">
             <div className="bg-white p-6 rounded-lg shadow-sm">
               {data?.data ? (
-                <>
+                <div ref={printRef}>
                   <div className="flex items-start justify-between">
                     <div>
                       <h2 className="text-xl font-bold text-gray-800">
@@ -215,9 +219,47 @@ const ScanOrderQR = () => {
                         {formatCurrency(data.data.totalAmount)}
                       </p>
                     </div>
-                    <div className="w-56">
+                    <div className="w-56 flex gap-2">
                       <Button
-                        className="w-full"
+                        className="flex-1"
+                        onClick={async () => {
+                          try {
+                            if (!printRef.current) return;
+                            const dataUrl = await htmlToImage.toPng(
+                              printRef.current,
+                              { cacheBust: true },
+                            );
+                            const img = new Image();
+                            img.src = dataUrl;
+                            img.onload = () => {
+                              const pdf = new jsPDF({
+                                unit: "px",
+                                format: "a4",
+                              });
+                              const pdfWidth = pdf.internal.pageSize.getWidth();
+                              const pdfHeight =
+                                (img.height * pdfWidth) / img.width;
+                              pdf.addImage(
+                                dataUrl,
+                                "PNG",
+                                0,
+                                0,
+                                pdfWidth,
+                                pdfHeight,
+                              );
+                              pdf.save(`${data.data.ticketId || "ticket"}.pdf`);
+                              antdMessage.success("Đã xuất vé ra PDF");
+                            };
+                          } catch (e) {
+                            console.error(e);
+                            antdMessage.error("Có lỗi khi xuất PDF");
+                          }
+                        }}
+                      >
+                        In vé
+                      </Button>
+                      <Button
+                        className="flex-1"
                         type="primary"
                         loading={isLoading}
                         onClick={() => mutate(data.data._id)}
@@ -226,7 +268,7 @@ const ScanOrderQR = () => {
                       </Button>
                     </div>
                   </div>
-                </>
+                </div>
               ) : (
                 <div className="text-center py-20 text-gray-400">
                   Chưa có vé được quét. Hãy đưa mã QR vào khung bên trái hoặc

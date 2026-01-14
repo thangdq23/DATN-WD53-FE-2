@@ -36,7 +36,6 @@ import {
 const { Title, Text } = Typography;
 
 const granOptions = [
-  { label: "Giờ", value: "hour" },
   { label: "Ngày", value: "day" },
   { label: "Tháng", value: "month" },
   { label: "Năm", value: "year" },
@@ -45,6 +44,8 @@ const granOptions = [
 const DashboardPage = () => {
   const [overview, setOverview] = useState(null);
   const [chartData, setChartData] = useState([]);
+  const [hasCompare, setHasCompare] = useState(true);
+  const [previousChartData, setPreviousChartData] = useState([]);
   const [granularity, setGranularity] = useState("day");
   const [pickerValue, setPickerValue] = useState(null);
   const [chartType, setChartType] = useState("bar");
@@ -60,7 +61,38 @@ const DashboardPage = () => {
 
   const loadChart = async (params) => {
     const res = await getOverviewRange(params);
-    setChartData(res.result || res || []);
+    const current = res.result || res || [];
+    setChartData(current);
+
+    // attempt to load previous period for comparison
+    try {
+      if (params?.createdAtFrom && params?.createdAtTo) {
+        const from = new Date(params.createdAtFrom);
+        const to = new Date(params.createdAtTo);
+        const diff = to.getTime() - from.getTime();
+        const prevTo = new Date(from.getTime() - 1);
+        const prevFrom = new Date(prevTo.getTime() - diff);
+        const prevParams = {
+          ...params,
+          createdAtFrom: prevFrom.toISOString(),
+          createdAtTo: prevTo.toISOString(),
+        };
+        const pres = await getOverviewRange(prevParams);
+        const prev = pres.result || pres || [];
+        setPreviousChartData(prev);
+        // merge previous revenue into current by index (aligning ends)
+        if (Array.isArray(current) && Array.isArray(prev) && prev.length) {
+          const merged = current.map((item, idx) => ({
+            ...item,
+            revenue_prev: prev[idx] ? prev[idx].revenue : undefined,
+          }));
+          setChartData(merged);
+        }
+      }
+    } catch (e) {
+      console.error("Error loading previous chart data", e);
+      setPreviousChartData([]);
+    }
   };
 
   const loadTop = async (params) => {
@@ -102,10 +134,7 @@ const DashboardPage = () => {
     const params = {};
     if (pickerValue) {
       const p = pickerValue;
-      if (granularity === "hour") {
-        params.createdAtFrom = p.startOf("hour").toISOString();
-        params.createdAtTo = p.endOf("hour").toISOString();
-      } else if (granularity === "day") {
+      if (granularity === "day") {
         params.createdAtFrom = p.startOf("day").toISOString();
         params.createdAtTo = p.endOf("day").toISOString();
       } else if (granularity === "month") {
@@ -173,7 +202,6 @@ const DashboardPage = () => {
                       ? "year"
                       : "date"
                   }
-                  showTime={granularity === "hour"}
                   value={pickerValue}
                   onChange={(v) => setPickerValue(v)}
                 />
@@ -200,23 +228,81 @@ const DashboardPage = () => {
               {chartType === "bar" ? (
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="period" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="revenue" fill="#8884d8" />
-                  <Bar dataKey="tickets" fill="#82ca9d" />
+                  <XAxis dataKey="period" tick={{ fontSize: 12 }} />
+                  <YAxis
+                    tickFormatter={(v) => v?.toLocaleString("vi-VN") + " đ"}
+                  />
+                  <Tooltip
+                    formatter={(value, name) => {
+                      if (name === "revenue" || name === "revenue_prev") {
+                        return [
+                          value?.toLocaleString("vi-VN") + " đ",
+                          name === "revenue"
+                            ? "Doanh thu"
+                            : "Doanh thu ( ngày trước )",
+                        ];
+                      }
+                      if (name === "tickets") return [value, "Số vé"];
+                      return [value, name];
+                    }}
+                    labelFormatter={(label) => `Thời gian: ${label}`}
+                  />
+                  <Bar
+                    dataKey="revenue_prev"
+                    fill="#b0b0b0"
+                    opacity={0.5}
+                    name="revenue_prev"
+                  />
+                  <Bar dataKey="revenue" fill="#3f51b5" name="revenue" />
+                  <Bar dataKey="tickets" fill="#21ba45" name="tickets" />
                 </BarChart>
               ) : (
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="period" />
-                  <YAxis />
-                  <Tooltip />
+                  <YAxis
+                    tickFormatter={(v) => v?.toLocaleString("vi-VN") + " đ"}
+                  />
+                  <Tooltip
+                    formatter={(value, name) => {
+                      if (name === "revenue" || name === "revenue_prev") {
+                        return [
+                          value?.toLocaleString("vi-VN") + " đ",
+                          name === "revenue"
+                            ? "Doanh thu"
+                            : "Doanh thu ( ngày trước )",
+                        ];
+                      }
+                      if (name === "tickets") return [value, "Số vé"];
+                      return [value, name];
+                    }}
+                    labelFormatter={(label) => `Thời gian: ${label}`}
+                  />
+                  {chartData.length &&
+                  chartData[0].revenue_prev !== undefined ? (
+                    <Line
+                      type="monotone"
+                      dataKey="revenue_prev"
+                      stroke="#b0b0b0"
+                      strokeDasharray="5 5"
+                      name="Doanh thu ( ngày trước )"
+                    />
+                  ) : null}
                   {chartData.length && chartData[0].revenue !== undefined ? (
-                    <Line type="monotone" dataKey="revenue" stroke="#8884d8" />
+                    <Line
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="#3f51b5"
+                      name="Doanh thu"
+                    />
                   ) : null}
                   {chartData.length && chartData[0].tickets !== undefined ? (
-                    <Line type="monotone" dataKey="tickets" stroke="#82ca9d" />
+                    <Line
+                      type="monotone"
+                      dataKey="tickets"
+                      stroke="#21ba45"
+                      name="Số vé"
+                    />
                   ) : null}
                 </LineChart>
               )}

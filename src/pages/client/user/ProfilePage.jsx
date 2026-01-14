@@ -298,6 +298,18 @@ const ProfilePage = () => {
           <Text type="secondary" style={{ color: "rgba(255,255,255,0.8)" }}>
             {profile?.email}
           </Text>
+          {((authUser && authUser.role === "admin") ||
+            profile?.role === "admin") && (
+            <div style={{ marginTop: 12 }}>
+              <Button
+                type="primary"
+                onClick={() => navigate("/admin")}
+                icon={<VideoCameraOutlined />}
+              >
+                Trang quản trị
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
