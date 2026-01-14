@@ -260,13 +260,6 @@ const DashboardPage = () => {
             <div>Tổng phòng chiếu: {roomStats?.totalRooms ?? "-"}</div>
           </Card>
         </Col>
-
-        <Col span={8}>
-          <Card title="Tổng quan khác">
-            <div>Từ: {overview?.queryTime?.current?.from || "-"}</div>
-            <div>Đến: {overview?.queryTime?.current?.to || "-"}</div>
-          </Card>
-        </Col>
       </Row>
     </div>
   );

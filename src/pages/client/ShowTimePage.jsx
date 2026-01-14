@@ -222,9 +222,6 @@ const ShowtimePage = () => {
                       <p className="text-xs text-slate-500 mt-1">
                         {m.genreIds?.map((g) => g.name).join(", ")}
                       </p>
-                      <div className="mt-2 flex items-center gap-1 text-xs text-yellow-500">
-                        ⭐ {m.rating || 0}
-                      </div>
                     </div>
                   </Link>
                 ))}
