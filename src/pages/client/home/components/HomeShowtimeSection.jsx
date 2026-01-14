@@ -26,7 +26,9 @@ const HomeShowtimeSection = () => {
       }),
   });
 
-  const movies = data?.data || [];
+  const movies = (data?.data || []).filter(
+    (mv) => !(mv && typeof mv.status !== "undefined" && mv.status === false),
+  );
 
   return (
     <FM.section
@@ -137,7 +139,16 @@ const MovieTimes = ({ movieId, selected }) => {
     enabled: !!selected,
   });
   const grouped = data?.data || {};
-  const times = Object.values(grouped).flat();
+  const times = Object.values(grouped)
+    .flat()
+    .filter(
+      (s) =>
+        !(
+          s.roomId &&
+          typeof s.roomId.status !== "undefined" &&
+          s.roomId.status === false
+        ),
+    );
   return (
     <div className="mt-3 flex flex-wrap gap-3">
       {times.map((s) => {

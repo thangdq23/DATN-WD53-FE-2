@@ -35,7 +35,9 @@ const ShowtimesPage = () => {
       }),
   });
 
-  const movies = data?.data || [];
+  const movies = (data?.data || []).filter(
+    (mv) => !(mv && typeof mv.status !== "undefined" && mv.status === false),
+  );
 
   const VI_DAY = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
   const formatDayChip = (d) => d.format("DD-MM-YYYY");
@@ -96,7 +98,9 @@ const ShowtimesPage = () => {
           ) : (
             <div className="space-y-6">
               {movies.map((m) => {
-                const age = getAgeBadge(m.ageRequire || m.age || m.ageRestriction);
+                const age = getAgeBadge(
+                  m.ageRequire || m.age || m.ageRestriction,
+                );
                 return (
                   <FM.div
                     key={m._id}
@@ -137,7 +141,11 @@ const ShowtimesPage = () => {
                             {ageText(age, m.ageRequire || m.age)}
                           </p>
                         </div>
-                        <MovieTimes movieId={m._id} selected={selected} roomId={selectedRoom} />
+                        <MovieTimes
+                          movieId={m._id}
+                          selected={selected}
+                          roomId={selectedRoom}
+                        />
                       </div>
                     </div>
                   </FM.div>
@@ -168,7 +176,16 @@ const MovieTimes = ({ movieId, selected, roomId }) => {
     enabled: !!selected,
   });
   const grouped = data?.data || {};
-  const times = Object.values(grouped).flat();
+  const times = Object.values(grouped)
+    .flat()
+    .filter(
+      (s) =>
+        !(
+          s.roomId &&
+          typeof s.roomId.status !== "undefined" &&
+          s.roomId.status === false
+        ),
+    );
   if (isLoading)
     return <div className="text-xs text-gray-400">Đang tải giờ chiếu...</div>;
   if (!times || times.length === 0)
@@ -192,7 +209,9 @@ const MovieTimes = ({ movieId, selected, roomId }) => {
         return (
           <Link
             key={s._id}
-            to={`/showtime/${movieId}/${s._id}/${roomId}?hour=${start.format("HH:mm")}&movieId=${movieId}`}
+            to={`/showtime/${movieId}/${s._id}/${roomId}?hour=${start.format(
+              "HH:mm",
+            )}&movieId=${movieId}`}
             className={`min-w-[84px] px-3 py-2 rounded-lg text-sm flex flex-col items-center border transition-all ${baseClass} group`}
             title={
               minPrice ? `Giá từ ${minPrice.toLocaleString()}đ` : undefined
@@ -202,7 +221,13 @@ const MovieTimes = ({ movieId, selected, roomId }) => {
               e.stopPropagation();
             }}
           >
-            <span className={`font-semibold ${isPast ? "" : "text-blue-500 group-hover:text-white"}`}>{start.format("HH:mm")}</span>
+            <span
+              className={`font-semibold ${
+                isPast ? "" : "text-blue-500 group-hover:text-white"
+              }`}
+            >
+              {start.format("HH:mm")}
+            </span>
           </Link>
         );
       })}

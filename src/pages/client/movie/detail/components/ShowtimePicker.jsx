@@ -120,6 +120,15 @@ const ShowtimePicker = () => {
     // Filter only future showtimes if it's today
     const now = dayjs();
     list = list.filter((s) => dayjs(s.startTime).isAfter(now));
+    // Remove showtimes whose room is locked (status === false)
+    list = list.filter(
+      (s) =>
+        !(
+          s.roomId &&
+          typeof s.roomId.status !== "undefined" &&
+          s.roomId.status === false
+        ),
+    );
 
     // Group by Room ID
     const grouped = {};
