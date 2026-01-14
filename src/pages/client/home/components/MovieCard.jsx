@@ -59,14 +59,6 @@ const MovieCard = ({ movie, onBuy = () => {}, fallback }) => {
     >
       <Link onClick={() => navigate(`/showtime/${movie._id}`)}>
         <div style={styles.posterWrap}>
-          {typeof movie.rating === "number" || typeof movie.imdb === "number" ? (
-            <div style={styles.ratingTag}>
-              {(() => {
-                const score = typeof movie.rating === "number" ? movie.rating : movie.imdb;
-                return typeof score === "number" ? score.toFixed(1) : score;
-              })()}
-            </div>
-          ) : null}
           <div style={styles.ageTag}>{movie.age}</div>
 
           <img
@@ -86,15 +78,17 @@ const MovieCard = ({ movie, onBuy = () => {}, fallback }) => {
           </p>
 
           <div className="text-xs text-gray-600">
-            Thể loại: {" "}
+            Thể loại:{" "}
             <Text strong className="text-slate-800">
               {movie?.genreIds?.map((item) => item.name).join(", ")}
             </Text>
           </div>
 
           <div className="text-xs text-gray-600 mt-1">
-            Thời lượng: {" "}
-            <Text strong className="text-slate-800">{movie.duration} phút</Text>
+            Thời lượng:{" "}
+            <Text strong className="text-slate-800">
+              {movie.duration} phút
+            </Text>
           </div>
 
           {movie.statusRelease === "nowShowing" && (

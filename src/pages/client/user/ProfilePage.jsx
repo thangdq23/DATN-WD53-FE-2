@@ -497,15 +497,6 @@ const ProfilePage = () => {
                         Đổi mật khẩu
                       </Button>
                     </div>
-                    <Text type="secondary">
-                      Cập nhật mật khẩu thường xuyên để bảo mật tài khoản
-                    </Text>
-                    <Progress
-                      percent={70}
-                      showInfo={false}
-                      status="active"
-                      style={{ marginTop: "8px" }}
-                    />
                   </div>
                   <Divider />
                 </div>

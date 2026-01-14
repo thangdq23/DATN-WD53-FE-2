@@ -239,13 +239,14 @@ const ShowtimePicker = () => {
                   className="bg-white rounded-none border-b border-slate-200 pb-6 last:border-0"
                 >
                   <h4 className="font-bold text-slate-700 text-lg mb-4 flex items-center gap-2">
-                    {group.room?.name || "Rạp chiếu"}
+                    Phòng: {group.room?.name || "Rạp chiếu"}
                   </h4>
 
                   <div className="flex items-start gap-6">
                     <div className="w-32 text-sm text-slate-500 font-medium pt-2">
                       2D Phụ đề
                     </div>
+
                     <div className="flex-1 flex flex-wrap gap-3">
                       {group.showtimes.map((s) => (
                         <button
