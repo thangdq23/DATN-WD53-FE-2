@@ -299,17 +299,7 @@ const ProfilePage = () => {
             {profile?.email}
           </Text>
           {((authUser && authUser.role === "admin") ||
-            profile?.role === "admin") && (
-            <div style={{ marginTop: 12 }}>
-              <Button
-                type="primary"
-                onClick={() => navigate("/admin")}
-                icon={<VideoCameraOutlined />}
-              >
-                Trang quản trị
-              </Button>
-            </div>
-          )}
+            profile?.role === "admin") && <div style={{ marginTop: 12 }}></div>}
         </div>
       </div>
 
