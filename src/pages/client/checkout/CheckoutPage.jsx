@@ -42,7 +42,7 @@ const CheckoutPage = () => {
   const movieId = searchParams.get("movieId");
   const userId = useAuthSelector((s) => s.user?._id);
   const user = useAuthSelector((s) => s.user);
-  const { HandleError } = useMessage();
+  const { HandleError, showMessage } = useMessage();
 
   const { data: roomSeatData } = useQuery({
     queryKey: [QUERYKEY.ROOM, roomId, "seat-map"],
@@ -135,6 +135,20 @@ const CheckoutPage = () => {
 
   const handleCheckout = async () => {
     const values = await form.validateFields();
+
+    // Block checkout if the room for this showtime is locked
+    if (
+      showtimeRes?.data?.roomId &&
+      typeof showtimeRes.data.roomId.status !== "undefined" &&
+      showtimeRes.data.roomId.status === false
+    ) {
+      showMessage({
+        type: "error",
+        title: "Phòng không khả dụng",
+        description: "Phòng chiếu đã bị khóa — không thể thanh toán.",
+      });
+      return;
+    }
     console.log("Checkout form values:", values);
 
     // Ensure robust fallback for roomName and movieName

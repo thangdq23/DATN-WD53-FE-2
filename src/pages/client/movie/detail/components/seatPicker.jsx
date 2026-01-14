@@ -468,6 +468,22 @@ const SeatPicker = ({
                     });
                     return;
                   }
+                  // Block checkout if room is locked
+                  if (
+                    showtimeResponse?.data?.roomId &&
+                    typeof showtimeResponse.data.roomId.status !==
+                      "undefined" &&
+                    showtimeResponse.data.roomId.status === false
+                  ) {
+                    showMessage({
+                      type: "error",
+                      title: "Phòng không khả dụng",
+                      description:
+                        "Phòng chiếu đã bị khóa, không thể thanh toán",
+                    });
+                    return;
+                  }
+
                   mutateExtendHold(showtimeId);
                 }}
                 className="bg-red-600 hover:bg-red-700 border-none h-12 rounded-xl text-base font-bold shadow-lg shadow-red-200"
