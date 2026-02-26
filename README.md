@@ -1,16 +1,84 @@
-# React + Vite
+# 🎬 Movie Ticket Booking Web Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 📌 Giới thiệu
 
-Currently, two official plugins are available:
+Đây là dự án Web Đặt Vé Xem Phim được xây dựng theo mô hình Full-stack sử dụng MERN Stack (MongoDB, ExpressJS, ReactJS, NodeJS).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Hệ thống cho phép người dùng xem thông tin phim, chọn suất chiếu, chọn ghế và đặt vé trực tuyến. Ngoài ra, hệ thống có trang quản trị dành cho Admin để quản lý phim, suất chiếu, người dùng và thống kê doanh thu.
 
-## React Compiler
+---
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+## 🚀 Công nghệ sử dụng
 
-## Expanding the ESLint configuration
+### Frontend
+- ReactJS
+- React Router
+- Axios
+- CSS / SCSS
+- React Hooks
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Backend
+- NodeJS
+- ExpressJS
+- RESTful API
+
+### Database
+- MongoDB
+- Mongoose
+
+### Authentication & Security
+- JWT (JSON Web Token)
+- bcrypt (mã hóa mật khẩu)
+- Role-based Authorization (Admin / User)
+
+### Deployment
+- Frontend: Vercel
+- Backend: Render
+- Database: MongoDB Atlas
+
+---
+
+## 🎯 Chức năng chính
+
+### 👤 Người dùng
+- Đăng ký / Đăng nhập tài khoản
+- Xem danh sách phim đang chiếu
+- Xem chi tiết phim
+- Chọn suất chiếu theo ngày và giờ
+- Chọn ghế ngồi
+- Đặt vé và tính tổng tiền
+- Xem lịch sử đặt vé
+
+### 🛠 Quản trị viên (Admin)
+- CRUD phim
+- CRUD suất chiếu
+- Quản lý người dùng
+- Quản lý vé đã đặt
+- Thống kê doanh thu
+
+---
+
+## 🏗 Kiến trúc hệ thống
+
+- Frontend và Backend tách biệt
+- Backend xây dựng theo mô hình MVC
+- Giao tiếp giữa Frontend và Backend thông qua RESTful API
+- Dữ liệu được lưu trữ trên MongoDB Atlas
+
+---
+
+## 💡 Điểm nổi bật
+
+- Xây dựng hệ thống Full-stack hoàn chỉnh
+- Triển khai xác thực và phân quyền người dùng
+- Thiết kế giao diện theo hướng Component-based
+- Xử lý logic chọn ghế và kiểm tra ghế đã đặt
+- Tổ chức cấu trúc dự án rõ ràng, dễ mở rộng
+
+---
+
+## 📷 Hình ảnh minh họa
+
+![alt text](image.png)
+
+
